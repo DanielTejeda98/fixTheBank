@@ -1,15 +1,12 @@
 import mongoose from "mongoose";
-import { User } from "./userModel";
-import { Expense } from "./expenseModel";
-import { Income } from "./incomeModel";
 
 export interface Budget extends mongoose.Document {
-    owner: User,
-    allowed: User[],
-    categories: string[],
-    accounts: string[],
-    income: Income[],
-    expenses: Expense[],
+    owner: mongoose.Types.ObjectId,
+    allowed: mongoose.Types.Array<mongoose.Types.ObjectId>,
+    categories: mongoose.Types.Array<string>,
+    accounts: mongoose.Types.Array<string>,
+    income: mongoose.Types.Array<mongoose.Types.ObjectId>,
+    expenses: mongoose.Types.Array<mongoose.Types.ObjectId>,
     isShared: boolean,
     shareId: mongoose.Types.ObjectId
 }

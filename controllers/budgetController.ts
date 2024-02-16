@@ -5,6 +5,7 @@ import budgetModel, { Budget } from "@/models/budgetModel";
 import shareableBudgetModel, { ShareableBudget } from "@/models/shareableBudgets";
 import incomeModel from "@/models/incomeModel";
 import expenseModel from "@/models/expenseModel";
+import userModel from "@/models/userModel";
 
 export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId, budgetMonth: Date) {
     try {
@@ -71,6 +72,62 @@ export async function toggleShareableBudget (userId: mongoose.Types.ObjectId) {
         return false;
     } catch (error) {
         throw error
+    }
+}
+
+export async function joinSharedBudget (userId: mongoose.Types.ObjectId, joinCode: string) {
+    try {
+        await dbConnect();
+
+        const sharedBudget = await shareableBudgetModel.findOne({joinCode}) as ShareableBudget;
+        if (!sharedBudget) {
+            throw new Error("No shared budget with the provided join code: " + joinCode);
+        }
+
+        sharedBudget.requestedAccounts.push(userId)
+        await sharedBudget.save();
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function getBudgetRequesters (userId: mongoose.Types.ObjectId, budgetId: mongoose.Types.ObjectId) {
+    try {
+        await dbConnect();
+        const sharedBudget = await shareableBudgetModel.findOne({owner: userId, budgetId}).populate("requestedAccounts", "_id username", userModel).exec() as ShareableBudget;
+        if (!sharedBudget) {
+            throw new Error(`No shared budget found for budget ID ${budgetId}`);
+        }
+
+        return sharedBudget.requestedAccounts || [];
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function approveRequesterToJoinBudget (userId: mongoose.Types.ObjectId, budgetId: mongoose.Types.ObjectId, requesterId: mongoose.Types.ObjectId) {
+    try {
+        await dbConnect();
+
+        const budget = await budgetModel.findOne({_id: budgetId, owner: userId}) as Budget
+        if (!budget) {
+            throw new Error(`No budget found for user ${userId} with the provided budget Id ${budgetId}`)
+        }
+
+        const sharedBudget = await shareableBudgetModel.findOne({budgetId}) as ShareableBudget;
+        if (!sharedBudget) {
+            throw new Error(`No shared budget found for budget ID ${budgetId}`);
+        }
+
+        sharedBudget.requestedAccounts.pull(requesterId);
+        budget.allowed.push(requesterId);
+
+        await sharedBudget.save();
+        await budget.save();
+
+    } catch (error) {
+        throw error;
     }
 }
 

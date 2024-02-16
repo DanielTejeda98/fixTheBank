@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
 export interface ShareableBudget extends mongoose.Document {
-    owner: mongoose.Schema.Types.ObjectId,
-    budgetId: mongoose.Schema.Types.ObjectId,
+    owner: mongoose.Types.ObjectId,
+    budgetId: mongoose.Types.ObjectId,
     joinCode: string,
-    requestedAccounts: mongoose.Schema.Types.ObjectId[]
+    requestedAccounts: mongoose.Types.Array<mongoose.Types.ObjectId>
 }
 
 const ShareableBudgetSchema = new mongoose.Schema<ShareableBudget>({
