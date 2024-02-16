@@ -107,6 +107,10 @@ export async function getBudgetRequesters (userId: mongoose.Types.ObjectId, budg
 }
 
 export async function approveRequesterToJoinBudget (userId: mongoose.Types.ObjectId, budgetId: mongoose.Types.ObjectId, requesterId: mongoose.Types.ObjectId) {
+    if (userId === requesterId) {
+        throw new Error(`Requester ID ${requesterId} is the same as budget owner ID ${userId}`);
+    }
+    
     try {
         await dbConnect();
 
