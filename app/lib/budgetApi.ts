@@ -55,11 +55,54 @@ const deleteIncome = async (headers: any, incomeId: string) => {
     return await res.json();
 }
 
+const toggleBudgetShareSettings = async (headers: any) => {
+    const res = await fetch(`http://${API_BASE_URL}/budget/share`, {
+        headers,
+        method: "POST",
+    })
+    return await res.json();
+}
+
+const requestToJoinBudget = async (headers: any, joinCode: string) => {
+    const res = await fetch(`http://${API_BASE_URL}/budget/join`, {
+        headers,
+        method: "POST",
+        body: JSON.stringify({
+            joinCode
+        })
+    })
+    return await res.json();
+}
+
+const approveJoinRequest = async (headers: any, budgetId: string, requesterId: string) => {
+    const res = await fetch(`http://${API_BASE_URL}/budget/join/approve`, {
+        headers,
+        method: "POST",
+        body: JSON.stringify({
+            budgetId,
+            requesterId
+        })
+    })
+    return await res.json();
+}
+
+const getRequestersList = async (headers: any, budgetId: string) => {
+    const res = await fetch(`http://${API_BASE_URL}/budget/share/${budgetId}`, {
+        headers,
+        method: "GET",
+    })
+    return await res.json();
+}
+
 export {
     createExpense,
     createIncome,
     getBudget,
     createBudget,
     deleteExpense,
-    deleteIncome 
+    deleteIncome,
+    requestToJoinBudget,
+    toggleBudgetShareSettings,
+    approveJoinRequest,
+    getRequestersList
 }

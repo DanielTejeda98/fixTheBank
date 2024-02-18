@@ -13,6 +13,8 @@ import React from "react";
 import TransactionCard from "../TransactionCard";
 import SelectBudget from "./SelectBudget";
 import Account from "../Account";
+import FullSizeCard from "../FullSizeCard";
+import { setUser } from "@/redux/features/user-slice";
 
 interface Budget {
     _id: string,
@@ -21,21 +23,32 @@ interface Budget {
     categories: string[],
     accounts: string[],
     minDate: string,
-    maxDate: string
+    maxDate: string,
+    isOwner: boolean,
+    isShared: boolean,
+    shareCode: string,
+    joinRequests: any[]
 }
 
-function useSetInitialStore({budget}: {budget: Budget}) {
+interface User {
+    _id: string,
+    username: string,
+    email: string
+}
+
+function useSetInitialStore({budget, user}: {budget: Budget, user: User}) {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setBudget(budget))
-    }, [budget, dispatch])
+        dispatch(setUser(user))
+    }, [budget, user, dispatch])
 }
 
-export default function DashboardView({ budget }: { budget: Budget }) {
+export default function DashboardView({budget, user}: {budget: Budget, user: User}) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [drawerComponent, setDrawerComponent] = useState("addIncome");
 
-    useSetInitialStore({ budget })
+    useSetInitialStore({ budget, user })
 
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
     const balance = useAppSelector((state) => state.budgetReducer.value.balance) || 0
@@ -74,8 +87,8 @@ export default function DashboardView({ budget }: { budget: Budget }) {
 
     return (
         <main>
-            <section className="bg-slate-900 m-3 p-3 rounded-lg">
-                <div className="flex justify-between">
+            <FullSizeCard>
+            <div className="flex justify-between">
                     <button className="bg-slate-500 p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("account")}><FontAwesomeIcon icon={faUser} /></button>
                     <p>Month: {new Date(budgetMonth).toLocaleDateString("en-us", {month: "long", year: "numeric"})}</p>
                     <button className="bg-slate-500 p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("selectBudget")}><FontAwesomeIcon icon={faGear} /></button>
@@ -108,7 +121,7 @@ export default function DashboardView({ budget }: { budget: Budget }) {
                     <button className="p-2 bg-slate-500 text-sm rounded-full" onClick={() => toggleDrawer("addIncome")}>(+) Add funds</button>
                     <button className="p-2 bg-slate-500 text-sm rounded-full" onClick={() => toggleDrawer("addExpense")}>(-) Add Expense</button>
                 </div>
-            </section>
+            </FullSizeCard>
 
             <section className="m-3 p-3">
                 <div className="flex justify-between items-end">

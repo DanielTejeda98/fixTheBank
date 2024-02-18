@@ -8,9 +8,9 @@ export async function GET(req: NextRequest) {
     
     try {
         const users = await userModel.find({})
-        return NextResponse.json({sucess: true, data: users}, {status: 200});
+        return NextResponse.json({success: true, data: users}, {status: 200});
     } catch (error) {
-        return NextResponse.json({sucess: false, error }, {status: 400})
+        return NextResponse.json({success: false, error }, {status: 400})
     }
 }
 
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     const request = await req.json();
     const error = validatePOSTFields(request);
     if (error) {
-        return NextResponse.json({sucess: false, error: error.message }, {status: 412})
+        return NextResponse.json({success: false, error: error.message }, {status: 412})
     }
     try {
         const password = await hash(request.password);
@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
             ...request,
             password
         })
-        return NextResponse.json({sucess: true, data: user}, {status: 200});
+        return NextResponse.json({success: true, data: user}, {status: 200});
     } catch (error) {
         console.log(error)
-        return NextResponse.json({sucess: false, error }, {status: 400})
+        return NextResponse.json({success: false, error }, {status: 400})
     }
 }
 

@@ -14,7 +14,7 @@ export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId
         expenseModel;
         await dbConnect()
 
-        const budget = await budgetModel.findOne({owner: userId})
+        const budget = await budgetModel.findOne().or([{owner: userId }, {allowed: userId}])
         .populate({
             path: "expenses",
             match: {date: {$gte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1), $lte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth() + 1, 0)}}
@@ -31,7 +31,8 @@ export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId
 
         return {
             ...budget._doc,
-            ...getBudgetMinMaxDates(budgetMonth)
+            ...getBudgetMinMaxDates(budgetMonth),
+            isOwner: budget._doc.owner.toString() === userId.toString()
         };
     } catch (error) {
         throw error
@@ -193,12 +194,14 @@ async function deleteSharedBudgetInformation (userId: mongoose.Types.ObjectId, s
     }
 }
 
-async function syncBudgetWithShareableBudgetInfo (budgetDocument: Budget, sharedBudgetInfo: mongoose.Types.ObjectId | null) {
+async function syncBudgetWithShareableBudgetInfo (budgetDocument: Budget, sharedBudgetInfo: ShareableBudget | null) {
     try {
         if (sharedBudgetInfo) {
+            budgetDocument.shareCode = sharedBudgetInfo.joinCode;
             budgetDocument.isShared = true;
             budgetDocument.shareId = sharedBudgetInfo._id;
         } else {
+            budgetDocument.shareCode = null;
             budgetDocument.isShared = false;
             budgetDocument.set("shareId", null)
         }

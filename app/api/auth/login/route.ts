@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     const request = await req.json();
     const error = validatePOSTFields(request);
     if (error) {
-        return NextResponse.json({sucess: false, error: error.message }, {status: 412})
+        return NextResponse.json({success: false, error: error.message }, {status: 412})
     }
     try {
         const user = await userModel.findOne({
@@ -17,11 +17,11 @@ export async function POST(req: NextRequest) {
         })
         const isEqual = await verify(request.password, user.password);
         if (isEqual) {
-            return NextResponse.json({sucess: true, data: {_id: user._id ,username: user.username, email: user.email}}, {status: 200});
+            return NextResponse.json({success: true, data: {_id: user._id ,username: user.username, email: user.email}}, {status: 200});
         }
-        return NextResponse.json({sucess: false, error: "Not authorized" }, {status: 401})
+        return NextResponse.json({success: false, error: "Not authorized" }, {status: 401})
     } catch (error) {
-        return NextResponse.json({sucess: false, error }, {status: 400})
+        return NextResponse.json({success: false, error }, {status: 400})
     }
 }
 

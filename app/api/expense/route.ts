@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const request = await req.json();
     const error = validatePOSTFields(request);
     if (error) {
-        return NextResponse.json({sucess: false, error: error.message }, {status: 412})
+        return NextResponse.json({success: false, error: error.message }, {status: 412})
     }
     try {
         const userId = new mongoose.Types.ObjectId(headerUserId || "");
@@ -29,10 +29,10 @@ export async function POST(req: NextRequest) {
             $push: {expenses: expense._id}
         })
 
-        return NextResponse.json({sucess: true, data: expense}, {status: 200});
+        return NextResponse.json({success: true, data: expense}, {status: 200});
     } catch (error) {
         console.log(error)
-        return NextResponse.json({sucess: false, error }, {status: 400})
+        return NextResponse.json({success: false, error }, {status: 400})
     }
 }
 
@@ -42,20 +42,20 @@ export async function DELETE(req: NextRequest) {
     const request = await req.json();
 
     if(!request.expenseId) {
-        return NextResponse.json({sucess: false, error: "No expense ID provided for delete"})
+        return NextResponse.json({success: false, error: "No expense ID provided for delete"})
     }
 
     try {
         const userIdAsObjectId = new mongoose.Types.ObjectId(userId || "");
         const budget = await budgetModel.findOne({owner: userIdAsObjectId})
         if (!budget) {
-            return NextResponse.json({sucess: false, error: "No budget found for user"})
+            return NextResponse.json({success: false, error: "No budget found for user"})
         }
 
         const expenseId = new mongoose.Types.ObjectId(request.expenseId)
         const expense = await expenseModel.findOneAndDelete({_id: expenseId, budgetId: budget._id})
         if (!expense) {
-            return NextResponse.json({sucess: false, error: "No expense found for delete"})
+            return NextResponse.json({success: false, error: "No expense found for delete"})
         }
 
         await budget.updateOne({
@@ -64,9 +64,9 @@ export async function DELETE(req: NextRequest) {
 
         await budget.save()
 
-        return NextResponse.json({sucess: true, data: "Successfuly deleted expense"}, {status: 200});
+        return NextResponse.json({success: true, data: "Successfuly deleted expense"}, {status: 200});
     } catch (error) {
-        return NextResponse.json({sucess: false, error }, {status: 400})
+        return NextResponse.json({success: false, error }, {status: 400})
     }
 }
 

@@ -10,14 +10,14 @@ type ApproveJoinRequest = {
 export async function POST (req: NextRequest) {
     const userId = req.headers.get("userId");
     if (!userId) {
-        return NextResponse.json({sucess: false, error: "No user ID" }, {status: 412})
+        return NextResponse.json({success: false, error: "No user ID" }, {status: 412})
     }
     const userIdAsObjectId = new mongoose.Types.ObjectId(userId || "");
     
     const body = await req.json() as ApproveJoinRequest;
     const error = validatePOSTFields(body);
     if (error) {
-        return NextResponse.json({sucess: false, error: error.message }, {status: 412})
+        return NextResponse.json({success: false, error: error.message }, {status: 412})
     }
 
     const budgetIdAsObjectId = new mongoose.Types.ObjectId(body.budgetId || "");
@@ -25,7 +25,7 @@ export async function POST (req: NextRequest) {
     try {
         await approveRequesterToJoinBudget(userIdAsObjectId, budgetIdAsObjectId, requesterIdAsObjectId)
     
-        return NextResponse.json({sucess: true, data: "User approved"});
+        return NextResponse.json({success: true, data: "User approved"});
     } catch (error) {
         console.log(error)
         return NextResponse.json({success: false, error})

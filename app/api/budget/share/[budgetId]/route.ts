@@ -8,7 +8,7 @@ export async function GET (
 ) {
     const userId = req.headers.get("userId");
     if (!userId) {
-        return NextResponse.json({sucess: false, error: "No user ID" }, {status: 412})
+        return NextResponse.json({success: false, error: "No user ID" }, {status: 412})
     }
 
     const userIdAsObjectId = new mongoose.Types.ObjectId(userId || "");
@@ -18,8 +18,8 @@ export async function GET (
         const joinRequests = await getBudgetRequesters(userIdAsObjectId, budgetIdAsObjectId)
 
         return NextResponse.json({success: true, data: joinRequests})
-    } catch (error) {
+    } catch (error: any) {
         console.log(error)
-        return NextResponse.json({success: false, error})
+        return NextResponse.json({success: false, error: error.message})
     }
 }

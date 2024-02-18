@@ -7,13 +7,13 @@ import incomeModel from "@/models/incomeModel";
 export async function POST(req: NextRequest) {
     const headerUserId = req.headers.get("userId");
     if (!headerUserId) {
-        return NextResponse.json({sucess: false, error: "User ID missing from header." }, {status: 412})
+        return NextResponse.json({success: false, error: "User ID missing from header." }, {status: 412})
     }
     await dbConnect();
     const request = await req.json();
     const error = validatePOSTFields(request);
     if (error) {
-        return NextResponse.json({sucess: false, error: error.message }, {status: 412})
+        return NextResponse.json({success: false, error: error.message }, {status: 412})
     }
     try {
         const userId = new mongoose.Types.ObjectId(headerUserId);
@@ -30,10 +30,10 @@ export async function POST(req: NextRequest) {
             $push: {income: income._id}
         })
 
-        return NextResponse.json({sucess: true, data: income}, {status: 200});
+        return NextResponse.json({success: true, data: income}, {status: 200});
     } catch (error) {
         console.log(error)
-        return NextResponse.json({sucess: false, error }, {status: 400})
+        return NextResponse.json({success: false, error }, {status: 400})
     }
 }
 
@@ -43,20 +43,20 @@ export async function DELETE(req: NextRequest) {
     const request = await req.json();
 
     if(!request.incomeId) {
-        return NextResponse.json({sucess: false, error: "No income ID provided for delete"})
+        return NextResponse.json({success: false, error: "No income ID provided for delete"})
     }
 
     try {
         const userIdAsObjectId = new mongoose.Types.ObjectId(userId || "");
         const budget = await budgetModel.findOne({owner: userIdAsObjectId})
         if (!budget) {
-            return NextResponse.json({sucess: false, error: "No budget found for user"})
+            return NextResponse.json({success: false, error: "No budget found for user"})
         }
 
         const incomeId = new mongoose.Types.ObjectId(request.incomeId)
         const income = await incomeModel.findOneAndDelete({_id: incomeId, budgetId: budget._id})
         if (!income) {
-            return NextResponse.json({sucess: false, error: "No income found for delete"})
+            return NextResponse.json({success: false, error: "No income found for delete"})
         }
 
         await budget.updateOne({
@@ -65,9 +65,9 @@ export async function DELETE(req: NextRequest) {
 
         await budget.save()
 
-        return NextResponse.json({sucess: true, data: "Successfuly deleted income"}, {status: 200});
+        return NextResponse.json({success: true, data: "Successfuly deleted income"}, {status: 200});
     } catch (error) {
-        return NextResponse.json({sucess: false, error }, {status: 400})
+        return NextResponse.json({success: false, error }, {status: 400})
     }
 }
 

@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
     const userId = req.headers.get("userId");
     if (!userId) {
-        return NextResponse.json({sucess: false, error: "No user ID" }, {status: 412})
+        return NextResponse.json({success: false, error: "No user ID" }, {status: 412})
     }
 
     const userIdAsObjectId = new mongoose.Types.ObjectId(userId || "");

@@ -15,6 +15,10 @@ type BudgetState = {
     expenses: any[];
     minDate: string;
     maxDate: string;
+    isOwner: boolean,
+    isShared: boolean;
+    shareCode?: string | null;
+    joinRequests?: any[],
     balance?: number,
     totalIncome?: number,
     totalExpenses?: number
@@ -29,6 +33,10 @@ const initialState = {
         expenses: [],
         minDate: "",
         maxDate: "",
+        isOwner: false,
+        isShared: false,
+        shareCode: null,
+        joinRequests: [],
         balance: 0,
         totalIncome: 0,
         totalExpenses: 0
@@ -58,10 +66,19 @@ export const budget = createSlice({
         setBudget: (state, action: PayloadAction<BudgetState>) => {
             return {
                 value: {
+                    ...state.value,
                     ...action.payload,
                     totalIncome: getTotalIncome(action.payload),
                     totalExpenses: getTotalExpenses(action.payload),
                     balance: getBalance(action.payload),
+                }
+            }
+        },
+        setJoinRequestList: (state, action: PayloadAction<any>) => {
+            return {
+                value: {
+                    ...state.value,
+                    joinRequests: action.payload.joinRequests
                 }
             }
         }
@@ -75,5 +92,5 @@ export const selectTransactions = createSelector([selectIncome, selectExpense], 
     return [...income, ...expenses]
 })
 
-export const { setBudget } = budget.actions;
+export const { setBudget, setJoinRequestList } = budget.actions;
 export default budget.reducer;

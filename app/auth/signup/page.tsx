@@ -43,7 +43,7 @@ export default function SignUp () {
         }
         try {
             const res = await createUser(formData);
-            if (res.sucess) {
+            if (res.success) {
                 router.push("/login?successful-signup")
             }
         } catch (error) {

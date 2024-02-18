@@ -8,6 +8,7 @@ export interface Budget extends mongoose.Document {
     income: mongoose.Types.Array<mongoose.Types.ObjectId>,
     expenses: mongoose.Types.Array<mongoose.Types.ObjectId>,
     isShared: boolean,
+    shareCode: string | null,
     shareId: mongoose.Types.ObjectId
 }
 
@@ -31,6 +32,10 @@ const BudgetSchema = new mongoose.Schema<Budget>({
     isShared: {
         type: Boolean,
         default: false
+    },
+    shareCode: {
+        type: String,
+        default: null
     },
     shareId: {
         type: mongoose.Schema.Types.ObjectId,

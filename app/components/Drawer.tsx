@@ -37,7 +37,7 @@ export default function Drawer({ children, isOpen, closeDrawer }: Props) {
         <div className={`fixed inset-x-0 bottom-0 h-full transition-all z-10 ${!isOpen ? 'translate-y-full' : ''}`} onClick={() => closeDrawer()}>
             <div className="h-full relative">
                 <div className="bg-slate-500 h-full opacity-50"></div>
-                <div className="absolute bottom-0 bg-slate-800 w-full min-h-60 py-5 px-2 rounded-t-lg" onClick={e => e.stopPropagation()}>
+                <div className="absolute bottom-0 bg-slate-800 w-full min-h-60 max-h-[80dvh] py-5 px-2 rounded-t-lg" onClick={e => e.stopPropagation()}>
                     {children}
                 </div>
             </div>
