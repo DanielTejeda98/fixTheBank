@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setJoinRequestList } from "@/redux/features/budget-slice";
 
-export default function Account() {
+export default function Account({closeDrawer}: {closeDrawer: Function}) {
     const router = useRouter();
     const reduxDispatch = useDispatch();
     const [pending, setPending] = useState(false); 
@@ -16,7 +16,8 @@ export default function Account() {
     const getuserId = useAppSelector((state) => state.userReducer.value._id);
     const logout = () => {
         document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        router.push("/");
+        closeDrawer()
+        router.refresh();
     }
 
     const approveRequestee = async (requesterId: string) => {

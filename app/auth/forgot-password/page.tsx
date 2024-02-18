@@ -1,7 +1,6 @@
 "use client"
 
 import { useFormState, useFormStatus } from "react-dom";
-import { useSearchParams } from "next/navigation";
 
 export default function ForgotPassword () {
     const [errorMessage, dispatch] = useFormState(() => {}, undefined)

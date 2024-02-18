@@ -41,7 +41,7 @@ export default function JoinOrCreateBudget({user}: {user: User}) {
 
     const DrawerComponents = {
         join: <JoinBudget closeDrawer={() => setIsDrawerOpen(false)}/>,
-        account: <Account />
+        account: <Account closeDrawer={() => setIsDrawerOpen(false)} />
     }
 
     const createNewBudget = async () => {

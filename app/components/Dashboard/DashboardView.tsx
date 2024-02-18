@@ -60,7 +60,7 @@ export default function DashboardView({budget, user}: {budget: Budget, user: Use
         addIncome: <AddIncome closeDrawer={() => setIsDrawerOpen(false)} budgetId={budget._id}/>,
         addExpense: <AddExpense closeDrawer={() => setIsDrawerOpen(false)} budgetId={budget._id} accounts={budget.accounts} categories={budget.categories} />,
         selectBudget: <SelectBudget closeDrawer={() => setIsDrawerOpen(false)} />,
-        account: <Account />
+        account: <Account closeDrawer={() => setIsDrawerOpen(false)} />
     }
 
     type ComponentString = "addIncome" | "addExpense" | "selectBudget" | "account"
@@ -126,7 +126,7 @@ export default function DashboardView({budget, user}: {budget: Budget, user: Use
             <section className="m-3 p-3">
                 <div className="flex justify-between items-end">
                     <h2>Budget Summary</h2>
-                    <a href="#" className="text-xs">Manage budget</a>
+                    <a href="" className="text-xs">Manage budget</a>
                 </div>
                 <div className="grid grid-rows-2 grid-flow-col gap-3 mt-3">
                     <div className="flex items-center p-2 bg-green-800 w-45 gap-2 rounded-md">
@@ -166,7 +166,7 @@ export default function DashboardView({budget, user}: {budget: Budget, user: Use
             <section className="m-3 p-3">
                 <div className="flex justify-between items-end">
                     <h2>Transactions</h2>
-                    <a href="#" className="text-xs">View all</a>
+                    <a href="" className="text-xs">View all</a>
                 </div>
 
                 <div className="grid gap-3 mt-3">
