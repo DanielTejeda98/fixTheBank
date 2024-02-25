@@ -1,13 +1,14 @@
 import { getBudget, toggleBudgetShareSettings } from "@/app/lib/budgetApi";
-import { getUserFromCookie } from "@/app/lib/utilClientHelpers";
 import { setBudget } from "@/redux/features/budget-slice";
 import { useAppSelector } from "@/redux/store";
 import { FormEvent, useReducer, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import SimpleReactValidator from "simple-react-validator";
 import ToggleSlider from "../ToggleSlider";
+import { useSession } from "next-auth/react";
 
 export default function SelectBudget ({closeDrawer}: {closeDrawer: Function}) {
+    const userId = useSession().data?.user.id;
     const validator = useRef(new SimpleReactValidator());
     const forceUpdate = useReducer(x => x + 1, 0)[1];
     const reduxDispatch = useDispatch();
@@ -28,13 +29,10 @@ export default function SelectBudget ({closeDrawer}: {closeDrawer: Function}) {
             return;
         }
 
-        const headers = {
-            userId: getUserFromCookie()?._id
-        }
         try {
-            await processBudgetShareUpdates(headers);
+            await processBudgetShareUpdates({userId});
 
-            const res = await getBudget(headers, new Date(budgetDate))
+            const res = await getBudget({userId}, new Date(budgetDate))
             if (res.success) {
                 sessionStorage.setItem("selectedBudgetDate", budgetDate);
                 // Set store values

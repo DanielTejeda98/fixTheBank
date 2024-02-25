@@ -1,35 +1,41 @@
 import DashboardView from "../components/Dashboard/DashboardView";
-import { getBudget } from "@/app/lib/budgetApi"
-import { getUserFromCookie } from "../lib/utilServerHelpers";
-import ReduxProvider from "@/redux/provider";
 import JoinOrCreateBudget from "../components/Dashboard/JoinOrCreateBudget";
-import { getBudgetRequesters } from "@/controllers/budgetController";
+import { getBudgetRequesters, getUserFullBudgetDocument } from "@/controllers/budgetController";
 import mongoose from "mongoose";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/config/authOptions";
+
+
+const normalizeMongooseObjects = (object: any) => {
+    return JSON.parse(JSON.stringify(object))
+}
 
 export default async function Dashboard() {
-    const user = getUserFromCookie()
-    const headers = {
-        userId: user?._id
-    }
+    const session = await getServerSession(authOptions)
+    const userId = new mongoose.Types.ObjectId(session?.user?.id)
+    try {
+        const data = await getUserFullBudgetDocument(userId, new Date())
+        if (!data) {
+            return (
+                <JoinOrCreateBudget />
+            )
+        }
 
-    const res = (await getBudget(headers))
-    if (res.success) {
-        const data = res.data;
         let requesters: mongoose.Types.Array<mongoose.Types.ObjectId> | never[] = [];
         if(data.isShared && data.isOwner) {
             try {
                 // Need to parse and stringify to bypass issues with NextJS passing non standard objects
-                requesters = JSON.parse(JSON.stringify(await getBudgetRequesters(new mongoose.Types.ObjectId(user._id), new mongoose.Types.ObjectId(data._id))));
+                requesters = normalizeMongooseObjects(await getBudgetRequesters(userId, new mongoose.Types.ObjectId(data._id)));
             } catch (error) {
                 console.log(error)
             }
         }
         const mappedBudget = {
-            _id: data._id,
+            _id: data._id.toString(),
             categories: data.categories,
             accounts: data.accounts,
-            income: data.income,
-            expenses: data.expenses,
+            income: normalizeMongooseObjects(data.income),
+            expenses: normalizeMongooseObjects(data.expenses),
             minDate: data.minDate,
             maxDate: data.maxDate,
             isShared: data.isShared,
@@ -38,17 +44,12 @@ export default async function Dashboard() {
             joinRequests: requesters,
         }
         return (
-            <ReduxProvider>
-                <DashboardView budget={mappedBudget} user={user}/>
-            </ReduxProvider>
+            <DashboardView budget={mappedBudget} />
         )
-    } else if (res.error === "No budget found for user") {
-        return (
-            <ReduxProvider>
-                <JoinOrCreateBudget user={user}/>
-            </ReduxProvider>
-        )
+
+    } catch (error) {
+        console.log(error);
+        // eslint-disable-next-line react/no-unescaped-entities
+        return (<div>Data didn't load :c</div>)
     }
-    // eslint-disable-next-line react/no-unescaped-entities
-    return (<div>Data didn't load :c</div>)
 }

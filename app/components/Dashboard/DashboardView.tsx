@@ -14,7 +14,6 @@ import TransactionCard from "../TransactionCard";
 import SelectBudget from "./SelectBudget";
 import Account from "../Account";
 import FullSizeCard from "../FullSizeCard";
-import { setUser } from "@/redux/features/user-slice";
 
 interface Budget {
     _id: string,
@@ -30,25 +29,18 @@ interface Budget {
     joinRequests: any[]
 }
 
-interface User {
-    _id: string,
-    username: string,
-    email: string
-}
-
-function useSetInitialStore({budget, user}: {budget: Budget, user: User}) {
+function useSetInitialStore({budget }: {budget: Budget }) {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setBudget(budget))
-        dispatch(setUser(user))
-    }, [budget, user, dispatch])
+    }, [budget, dispatch])
 }
 
-export default function DashboardView({budget, user}: {budget: Budget, user: User}) {
+export default function DashboardView({budget }: {budget: Budget }) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [drawerComponent, setDrawerComponent] = useState("addIncome");
 
-    useSetInitialStore({ budget, user })
+    useSetInitialStore({ budget })
 
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
     const balance = useAppSelector((state) => state.budgetReducer.value.balance) || 0

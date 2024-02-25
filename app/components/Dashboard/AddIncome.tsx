@@ -1,9 +1,9 @@
 import { createIncome, getBudget } from "@/app/lib/budgetApi";
-import { getUserFromCookie } from "@/app/lib/utilClientHelpers";
 import { FormEvent, useReducer, useRef } from "react";
 import SimpleReactValidator from "simple-react-validator";
 import { setBudget } from "@/redux/features/budget-slice";
 import { useDispatch } from "react-redux";
+import { useSession } from "next-auth/react";
 
 interface FormData {
     budgetId?: string,
@@ -13,6 +13,7 @@ interface FormData {
 }
 
 export default function AddIncome ({closeDrawer, budgetId}: {closeDrawer: Function, budgetId: string}) {
+    const userId = useSession().data?.user?.id;
     const reduxDispatch = useDispatch();
     const validator = useRef(new SimpleReactValidator());
     const forceUpdate = useReducer(x => x + 1, 0)[1];
@@ -41,13 +42,10 @@ export default function AddIncome ({closeDrawer, budgetId}: {closeDrawer: Functi
             forceUpdate();
             return;
         }
-        const headers = {
-            userId: getUserFromCookie()?._id
-        }
         
         try {
-            await createIncome(headers, {...formData, budgetId});
-            const res = await getBudget(headers)
+            await createIncome({userId}, {...formData, budgetId});
+            const res = await getBudget({userId})
             // Set store values
             reduxDispatch(setBudget(res.data));
         } catch (error) {

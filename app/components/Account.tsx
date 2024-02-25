@@ -6,6 +6,7 @@ import { approveJoinRequest, getRequestersList } from "../lib/budgetApi";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setJoinRequestList } from "@/redux/features/budget-slice";
+import { signOut, useSession } from "next-auth/react";
 
 export default function Account({closeDrawer}: {closeDrawer: Function}) {
     const router = useRouter();
@@ -13,17 +14,17 @@ export default function Account({closeDrawer}: {closeDrawer: Function}) {
     const [pending, setPending] = useState(false); 
     const getRequesters = useAppSelector((state) => state.budgetReducer.value.joinRequests);
     const getBudgetId = useAppSelector((state) => state.budgetReducer.value._id);
-    const getuserId = useAppSelector((state) => state.userReducer.value._id);
+    const getUserId = useSession().data?.user?.id;
     const logout = () => {
-        document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        closeDrawer()
+        signOut();
+        closeDrawer();
         router.refresh();
     }
 
     const approveRequestee = async (requesterId: string) => {
         try {
             setPending(true)
-            const res = await approveJoinRequest({userId: getuserId}, getBudgetId, requesterId)
+            const res = await approveJoinRequest({userId: getUserId}, getBudgetId, requesterId)
             if(!res.success) {
                 // TODO: display error
                 console.log(res.error)
@@ -42,7 +43,7 @@ export default function Account({closeDrawer}: {closeDrawer: Function}) {
 
     const getRequestersListResponse = async () => {
         try {
-            const res = await getRequestersList({userId: getuserId}, getBudgetId);
+            const res = await getRequestersList({userId: getUserId}, getBudgetId);
             if (!res.success) {
                 // TODO: display error
                 console.log(res.error);

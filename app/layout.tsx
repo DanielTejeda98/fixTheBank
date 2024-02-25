@@ -4,6 +4,9 @@ import "./globals.css";
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import Navigation from "./components/Navigation";
+import { AuthProvider } from "./providers/AuthProvider";
+import ReduxProvider from "@/redux/provider";
+
 config.autoAddCss = false
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,8 +23,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} flex flex-wrap min-h-dvh`}>{children}
-      <Navigation />
+      <body className={`${inter.className} flex flex-wrap min-h-dvh`}>
+        <ReduxProvider>
+          <AuthProvider>
+            {children}
+            <Navigation />
+          </AuthProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

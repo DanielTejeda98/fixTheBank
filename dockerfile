@@ -8,10 +8,8 @@ RUN npm ci
 
 COPY . .
 
-RUN npm run build
-
 RUN npm install -g next
 
-EXPOSE 3000
+EXPOSE 3721
 
-CMD ["next", "start", "-p", "3000"]
+CMD npm run build && next start -p 3721

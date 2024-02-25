@@ -1,10 +1,10 @@
-import { useAppSelector } from "@/redux/store";
 import SimpleReactValidator from "simple-react-validator";
 import { useState, useRef, useReducer, FormEvent } from "react";
 import { requestToJoinBudget } from "@/app/lib/budgetApi";
+import { useSession } from "next-auth/react";
 
 export default function JoinBudget ({closeDrawer} : {closeDrawer: Function}) {
-    const userId = useAppSelector((state) => state.userReducer.value._id);
+    const userId = useSession().data?.user?.id;
     const forceUpdate = useReducer(x => x + 1, 0)[1];
     const validator = useRef(new SimpleReactValidator());
     const [joinCode, setJoinCode] = useState("")

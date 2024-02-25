@@ -1,7 +1,7 @@
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_FTB_HOST}/api`
 
 const createExpense = async (headers: any, expense: any) => {
-    const res = await fetch(`http://${API_BASE_URL}/expense`, {
+    const res = await fetch(`${API_BASE_URL}/expense`, {
         headers,
         method: "POST",
         body: JSON.stringify(expense)
@@ -10,7 +10,7 @@ const createExpense = async (headers: any, expense: any) => {
 }
 
 const createIncome = async (headers: any, income: any) => {
-    const res = await fetch(`http://${API_BASE_URL}/income`, {
+    const res = await fetch(`${API_BASE_URL}/income`, {
         headers,
         method: "POST",
         body: JSON.stringify(income)
@@ -19,14 +19,14 @@ const createIncome = async (headers: any, income: any) => {
 }
 
 const getBudget = async (headers: any, budgetDate?: Date) => {
-    const res = await fetch(`http://${API_BASE_URL}/budget${budgetDate ? "?budgetDate=" + budgetDate.toString() : ""}`, {
+    const res = await fetch(`${API_BASE_URL}/budget${budgetDate ? "?budgetDate=" + budgetDate.toString() : ""}`, {
         headers
     })
     return await res.json()
 }
 
 const createBudget = async (headers: any) => {
-    const res = await fetch(`http://${API_BASE_URL}/budget`, {
+    const res = await fetch(`${API_BASE_URL}/budget`, {
         headers,
         method: "POST"
     })
@@ -34,7 +34,7 @@ const createBudget = async (headers: any) => {
 }
 
 const deleteExpense = async (headers: any, expenseId: string) => {
-    const res = await fetch(`http://${API_BASE_URL}/expense`, {
+    const res = await fetch(`${API_BASE_URL}/expense`, {
         headers,
         method: "DELETE",
         body: JSON.stringify({
@@ -45,7 +45,7 @@ const deleteExpense = async (headers: any, expenseId: string) => {
 }
 
 const deleteIncome = async (headers: any, incomeId: string) => {
-    const res = await fetch(`http://${API_BASE_URL}/income`, {
+    const res = await fetch(`${API_BASE_URL}/income`, {
         headers,
         method: "DELETE",
         body: JSON.stringify({
@@ -56,7 +56,7 @@ const deleteIncome = async (headers: any, incomeId: string) => {
 }
 
 const toggleBudgetShareSettings = async (headers: any) => {
-    const res = await fetch(`http://${API_BASE_URL}/budget/share`, {
+    const res = await fetch(`${API_BASE_URL}/budget/share`, {
         headers,
         method: "POST",
     })
@@ -64,7 +64,7 @@ const toggleBudgetShareSettings = async (headers: any) => {
 }
 
 const requestToJoinBudget = async (headers: any, joinCode: string) => {
-    const res = await fetch(`http://${API_BASE_URL}/budget/join`, {
+    const res = await fetch(`${API_BASE_URL}/budget/join`, {
         headers,
         method: "POST",
         body: JSON.stringify({
@@ -75,7 +75,7 @@ const requestToJoinBudget = async (headers: any, joinCode: string) => {
 }
 
 const approveJoinRequest = async (headers: any, budgetId: string, requesterId: string) => {
-    const res = await fetch(`http://${API_BASE_URL}/budget/join/approve`, {
+    const res = await fetch(`${API_BASE_URL}/budget/join/approve`, {
         headers,
         method: "POST",
         body: JSON.stringify({
@@ -87,7 +87,7 @@ const approveJoinRequest = async (headers: any, budgetId: string, requesterId: s
 }
 
 const getRequestersList = async (headers: any, budgetId: string) => {
-    const res = await fetch(`http://${API_BASE_URL}/budget/share/${budgetId}`, {
+    const res = await fetch(`${API_BASE_URL}/budget/share/${budgetId}`, {
         headers,
         method: "GET",
     })
