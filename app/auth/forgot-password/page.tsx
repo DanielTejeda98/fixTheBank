@@ -6,7 +6,7 @@ export default function ForgotPassword () {
     const [errorMessage, dispatch] = useFormState(() => {}, undefined)
     
     return (
-        <form action={dispatch} className="w-3/4 mt-5 mx-auto bg-white p-2 text-black rounded-md">
+        <form action={dispatch} className="w-3/4 h-fit mt-5 mx-auto bg-white p-2 text-black rounded-md">
             <h1 className="text-2xl font-bold text-center">Forgot Password</h1>
             <p className="mt-1 mb-2 text-sm text-center">Submit request for new password</p>
             <input type="email" name="email" placeholder="Email" required className="w-full p-1 rounded-md" />

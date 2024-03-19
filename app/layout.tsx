@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
-import Navigation from "./components/Navigation";
 import { AuthProvider } from "./providers/AuthProvider";
 import ReduxProvider from "@/redux/provider";
 
@@ -27,7 +26,6 @@ export default function RootLayout({
         <ReduxProvider>
           <AuthProvider>
             {children}
-            <Navigation />
           </AuthProvider>
         </ReduxProvider>
       </body>

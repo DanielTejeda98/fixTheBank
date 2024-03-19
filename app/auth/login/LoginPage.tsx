@@ -1,10 +1,11 @@
 "use client"
 import { useSearchParams } from "next/navigation";
-import { FormEvent, useReducer, useRef, useState } from "react";
+import { FormEvent, useReducer, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import SimpleReactValidator from "simple-react-validator";
 import Link from "next/link";
+import Input from "@/app/components/atoms/Input";
+import useReactValidator from "@/app/hooks/useReactValidator";
 
 const DEFAULT_REDIRECT = "/dashboard"
 
@@ -43,7 +44,7 @@ export default function LoginPage () {
     const params = useSearchParams();
     const redirect = params?.get("callbackUrl")?.toString();
 
-    const validator = useRef(new SimpleReactValidator());
+    const validator = useReactValidator();
     const forceUpdate = useReducer(x => x + 1, 0)[1];
     const [formData, formDispatch] = useReducer((state: LoginFormData, action: LoginFormData):LoginFormData => {
         return {...state, ...action}
@@ -87,13 +88,38 @@ export default function LoginPage () {
         clearForm()
     }
     return (
-        <form onSubmit={handleFormSubmit} className="w-3/4 mt-5 mx-auto bg-white p-2 text-black rounded-md">
+        <form onSubmit={handleFormSubmit} className="w-3/4 h-fit mt-5 mx-auto bg-white p-2 text-black rounded-md">
             <h1 className="text-2xl font-bold text-center">Log In</h1>
             <p className="mt-1 mb-2 text-sm text-center">Log in to continue</p>
-            <input type="text" name="username" placeholder="Username" required className="w-full p-1 rounded-md" value={formData.username} onChange={e => formDispatch({username: e.target.value})}/>
-            {validator.current.message("username", formData.username, "alpha_num_dash_space|required")}
-            <input type="password" name="password" placeholder="Password" required className="w-full mt-3 p-1 rounded-md" value={formData.password} onChange={e => formDispatch({password: e.target.value})}/>
-            {validator.current.message("password", formData.password, "alpha_num_dash_space|required")}
+            <Input id="username"
+                   type="text"
+                   name="username" 
+                   placeholder="Username" 
+                   label="Username" 
+                   required
+                   validation={{
+                    validator: validator,
+                    data: formData.username,
+                    validation: "alpha_num_dash_space|required"
+                   }}
+                   value={formData.username}
+                   onChange={(value:any) => formDispatch({username: value})}/>
+
+            <Input id="password"
+                   type="password"
+                   name="password"
+                   icon="faLock"
+                   placeholder="Password" 
+                   label="Password"
+                   required
+                   validation={{
+                    validator: validator,
+                    data: formData.password,
+                    validation: "alpha_num_dash_space|required"
+                   }}
+                   value={formData.password}
+                   onChange={(value:any) => formDispatch({password: value})}/>
+                   
             <input type="text" name="redirect" className="hidden" value={redirect} readOnly/>
             <LoginButton loading={loading}/>
             <Link href="/auth/forgot-password" className="mt-3 text-sm">Forgot Password</Link>

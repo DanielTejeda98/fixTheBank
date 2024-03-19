@@ -89,7 +89,7 @@ export default function AddExpense ({closeDrawer, budgetId, accounts, categories
 
             <div className="mt-2">
                 <label htmlFor="category">Category</label>
-                <select className="ml-2 bg-slate-700" value={formData.category} onChange={e => dispatch({category: e.target.value.trim()})}>
+                <select className="ml-2 bg-slate-700" value={formData.category} onChange={e => dispatch({category: e.target.value})}>
                     {renderCategoryOptions()}
                 </select>
                 {validator.current.message("category", formData.category, "required")}
@@ -103,7 +103,7 @@ export default function AddExpense ({closeDrawer, budgetId, accounts, categories
 
             <div className="mt-2">
                 <label htmlFor="description">Description</label>
-                <input type="text" name="description" className="ml-2 bg-slate-700" value={formData.description} onChange={e => dispatch({description: e.target.value.trim()})}/>
+                <input type="text" name="description" className="ml-2 bg-slate-700" value={formData.description} onChange={e => dispatch({description: e.target.value})}/>
                 {validator.current.message("description", formData.description, "alpha_num_dash_space|required")}
             </div>
             

@@ -4,6 +4,7 @@ import { getBudgetRequesters, getUserFullBudgetDocument } from "@/controllers/bu
 import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/config/authOptions";
+import Navigation from "../components/Navigation";
 
 
 const normalizeMongooseObjects = (object: any) => {
@@ -17,7 +18,10 @@ export default async function Dashboard() {
         const data = await getUserFullBudgetDocument(userId, new Date())
         if (!data) {
             return (
-                <JoinOrCreateBudget />
+                <>
+                    <JoinOrCreateBudget />
+                    <Navigation />
+                </>
             )
         }
 
@@ -44,12 +48,20 @@ export default async function Dashboard() {
             joinRequests: requesters,
         }
         return (
-            <DashboardView budget={mappedBudget} />
+            <>
+                <DashboardView budget={mappedBudget} />
+                <Navigation />
+            </>
         )
 
     } catch (error) {
         console.log(error);
         // eslint-disable-next-line react/no-unescaped-entities
-        return (<div>Data didn't load :c</div>)
+        return (
+            <>
+                <div>Data didn't load :c</div>
+                <Navigation />
+            </>
+            )
     }
 }

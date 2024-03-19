@@ -68,7 +68,7 @@ export default function AddIncome ({closeDrawer, budgetId}: {closeDrawer: Functi
 
             <div className="mt-2">
                 <label htmlFor="source">Source</label>
-                <input type="text" id="source" name="source" className="ml-2 bg-slate-700" value={formData.source} onChange={e => formDispatch({source: e.target.value.trim()})}/>
+                <input type="text" id="source" name="source" className="ml-2 bg-slate-700" value={formData.source} onChange={e => formDispatch({source: e.target.value})}/>
                 {validator.current.message("source", formData.source, "alpha_num_dash_space|required")}
             </div>
 
