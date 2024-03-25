@@ -1,10 +1,9 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { currencyFormat } from "@/app/lib/renderHelper";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear, faUser } from '@fortawesome/free-solid-svg-icons';
-import { selectTransactions, setBudget } from "@/redux/features/budget-slice";
-import { useDispatch } from "react-redux";
+import { selectTransactions, useSetInitialStore } from "@/redux/features/budget-slice";
 import { useAppSelector } from "@/redux/store";
 import Drawer from "../Drawer";
 import AddIncome from "./AddIncome";
@@ -14,29 +13,9 @@ import TransactionCard from "../TransactionCard";
 import SelectBudget from "./SelectBudget";
 import Account from "../Account";
 import FullSizeCard from "../FullSizeCard";
+import { BudgetView } from "@/types/budget";
 
-interface Budget {
-    _id: string,
-    income: any[],
-    expenses: any[],
-    categories: string[],
-    accounts: string[],
-    minDate: string,
-    maxDate: string,
-    isOwner: boolean,
-    isShared: boolean,
-    shareCode: string,
-    joinRequests: any[]
-}
-
-function useSetInitialStore({budget }: {budget: Budget }) {
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(setBudget(budget))
-    }, [budget, dispatch])
-}
-
-export default function DashboardView({budget }: {budget: Budget }) {
+export default function DashboardView({budget }: {budget: BudgetView }) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [drawerComponent, setDrawerComponent] = useState("addIncome");
 
@@ -78,9 +57,9 @@ export default function DashboardView({budget }: {budget: Budget }) {
     }
 
     return (
-        <main>
+        <main className="w-full">
             <FullSizeCard>
-            <div className="flex justify-between">
+                <div className="flex justify-between">
                     <button className="bg-slate-500 p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("account")}><FontAwesomeIcon icon={faUser} /></button>
                     <p>Month: {new Date(budgetMonth).toLocaleDateString("en-us", {month: "long", year: "numeric"})}</p>
                     <button className="bg-slate-500 p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("selectBudget")}><FontAwesomeIcon icon={faGear} /></button>

@@ -2,6 +2,9 @@ import { Expense } from "@/models/expenseModel";
 import { Income } from "@/models/incomeModel";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { BudgetView } from "@/types/budget";
 
 type InitialState = {
     value: BudgetState;
@@ -91,6 +94,13 @@ const selectExpense = (state:RootState) => state.budgetReducer.value.expenses;
 export const selectTransactions = createSelector([selectIncome, selectExpense], (income, expenses) => {
     return [...income, ...expenses]
 })
+
+export function useSetInitialStore({budget }: {budget: BudgetView }) {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setBudget(budget))
+    }, [budget, dispatch])
+}
 
 export const { setBudget, setJoinRequestList } = budget.actions;
 export default budget.reducer;

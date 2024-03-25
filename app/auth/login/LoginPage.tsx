@@ -6,6 +6,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import Input from "@/app/components/atoms/Input";
 import useReactValidator from "@/app/hooks/useReactValidator";
+import MessageBlock from "@/app/components/atoms/MessageBlock";
 
 const DEFAULT_REDIRECT = "/dashboard"
 
@@ -91,6 +92,10 @@ export default function LoginPage () {
         <form onSubmit={handleFormSubmit} className="w-3/4 h-fit mt-5 mx-auto bg-white p-2 text-black rounded-md">
             <h1 className="text-2xl font-bold text-center">Log In</h1>
             <p className="mt-1 mb-2 text-sm text-center">Log in to continue</p>
+
+            {!!signInError ? <MessageBlock severity="error">{signInError}</MessageBlock> : null}
+            
+
             <Input id="username"
                    type="text"
                    name="username" 

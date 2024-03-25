@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/config/authOptions";
 import Navigation from "../components/Navigation";
+import { BudgetView } from "@/types/budget";
 
 
 const normalizeMongooseObjects = (object: any) => {
@@ -46,7 +47,7 @@ export default async function Dashboard() {
             shareCode: data.shareCode,
             isOwner: data.isOwner,
             joinRequests: requesters,
-        }
+        } as BudgetView;
         return (
             <>
                 <DashboardView budget={mappedBudget} />
@@ -56,9 +57,9 @@ export default async function Dashboard() {
 
     } catch (error) {
         console.log(error);
-        // eslint-disable-next-line react/no-unescaped-entities
         return (
             <>
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
                 <div>Data didn't load :c</div>
                 <Navigation />
             </>
