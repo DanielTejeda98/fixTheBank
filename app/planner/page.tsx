@@ -33,8 +33,8 @@ export default async function Planner () {
 
         const mappedBudget = {
             _id: data._id.toString(),
-            categories: data.categories,
-            accounts: data.accounts,
+            categories: normalizeMongooseObjects(data.categories),
+            accounts: normalizeMongooseObjects(data.accounts),
             income: normalizeMongooseObjects(data.income),
             expenses: normalizeMongooseObjects(data.expenses),
             minDate: data.minDate,

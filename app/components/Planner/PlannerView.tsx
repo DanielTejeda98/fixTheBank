@@ -11,6 +11,7 @@ import { useSetInitialStore } from "@/redux/features/budget-slice";
 import PlannerCategoriesList from "./PlannerCategoriesList";
 import { useAppSelector } from "@/redux/store";
 import PlannerIncomeList from "./PlannerIncomeList";
+import PlannerCategoriesEditor from "./PlannerCategoriesEditor";
 
 export default function PlannerView ({budget}: {budget: BudgetView}) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -25,18 +26,23 @@ export default function PlannerView ({budget}: {budget: BudgetView}) {
     const DrawerComponents = {
         selectBudget: <SelectBudget closeDrawer={() => setIsDrawerOpen(false)} />,
         account: <Account closeDrawer={() => setIsDrawerOpen(false)} />,
+        categoriesEditor: <PlannerCategoriesEditor categories={[]} />,
         categoryExplorer: <div>{selectedCategory}</div>,
         incomePlanner: <div>Income Planner</div>
     }
-    type ComponentString = "selectBudget" | "account" | "categoryExplorer" | "incomePlanner"
+    type ComponentString = "selectBudget" | "account" | "categoryExplorer" | "incomePlanner" | "categoriesEditor"
     const toggleDrawer = (component: ComponentString) => {
         setDrawerComponent(component);
         setIsDrawerOpen(!isDrawerOpen);
     }
 
     const handleCategoryClick = (category: string) => {
-        setSelectedCategory(category || "Edit Categories")
+        setSelectedCategory(category)
         toggleDrawer("categoryExplorer");
+    }
+
+    const handleCategoryEditorClick = () => {
+        toggleDrawer("categoriesEditor");
     }
     return (
         <main className="w-full">
@@ -54,7 +60,7 @@ export default function PlannerView ({budget}: {budget: BudgetView}) {
             <PlannerIncomeList addIncomeClick={() => toggleDrawer("incomePlanner")}/>
 
             <PlannerCategoriesList categories={categories}
-                                   editCategoriesClick={() => handleCategoryClick("")}
+                                   editCategoriesClick={handleCategoryEditorClick}
                                    cardOnClick={handleCategoryClick}/>
 
             <Drawer isOpen={isDrawerOpen}

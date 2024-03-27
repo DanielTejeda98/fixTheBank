@@ -73,13 +73,13 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
         <form onSubmit={formSubmit} onReset={clearForm} className="flex flex-wrap">
             <h2 className="text-lg font-bold w-full">Add Expense</h2>
             <p className="text-sm w-full">Add an expense for this month</p>
-            <div className="mt-2">
+            <div className="mt-2 w-full">
                 <label htmlFor="amount">Amount</label>
                 <input type="number" name="amount" className="ml-2 bg-slate-700" value={formData.amount} onChange={e => dispatch({ amount: Number(e.target.value) })} />
                 {validator.current.message("amount", formData.amount, "numeric|required")}
             </div>
 
-            <div className="mt-2">
+            <div className="mt-2 w-full">
                 <label htmlFor="account">Account</label>
                 <select className="ml-2 bg-slate-700" value={formData.account} onChange={e => dispatch({ account: e.target.value })}>
                     {renderAccountOptions()}
@@ -87,7 +87,7 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
                 {validator.current.message("account", formData.account, "alpha_space|required")}
             </div>
 
-            <div className="mt-2">
+            <div className="mt-2 w-full">
                 <label htmlFor="category">Category</label>
                 <select className="ml-2 bg-slate-700" value={formData.category} onChange={e => dispatch({ category: e.target.value })}>
                     {renderCategoryOptions()}
@@ -95,13 +95,13 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
                 {validator.current.message("category", formData.category, "required")}
             </div>
 
-            <div className="mt-2">
+            <div className="mt-2 w-full">
                 <label htmlFor="date">Date</label>
                 <input type="date" name="date" className="ml-2 bg-slate-700" value={formData.date} onChange={e => dispatch({ date: e.target.value })} />
                 {validator.current.message("date", formData.date, "alpha_num_dash_space|required")}
             </div>
 
-            <div className="mt-2">
+            <div className="mt-2 w-full">
                 <label htmlFor="description">Description</label>
                 <input type="text" name="description" className="ml-2 bg-slate-700" value={formData.description} onChange={e => dispatch({ description: e.target.value })} />
                 {validator.current.message("description", formData.description, "alpha_num_dash_space|required")}

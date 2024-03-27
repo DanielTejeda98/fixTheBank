@@ -6,21 +6,25 @@ import shareableBudgetModel, { ShareableBudget } from "@/models/shareableBudgets
 import incomeModel from "@/models/incomeModel";
 import expenseModel from "@/models/expenseModel";
 import userModel from "@/models/userModel";
+import categoriesModel from "@/models/categoriesModel";
 
 export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId, budgetMonth: Date) {
     try {
-        // Declare to have schema available for populate (in case this is the first time the schemas are referenced)
-        incomeModel;
-        expenseModel;
         await dbConnect()
 
         const budget = await budgetModel.findOne().or([{owner: userId }, {allowed: userId}])
         .populate({
+            path: "categories",
+            model: categoriesModel
+        })
+        .populate({
             path: "expenses",
+            model: expenseModel,
             match: {date: {$gte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1), $lte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth() + 1, 0)}}
         })
         .populate({
             path: "income",
+            model: incomeModel,
             match: {date: {$gte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1), $lte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth() + 1, 0)}}
         })
         .exec();
@@ -42,11 +46,8 @@ export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId
 export async function createUserBudget (userId: string) {
     try {
         await dbConnect();
-        const [categories, accounts] = getDefaultAccountsAndCategories();
         const budget = await budgetModel.create({
-            owner: new mongoose.Types.ObjectId(userId),
-            accounts,
-            categories
+            owner: new mongoose.Types.ObjectId(userId)
         })
 
         if (!budget) {
@@ -83,6 +84,10 @@ export async function joinSharedBudget (userId: mongoose.Types.ObjectId, joinCod
         const sharedBudget = await shareableBudgetModel.findOne({joinCode}) as ShareableBudget;
         if (!sharedBudget) {
             throw new Error("No shared budget with the provided join code: " + joinCode);
+        }
+
+        if(sharedBudget.requestedAccounts.includes(userId)) {
+            throw new Error("Already requested to join budget!")
         }
 
         sharedBudget.requestedAccounts.push(userId)
@@ -141,12 +146,6 @@ function getBudgetMinMaxDates (budgetMonth: Date) {
         minDate: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1).toLocaleDateString(),
             maxDate: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth() + 1, 0).toLocaleDateString()
     }
-}
-
-function getDefaultAccountsAndCategories () {
-    const categories = ["Mortgage", "Car Payment", "Car Insurance", "Electricity", "Phones", "House Internet", "Groceries/Household", "Gifts", "Restaurants", "Therapy", "Medical", "Toby", "Toby Medical", "Debts", "Savings", "Investing", "Grooming", "Subscriptions", "Misc"]
-    const accounts = ["Chase Debit", "Chase Savings", "Discover IT", "Discover MILES", "Target Redcard", "Chase Disney Credit"];
-    return [categories, accounts]
 }
 
 async function createSharedBudgetInformation (userId: mongoose.Types.ObjectId) {
