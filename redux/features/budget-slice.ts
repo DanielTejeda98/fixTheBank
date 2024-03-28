@@ -4,7 +4,7 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { BudgetView } from "@/types/budget";
+import { AccountView, BudgetView, CategoryView } from "@/types/budget";
 
 type InitialState = {
     value: BudgetState;
@@ -12,8 +12,8 @@ type InitialState = {
 
 type BudgetState = {
     _id: string;
-    categories: string[];
-    accounts: string[];
+    categories: CategoryView[];
+    accounts: AccountView[];
     income: any[];
     expenses: any[];
     minDate: string;

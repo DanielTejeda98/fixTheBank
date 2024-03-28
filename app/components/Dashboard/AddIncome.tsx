@@ -1,9 +1,9 @@
 import { createIncome, getBudget } from "@/app/lib/budgetApi";
-import { FormEvent, useReducer, useRef } from "react";
-import SimpleReactValidator from "simple-react-validator";
+import { FormEvent, useReducer } from "react";
 import { setBudget } from "@/redux/features/budget-slice";
 import { useDispatch } from "react-redux";
 import { useSession } from "next-auth/react";
+import useReactValidator from "@/app/hooks/useReactValidator";
 
 interface FormData {
     budgetId?: string,
@@ -15,7 +15,7 @@ interface FormData {
 export default function AddIncome ({closeDrawer, budgetId}: {closeDrawer: Function, budgetId: string}) {
     const userId = useSession().data?.user?.id;
     const reduxDispatch = useDispatch();
-    const validator = useRef(new SimpleReactValidator());
+    const validator = useReactValidator();
     const forceUpdate = useReducer(x => x + 1, 0)[1];
     const [formData, formDispatch] = useReducer((state: FormData, action: FormData):FormData => {
         return {...state, ...action}

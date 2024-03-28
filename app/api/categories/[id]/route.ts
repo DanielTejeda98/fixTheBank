@@ -9,10 +9,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     try {
         const requestBody = await req.json();
         const errors = validateFields(requestBody);
-        if (errors) {
+        if (errors.length > 0) {
             return NextResponse.json({success: false, error: `The following fields are missing from the request body: ${errors.join(", ")}` }, {status: 400});
         }
-
         const updatedCategory = await updateCategory(params.id, userId, requestBody.name, requestBody.sortRank, requestBody.date, requestBody.amount);
         if (!updatedCategory) {
             return NextResponse.json({success: false}, {status: 404});
@@ -33,7 +32,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     try { 
         await deleteCategory(params.id, userId)
 
-        return NextResponse.json({success: true}, {status: 204})
+        return NextResponse.json({success: true}, {status: 200})
     } catch (error: any) {
         return NextResponse.json({success: false, error: error.message}, {status: 500})
     }
@@ -44,7 +43,8 @@ function validateFields (body: any): String[] {
     if(!body.name) {
         missingFields.push("name")
     }
-    if(!body.sortRank) {
+
+    if(typeof body.sortRank === "undefined") {
         missingFields.push("sortRank")
     }
     return missingFields;

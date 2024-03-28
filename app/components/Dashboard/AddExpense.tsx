@@ -1,29 +1,30 @@
-import SimpleReactValidator from "simple-react-validator";
 import { FormEvent, useReducer, useRef } from "react";
 import { createExpense, getBudget } from "@/app/lib/budgetApi";
 import { setBudget } from "@/redux/features/budget-slice";
 import { useDispatch } from "react-redux";
 import { useSession } from "next-auth/react";
+import { AccountView, CategoryView } from "@/types/budget";
+import useReactValidator from "@/app/hooks/useReactValidator";
 
 interface FormData {
     amount?: number,
     account?: string
-    category?: string
+    category?: string,
     date?: string
     description?: string
 }
 
-export default function AddExpense({ closeDrawer, budgetId, accounts, categories }: { closeDrawer: Function, budgetId: string, accounts: string[], categories: string[] }) {
+export default function AddExpense({ closeDrawer, budgetId, accounts, categories }: { closeDrawer: Function, budgetId: string, accounts: AccountView[], categories: CategoryView[] }) {
     const userId = useSession().data?.user?.id;
-    const validator = useRef(new SimpleReactValidator());
+    const validator = useReactValidator();
     const forceUpdate = useReducer(x => x + 1, 0)[1];
     const reduxDispatch = useDispatch();
     const [formData, dispatch] = useReducer((state: FormData, action: FormData): FormData => {
         return { ...state, ...action }
     }, {
         amount: 0,
-        account: accounts?.length > 0 ? accounts[0] : "",
-        category: categories?.length > 0 ? categories[0] : "",
+        account: accounts?.length > 0 ? accounts[0]._id : "",
+        category: categories?.length > 0 ? categories[0]._id : "",
         date: "",
         description: ""
     })
@@ -31,8 +32,8 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
     const clearForm = () => {
         dispatch({
             amount: 0,
-            account: accounts?.length > 0 ? accounts[0] : "",
-            category: categories?.length > 0 ? categories[0] : "",
+            account: accounts?.length > 0 ? accounts[0]._id : "",
+            category: categories?.length > 0 ? categories[0]._id : "",
             date: "",
             description: ""
         })
@@ -62,11 +63,11 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
     }
 
     const renderAccountOptions = () => {
-        return accounts.map(account => <option key={account} value={account}>{account}</option>)
+        return accounts.map(account => <option key={account._id} value={account._id}>{account.name}</option>)
     }
 
     const renderCategoryOptions = () => {
-        return categories.map(category => <option key={category} value={category}>{category}</option>)
+        return categories.map((category: CategoryView) => <option key={category._id} value={category._id}>{category.name}</option>)
     }
 
     return (
@@ -84,7 +85,7 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
                 <select className="ml-2 bg-slate-700" value={formData.account} onChange={e => dispatch({ account: e.target.value })}>
                     {renderAccountOptions()}
                 </select>
-                {validator.current.message("account", formData.account, "alpha_space|required")}
+                {validator.current.message("account", formData.account, "required")}
             </div>
 
             <div className="mt-2 w-full">

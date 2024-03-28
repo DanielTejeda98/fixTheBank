@@ -5,8 +5,8 @@ export interface Expense extends mongoose.Document {
     createdBy: User,
     updatedBy: User,
     amount: number,
-    account: string
-    category: string
+    account: mongoose.Types.ObjectId,
+    category: mongoose.Types.ObjectId,
     date: Date,
     description: string,
     budgetId: mongoose.Schema.Types.ObjectId
@@ -26,11 +26,13 @@ const ExpenseSchema = new mongoose.Schema<Expense>({
         default: 0
     },
     account: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Account",
         required: [true, "Please provide an account for the expense"]
     },
     category: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Categories",
         required: [true, "Please provide a category for the expense"]
     },
     date: {

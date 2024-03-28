@@ -18,8 +18,8 @@ const createIncome = async (headers: any, income: any) => {
     return await res.json();
 }
 
-const getBudget = async (headers: any, budgetDate?: Date) => {
-    const res = await fetch(`${API_BASE_URL}/budget${budgetDate ? "?budgetDate=" + budgetDate.toString() : ""}`, {
+const getBudget = async (headers: any, budgetDate?: String) => {
+    const res = await fetch(`${API_BASE_URL}/budget${budgetDate ? "?budgetDate=" + budgetDate : ""}`, {
         headers
     })
     return await res.json()

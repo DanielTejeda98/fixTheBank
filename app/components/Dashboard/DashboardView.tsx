@@ -20,7 +20,8 @@ export default function DashboardView({budget }: {budget: BudgetView }) {
     const [drawerComponent, setDrawerComponent] = useState("addIncome");
 
     useSetInitialStore({ budget })
-
+    const categories = useAppSelector((state) => state.budgetReducer.value.categories)
+    const accounts = useAppSelector((state) => state.budgetReducer.value.accounts)
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
     const balance = useAppSelector((state) => state.budgetReducer.value.balance) || 0
     const totalIncome = useAppSelector((state) => state.budgetReducer.value.totalIncome) || 0
@@ -45,14 +46,16 @@ export default function DashboardView({budget }: {budget: BudgetView }) {
         return transactions.map(transaction => {
             let type;
             let account;
+            const category = categories.find(cat => cat._id === transaction.category)?.name || ""
             if (transaction.source) {
                 type = "income"
                 account = ""
             } else {
                 type = "expense"
-                account = transaction.account
+                account = accounts.find(account => account._id === transaction.account)?.name || ""
             }
-            return <TransactionCard key={transaction._id} id={transaction._id} type={type} account={account} category={transaction.category} amount={transaction.amount} date={transaction.date} />
+
+            return <TransactionCard key={transaction._id} id={transaction._id} type={type} account={account} category={category} amount={transaction.amount} date={transaction.date} />
         })
     }
 
@@ -120,7 +123,7 @@ export default function DashboardView({budget }: {budget: BudgetView }) {
                         <div className="rounded-full w-10 h-10 bg-slate-300"></div>
                         <div>
                             <p className="text-xs">Budget Spent</p>
-                            <p>$0.00</p>
+                            <p>{currencyFormat(totalExpenses)}</p>
                         </div>
                     </div>
 

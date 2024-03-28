@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 type CategoryMonthlyMax = {
-    month: Date,
+    month: String,
     amount: Number
 }
 
@@ -27,10 +27,10 @@ const CategoriesSchema = new mongoose.Schema<Category>({
     },
     maxMonthExpectedAmount: {
         type: [{
-            month: Date,
+            month: String,
             amount: Number
         }]
     },
 })
 
-export default mongoose.models.Budget || mongoose.model<Category>("Categories", CategoriesSchema);
+export default mongoose.models.Categories || mongoose.model<Category>("Categories", CategoriesSchema);

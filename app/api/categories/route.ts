@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     try {
         const requestBody = await req.json();
         const errors = validateFields(requestBody);
-        if (errors) {
+        if (errors.length) {
             return NextResponse.json({success: false, error: `The following fields are missing from the request body: ${errors.join(", ")}` }, {status: 400});
         }
         const createdCategory = await createCategory(requestBody.budgetId, userId, requestBody.name);

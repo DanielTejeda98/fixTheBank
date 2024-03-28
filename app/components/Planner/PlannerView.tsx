@@ -6,28 +6,29 @@ import SelectBudget from "../Dashboard/SelectBudget";
 import Account from "../Account";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
-import { BudgetView } from "@/types/budget";
+import { BudgetView, CategoryView } from "@/types/budget";
 import { useSetInitialStore } from "@/redux/features/budget-slice";
 import PlannerCategoriesList from "./PlannerCategoriesList";
 import { useAppSelector } from "@/redux/store";
 import PlannerIncomeList from "./PlannerIncomeList";
 import PlannerCategoriesEditor from "./PlannerCategoriesEditor";
+import PlannerCategoryView from "./PlannerCategoryView";
 
 export default function PlannerView ({budget}: {budget: BudgetView}) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [drawerComponent, setDrawerComponent] = useState("addIncome");
-    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState<CategoryView|undefined>(undefined);
 
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
-    const categories = useAppSelector((state) => state.budgetReducer.value.categories);
+    const categories = useAppSelector((state) => state.budgetReducer.value.categories) as CategoryView[];
 
     useSetInitialStore({budget});
 
     const DrawerComponents = {
         selectBudget: <SelectBudget closeDrawer={() => setIsDrawerOpen(false)} />,
         account: <Account closeDrawer={() => setIsDrawerOpen(false)} />,
-        categoriesEditor: <PlannerCategoriesEditor categories={[]} />,
-        categoryExplorer: <div>{selectedCategory}</div>,
+        categoriesEditor: <PlannerCategoriesEditor categories={categories} />,
+        categoryExplorer: <PlannerCategoryView key={selectedCategory?._id} category={selectedCategory} closeDrawer={() => setIsDrawerOpen(false)}/>,
         incomePlanner: <div>Income Planner</div>
     }
     type ComponentString = "selectBudget" | "account" | "categoryExplorer" | "incomePlanner" | "categoriesEditor"
@@ -36,7 +37,7 @@ export default function PlannerView ({budget}: {budget: BudgetView}) {
         setIsDrawerOpen(!isDrawerOpen);
     }
 
-    const handleCategoryClick = (category: string) => {
+    const handleCategoryClick = (category: CategoryView) => {
         setSelectedCategory(category)
         toggleDrawer("categoryExplorer");
     }

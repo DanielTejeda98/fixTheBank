@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 export interface Budget extends mongoose.Document {
     owner: mongoose.Types.ObjectId,
     allowed: mongoose.Types.Array<mongoose.Types.ObjectId>,
-    categories: mongoose.Types.Array<string>,
-    accounts: mongoose.Types.Array<string>,
+    categories: mongoose.Types.Array<mongoose.Types.ObjectId>,
+    accounts: mongoose.Types.Array<mongoose.Types.ObjectId>,
     income: mongoose.Types.Array<mongoose.Types.ObjectId>,
     expenses: mongoose.Types.Array<mongoose.Types.ObjectId>,
     isShared: boolean,
@@ -22,10 +22,12 @@ const BudgetSchema = new mongoose.Schema<Budget>({
         ref: "User"
     }],
     categories: [{
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Categories"
     }],
     accounts: [{
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Account"
     }],
     income: [{type: mongoose.Schema.Types.ObjectId, ref: "Income"}],
     expenses: [{type: mongoose.Schema.Types.ObjectId, ref: "Expense"}],

@@ -7,10 +7,12 @@ import incomeModel from "@/models/incomeModel";
 import expenseModel from "@/models/expenseModel";
 import userModel from "@/models/userModel";
 import categoriesModel from "@/models/categoriesModel";
+import accountModel from "@/models/accountModel";
 
 export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId, budgetMonth: Date) {
     try {
         await dbConnect()
+        const {minDate, maxDate} = getBudgetMinMaxDates(budgetMonth);
 
         const budget = await budgetModel.findOne().or([{owner: userId }, {allowed: userId}])
         .populate({
@@ -18,14 +20,18 @@ export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId
             model: categoriesModel
         })
         .populate({
+            path: "accounts",
+            model: accountModel
+        })
+        .populate({
             path: "expenses",
             model: expenseModel,
-            match: {date: {$gte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1), $lte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth() + 1, 0)}}
+            match: {date: {$gte: minDate, $lte: maxDate}},
         })
         .populate({
             path: "income",
             model: incomeModel,
-            match: {date: {$gte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1), $lte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth() + 1, 0)}}
+            match: {date: {$gte: minDate, $lte: maxDate}}
         })
         .exec();
 
@@ -33,9 +39,23 @@ export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId
             return null;
         }
 
+        // Create default account if no accounts exist
+        if (!budget.accounts.length) {
+            const account = await accountModel.create({
+                budgetId: budget._id,
+                name: "default"
+            })
+    
+            if (account) {
+                budget.accounts.push(account._id);
+                budget.save();
+            }
+        }
+
         return {
             ...budget._doc,
-            ...getBudgetMinMaxDates(budgetMonth),
+            minDate,
+            maxDate,
             isOwner: budget._doc.owner.toString() === userId.toString()
         };
     } catch (error) {
@@ -46,14 +66,25 @@ export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId
 export async function createUserBudget (userId: string) {
     try {
         await dbConnect();
+        
         const budget = await budgetModel.create({
             owner: new mongoose.Types.ObjectId(userId)
         })
-
+        
         if (!budget) {
             return null;
-        } 
+        }
 
+        const account = await accountModel.create({
+            budgetId: budget._id,
+            name: "default"
+        })
+
+        if (account) {
+            budget.accounts.push(account._id);
+            budget.save();
+        }
+        
         return budget;
     } catch (error) {
         throw error
@@ -143,8 +174,8 @@ export async function approveRequesterToJoinBudget (userId: mongoose.Types.Objec
 
 function getBudgetMinMaxDates (budgetMonth: Date) {
     return {
-        minDate: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1).toLocaleDateString(),
-            maxDate: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth() + 1, 0).toLocaleDateString()
+        minDate: new Date(budgetMonth.getUTCFullYear(), budgetMonth.getUTCMonth(), 1).toLocaleDateString("en-US", { timeZone: "America/New_York" }),
+        maxDate: new Date(budgetMonth.getUTCFullYear(), budgetMonth.getUTCMonth() + 1, 0).toLocaleDateString("en-US", { timeZone: "America/New_York" })
     }
 }
 

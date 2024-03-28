@@ -1,11 +1,21 @@
+import { getBudget } from "@/app/lib/budgetApi";
+import { createCategory } from "@/app/lib/categoriesApi";
+import { setBudget } from "@/redux/features/budget-slice";
+import { useAppSelector } from "@/redux/store";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 
 export default function PlannerCategoriesEditor ({categories}: {categories: any[]}) {
     const [addingNewCategory, setAddingNewCategory] = useState(false);
     const [newCategoryName, setNewCategoryName] = useState("");
 
+    const budgetId = useAppSelector((state) => state.budgetReducer.value._id);
+    const reduxDispatch = useDispatch();
+    const userId = useSession().data?.user?.id;
+    
     const handleAddCategoryClick = () => {
         setAddingNewCategory(true);
         // Allows for React to finish rendering the field
@@ -16,10 +26,20 @@ export default function PlannerCategoriesEditor ({categories}: {categories: any[
         },0)
     }
 
-    const handleAddingCategoryBlur = () => {
+    const handleAddingCategoryBlur = async () => {
         const categoryName = newCategoryName.trim();
         if (categoryName) {
-            categories.push({name: categoryName});
+            try {
+                await createCategory({userId}, {
+                    budgetId,
+                    name: newCategoryName
+                })
+                const res = await getBudget({ userId })
+                // Set store values
+                reduxDispatch(setBudget(res.data));
+            } catch (error) {
+                console.log(error)
+            }
             setNewCategoryName("");
         }
         setAddingNewCategory(false);
@@ -53,7 +73,6 @@ export default function PlannerCategoriesEditor ({categories}: {categories: any[
                 ) : null}
                 {renderCategories()}
             </div>
-            <button className="ml-auto bg-slate-500 rounded-md p-1">Save Changes</button>
         </div>
     )
 }

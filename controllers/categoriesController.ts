@@ -26,7 +26,7 @@ export async function createCategory (budgetId: string, userId: string, name: st
     }
 }
 
-export async function updateCategory (categoryId: string, userId: string, name: string, sortRank: Number, date?: Date, amount?: Number): Promise<Category|null> {
+export async function updateCategory (categoryId: string, userId: string, name: string, sortRank: Number, date?: string, amount?: Number): Promise<Category|null> {
     try {
         await dbConnect();
         const budget = await findBudget(userId) as Budget;
@@ -44,10 +44,18 @@ export async function updateCategory (categoryId: string, userId: string, name: 
         category.name = name;
         category.sortRank = sortRank;
         if (date && amount) {
-            category.maxMonthExpectedAmount.push({
-                [getCategoryIndexDate(date)]: amount
-            })
+            const existingMax = category.maxMonthExpectedAmount.find(cat => cat.month === date)
+            if (!existingMax) {
+                category.maxMonthExpectedAmount.push({
+                    month: date,
+                    amount
+                })
+            } else {
+                existingMax.amount = amount;
+            }
         }
+
+        category.save();
 
         return category;
     } catch (error) {
@@ -71,13 +79,6 @@ export async function deleteCategory (categoryId: string, userId: string): Promi
     }
 }
 
-function getCategoryIndexDate (date: Date): string {
-    return date.toLocaleDateString("en-US", {
-        month: "2-digit",
-        year: "numeric"
-    })
-}
-
 async function findBudget (userId: string): Promise<Budget> {
     const budget = await budgetModel.findOne().or([{owner: userId }, {allowed: userId}]);
 
@@ -89,5 +90,5 @@ async function findBudget (userId: string): Promise<Budget> {
 }
 
 function canAccessCategoryCheck (categoryId: string, budget: Budget): Boolean {
-    return budget.categories.includes(categoryId);
+    return budget.categories.includes(new mongoose.Types.ObjectId(categoryId));
 }

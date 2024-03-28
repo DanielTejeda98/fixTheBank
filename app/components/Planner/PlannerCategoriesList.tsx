@@ -1,13 +1,14 @@
+import { CategoryView } from "@/types/budget"
 import PlannerCategoriesCard from "./PlannerCategoryCard"
 
 type PlannerCategoriesList = {
-    categories: string[],
+    categories: CategoryView[],
     editCategoriesClick: Function,
     cardOnClick: Function
 }
 
 export default function PlannerCategoriesList ({categories, editCategoriesClick, cardOnClick}: PlannerCategoriesList) {
-    const mapCategoriesToComponents = (categories: string[]) => {
+    const mapCategoriesToComponents = (categories: CategoryView[]) => {
         if (!categories.length) {
             return (
                 <li>
@@ -16,7 +17,7 @@ export default function PlannerCategoriesList ({categories, editCategoriesClick,
             )
         }
 
-        return categories.map((category: string, index: number) => {
+        return categories.map((category: CategoryView, index: number) => {
             return (
                 <PlannerCategoriesCard key={index} category={category} onClick={cardOnClick}/>
             )
