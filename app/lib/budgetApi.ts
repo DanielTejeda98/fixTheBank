@@ -122,5 +122,7 @@ export {
     requestToJoinBudget,
     toggleBudgetShareSettings,
     approveJoinRequest,
-    getRequestersList
+    getRequestersList,
+    createPlannedIncome,
+    deletePlannedIncome
 }
