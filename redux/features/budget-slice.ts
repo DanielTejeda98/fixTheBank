@@ -15,6 +15,7 @@ type BudgetState = {
     categories: CategoryView[];
     accounts: AccountView[];
     income: any[];
+    plannedIncome: any[],
     expenses: any[];
     minDate: string;
     maxDate: string;
@@ -33,6 +34,7 @@ const initialState = {
         categories: [],
         accounts: [],
         income: [],
+        plannedIncome: [],
         expenses: [],
         minDate: "",
         maxDate: "",

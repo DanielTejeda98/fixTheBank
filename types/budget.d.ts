@@ -3,6 +3,7 @@
 export interface BudgetView {
     _id: string,
     income: any[],
+    plannedIncome: PlannedIncomeView[],
     expenses: any[],
     categories: CategoryView[],
     accounts: AccountView[],
@@ -23,4 +24,10 @@ export interface CategoryView {
 export interface AccountView {
     _id: string,
     name: string
+}
+
+export interface PlannedIncomeView {
+    _id: string,
+    month: string,
+    incomeStreams: any[]
 }

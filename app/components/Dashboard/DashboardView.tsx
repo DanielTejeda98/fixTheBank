@@ -14,6 +14,7 @@ import SelectBudget from "./SelectBudget";
 import Account from "../Account";
 import FullSizeCard from "../FullSizeCard";
 import { BudgetView } from "@/types/budget";
+import Link from "next/link";
 
 export default function DashboardView({budget }: {budget: BudgetView }) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -100,7 +101,7 @@ export default function DashboardView({budget }: {budget: BudgetView }) {
             <section className="m-3 p-3">
                 <div className="flex justify-between items-end">
                     <h2>Budget Summary</h2>
-                    <a href="" className="text-xs">Manage budget</a>
+                    <Link href="/planner" className="text-xs">Manage budget</Link>
                 </div>
                 <div className="grid grid-rows-2 grid-flow-col gap-3 mt-3">
                     <div className="flex items-center p-2 bg-green-800 w-45 gap-2 rounded-md">

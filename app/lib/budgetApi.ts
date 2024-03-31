@@ -94,6 +94,24 @@ const getRequestersList = async (headers: any, budgetId: string) => {
     return await res.json();
 }
 
+const createPlannedIncome = async (headers: any, pIncome: any) => {
+    const res = await fetch(`${API_BASE_URL}/budget/planned-income`, {
+        headers,
+        method: "POST",
+        body: pIncome
+    })
+    return await res.json();
+}
+
+const deletePlannedIncome = async (headers: any, pIncomeToDelete: any) => {
+    const res = await fetch(`${API_BASE_URL}/budget/planned-income`, {
+        headers,
+        method: "DELETE",
+        body: pIncomeToDelete
+    })
+    return await res.json();
+}
+
 export {
     createExpense,
     createIncome,

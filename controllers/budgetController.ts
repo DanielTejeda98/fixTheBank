@@ -172,6 +172,53 @@ export async function approveRequesterToJoinBudget (userId: mongoose.Types.Objec
     }
 }
 
+export async function addPlannedIncome (userId: mongoose.Types.ObjectId, monthIndex: string, newIncomeStream: {source: string, amount: Number}) {
+    try {
+        await dbConnect();
+        const budget = await budgetModel.findOne().or([{owner: userId }, {allowed: userId}])
+
+        if (!budget) {
+            throw new Error(`No budget found for user ID: ${userId}`)
+        }
+
+        const plannedIncomeMonthList = budget.plannedIncome.find((pi:any) => pi.month === monthIndex);
+        // If the month index does not exist, create one and push our new source
+        if (!plannedIncomeMonthList.length) {
+            budget.plannedIncome.push({month: monthIndex, incomeStreams: [{source: newIncomeStream.source, amount: newIncomeStream.amount}]});
+        } else {
+            plannedIncomeMonthList.push({source: newIncomeStream.source, amount: newIncomeStream.amount});
+        }
+
+        await budget.save();
+    } catch (error) {
+        throw error
+    }
+}
+
+export async function removePlannedIncome (userId: mongoose.Types.ObjectId, monthIndex: string, incomeSourceId: mongoose.Types.ObjectId) {
+    try {
+        await dbConnect();
+        const budget = await budgetModel.findOne().or([{owner: userId }, {allowed: userId}])
+
+        if (!budget) {
+            throw new Error(`No budget found for user ID: ${userId}`)
+        }
+
+        const plannedIncomeMonthList = budget.plannedIncome.find((pi:any) => pi.month === monthIndex);
+
+        // If the month index does not exist, create one and push our new source
+        if (!plannedIncomeMonthList.length) {
+            throw new Error("Month index does not exist!");
+        }
+
+        plannedIncomeMonthList.pull(incomeSourceId);
+
+        budget.save();
+    } catch (error) {
+        throw error
+    }
+}
+
 function getBudgetMinMaxDates (budgetMonth: Date) {
     return {
         minDate: new Date(budgetMonth.getUTCFullYear(), budgetMonth.getUTCMonth(), 1).toLocaleDateString("en-US", { timeZone: "America/New_York" }),
@@ -239,7 +286,7 @@ async function syncBudgetWithShareableBudgetInfo (budgetDocument: Budget, shared
     } catch (error) {
         throw error
     }
-} 
+}
 
 function generateJoinCode () {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

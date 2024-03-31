@@ -22,7 +22,7 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
     const [formData, dispatch] = useReducer((state: FormData, action: FormData): FormData => {
         return { ...state, ...action }
     }, {
-        amount: 0,
+        amount: undefined,
         account: accounts?.length > 0 ? accounts[0]._id : "",
         category: categories?.length > 0 ? categories[0]._id : "",
         date: "",
