@@ -8,7 +8,7 @@ RUN npm ci
 
 COPY . .
 
-RUN npm install -g next
+RUN yarn global add next
 
 EXPOSE 3721
 

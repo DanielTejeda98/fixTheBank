@@ -10,6 +10,9 @@ import categoriesModel from "@/models/categoriesModel";
 import accountModel from "@/models/accountModel";
 
 export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId, budgetMonth: Date) {
+    if(process.env.DEBUG === 'debug') {
+        console.log(`[getUserFullBudgetDocument] Getting full budget document started`)
+    }
     try {
         await dbConnect()
         const {minDate, maxDate} = getBudgetMinMaxDates(budgetMonth);
@@ -220,6 +223,9 @@ export async function removePlannedIncome (userId: mongoose.Types.ObjectId, mont
 }
 
 function getBudgetMinMaxDates (budgetMonth: Date) {
+    if(process.env.DEBUG === "debug") {
+        console.log(`[getBudgetMinMaxDates]: Received call with budgetMonth ${budgetMonth}`);
+    } 
     return {
         minDate: new Date(budgetMonth.getUTCFullYear(), budgetMonth.getUTCMonth(), 1).toLocaleDateString("en-US", { timeZone: "America/New_York" }),
         maxDate: new Date(budgetMonth.getUTCFullYear(), budgetMonth.getUTCMonth() + 1, 0).toLocaleDateString("en-US", { timeZone: "America/New_York" })
