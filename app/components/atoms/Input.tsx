@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons/faUser";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons/faEnvelope";
 
 type ValidationType = {
     validator: any,
@@ -11,8 +12,8 @@ type ValidationType = {
 type InputProps = {
     id: string,
     name: string,
-    type: "text" | "password",
-    icon?: "faUser" | "faLock",
+    type: "text" | "password" | "email",
+    icon?: "faUser" | "faLock" | "faEnvelope",
     required?: boolean,
     label?: string,
     placeholder?: string,
@@ -23,7 +24,8 @@ type InputProps = {
 
 const icons = {
     faUser,
-    faLock
+    faLock,
+    faEnvelope
 }
 
 function RenderLabel (id: string, labelText: string|undefined, required: boolean, info: string|null|undefined) {

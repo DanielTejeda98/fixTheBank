@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
             createdBy: userId,
             updatedBy: userId,
             amount: request.amount,
-            category: request.category,
+            category: new mongoose.Types.ObjectId(request.category),
             date: request.date,
             description: request.description,
             account: request.account,

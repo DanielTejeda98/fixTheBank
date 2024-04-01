@@ -1,10 +1,9 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { currencyFormat } from "@/app/lib/renderHelper";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear, faUser } from '@fortawesome/free-solid-svg-icons';
-import { selectTransactions, setBudget } from "@/redux/features/budget-slice";
-import { useDispatch } from "react-redux";
+import { selectTransactions, useSetInitialStore } from "@/redux/features/budget-slice";
 import { useAppSelector } from "@/redux/store";
 import Drawer from "../Drawer";
 import AddIncome from "./AddIncome";
@@ -14,36 +13,19 @@ import TransactionCard from "../TransactionCard";
 import SelectBudget from "./SelectBudget";
 import Account from "../Account";
 import FullSizeCard from "../FullSizeCard";
+import { BudgetView } from "@/types/budget";
+import Link from "next/link";
 
-interface Budget {
-    _id: string,
-    income: any[],
-    expenses: any[],
-    categories: string[],
-    accounts: string[],
-    minDate: string,
-    maxDate: string,
-    isOwner: boolean,
-    isShared: boolean,
-    shareCode: string,
-    joinRequests: any[]
-}
-
-function useSetInitialStore({budget }: {budget: Budget }) {
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(setBudget(budget))
-    }, [budget, dispatch])
-}
-
-export default function DashboardView({budget }: {budget: Budget }) {
+export default function DashboardView({budget }: {budget: BudgetView }) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [drawerComponent, setDrawerComponent] = useState("addIncome");
 
     useSetInitialStore({ budget })
-
+    const categories = useAppSelector((state) => state.budgetReducer.value.categories)
+    const accounts = useAppSelector((state) => state.budgetReducer.value.accounts)
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
     const balance = useAppSelector((state) => state.budgetReducer.value.balance) || 0
+    const totalPlannedIncome = useAppSelector((state) => state.budgetReducer.value.totalPlannedIncome) || 0
     const totalIncome = useAppSelector((state) => state.budgetReducer.value.totalIncome) || 0
     const totalExpenses = useAppSelector((state) => state.budgetReducer.value.totalExpenses) || 0
     const transactions = useAppSelector(selectTransactions).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0,10)
@@ -66,21 +48,23 @@ export default function DashboardView({budget }: {budget: Budget }) {
         return transactions.map(transaction => {
             let type;
             let account;
+            const category = categories.find(cat => cat._id === transaction.category)?.name || ""
             if (transaction.source) {
                 type = "income"
                 account = ""
             } else {
                 type = "expense"
-                account = transaction.account
+                account = accounts.find(account => account._id === transaction.account)?.name || ""
             }
-            return <TransactionCard key={transaction._id} id={transaction._id} type={type} account={account} category={transaction.category} amount={transaction.amount} date={transaction.date} />
+
+            return <TransactionCard key={transaction._id} id={transaction._id} type={type} account={account} category={category} amount={transaction.amount} date={transaction.date} />
         })
     }
 
     return (
-        <main>
+        <main className="w-full">
             <FullSizeCard>
-            <div className="flex justify-between">
+                <div className="flex justify-between">
                     <button className="bg-slate-500 p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("account")}><FontAwesomeIcon icon={faUser} /></button>
                     <p>Month: {new Date(budgetMonth).toLocaleDateString("en-us", {month: "long", year: "numeric"})}</p>
                     <button className="bg-slate-500 p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("selectBudget")}><FontAwesomeIcon icon={faGear} /></button>
@@ -118,14 +102,14 @@ export default function DashboardView({budget }: {budget: Budget }) {
             <section className="m-3 p-3">
                 <div className="flex justify-between items-end">
                     <h2>Budget Summary</h2>
-                    <a href="" className="text-xs">Manage budget</a>
+                    <Link href="/planner" className="text-xs">Manage budget</Link>
                 </div>
                 <div className="grid grid-rows-2 grid-flow-col gap-3 mt-3">
                     <div className="flex items-center p-2 bg-green-800 w-45 gap-2 rounded-md">
                         <div className="rounded-full w-10 h-10 bg-slate-300"></div>
                         <div>
-                            <p className="text-xs">Total budget</p>
-                            <p>$0.00</p>
+                            <p className="text-xs">Planned Income</p>
+                            <p>{currencyFormat(totalPlannedIncome)}</p>
                         </div>
                     </div>
 
@@ -133,7 +117,7 @@ export default function DashboardView({budget }: {budget: Budget }) {
                         <div className="rounded-full w-10 h-10 bg-slate-300"></div>
                         <div>
                             <p className="text-xs">Remaining Budget</p>
-                            <p>$0.00</p>
+                            <p>{currencyFormat(totalPlannedIncome - totalExpenses)}</p>
                         </div>
                     </div>
 
@@ -141,7 +125,7 @@ export default function DashboardView({budget }: {budget: Budget }) {
                         <div className="rounded-full w-10 h-10 bg-slate-300"></div>
                         <div>
                             <p className="text-xs">Budget Spent</p>
-                            <p>$0.00</p>
+                            <p>{currencyFormat(totalExpenses)}</p>
                         </div>
                     </div>
 

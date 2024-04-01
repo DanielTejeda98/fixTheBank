@@ -1,3 +1,6 @@
+import { setBudget } from "@/redux/features/budget-slice";
+import { store } from "@/redux/store";
+
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_FTB_HOST}/api`
 
 const createExpense = async (headers: any, expense: any) => {
@@ -18,8 +21,8 @@ const createIncome = async (headers: any, income: any) => {
     return await res.json();
 }
 
-const getBudget = async (headers: any, budgetDate?: Date) => {
-    const res = await fetch(`${API_BASE_URL}/budget${budgetDate ? "?budgetDate=" + budgetDate.toString() : ""}`, {
+const getBudget = async (headers: any, budgetDate?: String) => {
+    const res = await fetch(`${API_BASE_URL}/budget${budgetDate ? "?budgetDate=" + budgetDate : ""}`, {
         headers
     })
     return await res.json()
@@ -94,6 +97,48 @@ const getRequestersList = async (headers: any, budgetId: string) => {
     return await res.json();
 }
 
+const createPlannedIncome = async (headers: any, monthIndex: String, pIncome: any) => {
+    const res = await fetch(`${API_BASE_URL}/budget/planned-income`, {
+        headers,
+        method: "POST",
+        body: JSON.stringify({
+            monthIndex,
+            newIncomeSource: pIncome
+        })
+    })
+
+    const parsedRes = await res.json()
+    if (!parsedRes.success) {
+        throw Error(parsedRes.error);
+    }
+
+    const budgetRes = await getBudget({ userId: headers.userId })
+    store.dispatch(setBudget(budgetRes.data));
+
+    return parsedRes;
+}
+
+const deletePlannedIncome = async (headers: any, monthIndex: String, incomeSourceId: any) => {
+    const res = await fetch(`${API_BASE_URL}/budget/planned-income`, {
+        headers,
+        method: "DELETE",
+        body: JSON.stringify({
+            monthIndex,
+            incomeSourceId
+        })
+    })
+
+    const parsedRes = await res.json()
+    if (!parsedRes.success) {
+        throw Error(parsedRes.error);
+    }
+
+    const budgetRes = await getBudget({ userId: headers.userId })
+    store.dispatch(setBudget(budgetRes.data));
+
+    return parsedRes;
+}
+
 export {
     createExpense,
     createIncome,
@@ -104,5 +149,7 @@ export {
     requestToJoinBudget,
     toggleBudgetShareSettings,
     approveJoinRequest,
-    getRequestersList
+    getRequestersList,
+    createPlannedIncome,
+    deletePlannedIncome
 }

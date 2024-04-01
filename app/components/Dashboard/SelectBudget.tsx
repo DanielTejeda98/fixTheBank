@@ -32,7 +32,7 @@ export default function SelectBudget ({closeDrawer}: {closeDrawer: Function}) {
         try {
             await processBudgetShareUpdates({userId});
 
-            const res = await getBudget({userId}, new Date(budgetDate))
+            const res = await getBudget({userId}, budgetDate)
             if (res.success) {
                 sessionStorage.setItem("selectedBudgetDate", budgetDate);
                 // Set store values

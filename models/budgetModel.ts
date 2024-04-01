@@ -1,11 +1,17 @@
 import mongoose from "mongoose";
 
+export interface PlannedIncome {
+    month: String,
+    incomeStreams: mongoose.Types.Array<{source: String, amount: Number}>
+}
+
 export interface Budget extends mongoose.Document {
     owner: mongoose.Types.ObjectId,
     allowed: mongoose.Types.Array<mongoose.Types.ObjectId>,
-    categories: mongoose.Types.Array<string>,
-    accounts: mongoose.Types.Array<string>,
+    categories: mongoose.Types.Array<mongoose.Types.ObjectId>,
+    accounts: mongoose.Types.Array<mongoose.Types.ObjectId>,
     income: mongoose.Types.Array<mongoose.Types.ObjectId>,
+    plannedIncome: mongoose.Types.Array<PlannedIncome>
     expenses: mongoose.Types.Array<mongoose.Types.ObjectId>,
     isShared: boolean,
     shareCode: string | null,
@@ -22,12 +28,25 @@ const BudgetSchema = new mongoose.Schema<Budget>({
         ref: "User"
     }],
     categories: [{
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Categories"
     }],
     accounts: [{
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Account"
     }],
     income: [{type: mongoose.Schema.Types.ObjectId, ref: "Income"}],
+    plannedIncome: [{
+        type: {
+            month: String,
+            incomeStreams: [{
+                type: {
+                    source: String,
+                    amount: Number
+                }
+            }]
+        }
+    }],
     expenses: [{type: mongoose.Schema.Types.ObjectId, ref: "Expense"}],
     isShared: {
         type: Boolean,

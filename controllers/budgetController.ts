@@ -6,22 +6,32 @@ import shareableBudgetModel, { ShareableBudget } from "@/models/shareableBudgets
 import incomeModel from "@/models/incomeModel";
 import expenseModel from "@/models/expenseModel";
 import userModel from "@/models/userModel";
+import categoriesModel from "@/models/categoriesModel";
+import accountModel from "@/models/accountModel";
 
 export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId, budgetMonth: Date) {
     try {
-        // Declare to have schema available for populate (in case this is the first time the schemas are referenced)
-        incomeModel;
-        expenseModel;
         await dbConnect()
+        const {minDate, maxDate} = getBudgetMinMaxDates(budgetMonth);
 
         const budget = await budgetModel.findOne().or([{owner: userId }, {allowed: userId}])
         .populate({
+            path: "categories",
+            model: categoriesModel
+        })
+        .populate({
+            path: "accounts",
+            model: accountModel
+        })
+        .populate({
             path: "expenses",
-            match: {date: {$gte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1), $lte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth() + 1, 0)}}
+            model: expenseModel,
+            match: {date: {$gte: minDate, $lte: maxDate}},
         })
         .populate({
             path: "income",
-            match: {date: {$gte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1), $lte: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth() + 1, 0)}}
+            model: incomeModel,
+            match: {date: {$gte: minDate, $lte: maxDate}}
         })
         .exec();
 
@@ -29,9 +39,23 @@ export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId
             return null;
         }
 
+        // Create default account if no accounts exist
+        if (!budget.accounts.length) {
+            const account = await accountModel.create({
+                budgetId: budget._id,
+                name: "default"
+            })
+    
+            if (account) {
+                budget.accounts.push(account._id);
+                budget.save();
+            }
+        }
+
         return {
             ...budget._doc,
-            ...getBudgetMinMaxDates(budgetMonth),
+            minDate,
+            maxDate,
             isOwner: budget._doc.owner.toString() === userId.toString()
         };
     } catch (error) {
@@ -42,17 +66,25 @@ export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId
 export async function createUserBudget (userId: string) {
     try {
         await dbConnect();
-        const [categories, accounts] = getDefaultAccountsAndCategories();
+        
         const budget = await budgetModel.create({
-            owner: new mongoose.Types.ObjectId(userId),
-            accounts,
-            categories
+            owner: new mongoose.Types.ObjectId(userId)
         })
-
+        
         if (!budget) {
             return null;
-        } 
+        }
 
+        const account = await accountModel.create({
+            budgetId: budget._id,
+            name: "default"
+        })
+
+        if (account) {
+            budget.accounts.push(account._id);
+            budget.save();
+        }
+        
         return budget;
     } catch (error) {
         throw error
@@ -83,6 +115,10 @@ export async function joinSharedBudget (userId: mongoose.Types.ObjectId, joinCod
         const sharedBudget = await shareableBudgetModel.findOne({joinCode}) as ShareableBudget;
         if (!sharedBudget) {
             throw new Error("No shared budget with the provided join code: " + joinCode);
+        }
+
+        if(sharedBudget.requestedAccounts.includes(userId)) {
+            throw new Error("Already requested to join budget!")
         }
 
         sharedBudget.requestedAccounts.push(userId)
@@ -136,17 +172,58 @@ export async function approveRequesterToJoinBudget (userId: mongoose.Types.Objec
     }
 }
 
-function getBudgetMinMaxDates (budgetMonth: Date) {
-    return {
-        minDate: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1).toLocaleDateString(),
-            maxDate: new Date(budgetMonth.getFullYear(), budgetMonth.getMonth() + 1, 0).toLocaleDateString()
+export async function addPlannedIncome (userId: mongoose.Types.ObjectId, monthIndex: string, newIncomeStream: {source: string, amount: Number}) {
+    try {
+        await dbConnect();
+        const budget = await budgetModel.findOne().or([{owner: userId }, {allowed: userId}])
+
+        if (!budget) {
+            throw new Error(`No budget found for user ID: ${userId}`)
+        }
+
+        const plannedIncomeMonthList = budget._doc.plannedIncome.find((doc:any) => doc.month === monthIndex);
+        // If the month index does not exist, create one and push our new source
+        if (!plannedIncomeMonthList) {
+            budget.plannedIncome.push({month: monthIndex, incomeStreams: [{source: newIncomeStream.source, amount: newIncomeStream.amount}]});
+        } else {
+            plannedIncomeMonthList.incomeStreams.push({source: newIncomeStream.source, amount: newIncomeStream.amount});
+        }
+
+        await budget.save();
+    } catch (error) {
+        throw error
     }
 }
 
-function getDefaultAccountsAndCategories () {
-    const categories = ["Mortgage", "Car Payment", "Car Insurance", "Electricity", "Phones", "House Internet", "Groceries/Household", "Gifts", "Restaurants", "Therapy", "Medical", "Toby", "Toby Medical", "Debts", "Savings", "Investing", "Grooming", "Subscriptions", "Misc"]
-    const accounts = ["Chase Debit", "Chase Savings", "Discover IT", "Discover MILES", "Target Redcard", "Chase Disney Credit"];
-    return [categories, accounts]
+export async function removePlannedIncome (userId: mongoose.Types.ObjectId, monthIndex: string, incomeSourceId: mongoose.Types.ObjectId) {
+    try {
+        await dbConnect();
+        const budget = await budgetModel.findOne().or([{owner: userId }, {allowed: userId}])
+
+        if (!budget) {
+            throw new Error(`No budget found for user ID: ${userId}`)
+        }
+
+        const plannedIncomeMonthList = budget._doc.plannedIncome.find((doc:any) => doc.month === monthIndex);
+
+        // If the month index does not exist, create one and push our new source
+        if (!plannedIncomeMonthList) {
+            throw new Error("Month index does not exist!");
+        }
+
+        plannedIncomeMonthList.pull(incomeSourceId);
+
+        budget.save();
+    } catch (error) {
+        throw error
+    }
+}
+
+function getBudgetMinMaxDates (budgetMonth: Date) {
+    return {
+        minDate: new Date(budgetMonth.getUTCFullYear(), budgetMonth.getUTCMonth(), 1).toLocaleDateString("en-US", { timeZone: "America/New_York" }),
+        maxDate: new Date(budgetMonth.getUTCFullYear(), budgetMonth.getUTCMonth() + 1, 0).toLocaleDateString("en-US", { timeZone: "America/New_York" })
+    }
 }
 
 async function createSharedBudgetInformation (userId: mongoose.Types.ObjectId) {
@@ -209,7 +286,7 @@ async function syncBudgetWithShareableBudgetInfo (budgetDocument: Budget, shared
     } catch (error) {
         throw error
     }
-} 
+}
 
 function generateJoinCode () {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

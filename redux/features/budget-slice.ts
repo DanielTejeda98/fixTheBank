@@ -2,6 +2,9 @@ import { Expense } from "@/models/expenseModel";
 import { Income } from "@/models/incomeModel";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { AccountView, BudgetView, CategoryView } from "@/types/budget";
 
 type InitialState = {
     value: BudgetState;
@@ -9,9 +12,10 @@ type InitialState = {
 
 type BudgetState = {
     _id: string;
-    categories: string[];
-    accounts: string[];
+    categories: CategoryView[];
+    accounts: AccountView[];
     income: any[];
+    plannedIncome: any[],
     expenses: any[];
     minDate: string;
     maxDate: string;
@@ -20,6 +24,7 @@ type BudgetState = {
     shareCode?: string | null;
     joinRequests?: any[],
     balance?: number,
+    totalPlannedIncome?: number,
     totalIncome?: number,
     totalExpenses?: number
 }
@@ -30,6 +35,7 @@ const initialState = {
         categories: [],
         accounts: [],
         income: [],
+        plannedIncome: [],
         expenses: [],
         minDate: "",
         maxDate: "",
@@ -38,10 +44,16 @@ const initialState = {
         shareCode: null,
         joinRequests: [],
         balance: 0,
+        totalPlannedIncome: 0,
         totalIncome: 0,
         totalExpenses: 0
     } as BudgetState
 } as InitialState
+
+const getTotalPlannedIncome = (budget: any): number => {
+    return budget.plannedIncome.find((pi:any) => pi.month === budget.minDate)
+    ?.incomeStreams.reduce((acc: number, current: any) => acc + current.amount, 0)
+}
 
 const getTotalIncome = (budget:any): number => {
     return budget.income.reduce((total:number, current: Income) => {
@@ -68,6 +80,7 @@ export const budget = createSlice({
                 value: {
                     ...state.value,
                     ...action.payload,
+                    totalPlannedIncome: getTotalPlannedIncome(action.payload),
                     totalIncome: getTotalIncome(action.payload),
                     totalExpenses: getTotalExpenses(action.payload),
                     balance: getBalance(action.payload),
@@ -91,6 +104,13 @@ const selectExpense = (state:RootState) => state.budgetReducer.value.expenses;
 export const selectTransactions = createSelector([selectIncome, selectExpense], (income, expenses) => {
     return [...income, ...expenses]
 })
+
+export function useSetInitialStore({budget }: {budget: BudgetView }) {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setBudget(budget))
+    }, [budget, dispatch])
+}
 
 export const { setBudget, setJoinRequestList } = budget.actions;
 export default budget.reducer;
