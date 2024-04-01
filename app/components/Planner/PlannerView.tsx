@@ -21,6 +21,7 @@ export default function PlannerView ({budget}: {budget: BudgetView}) {
     const [selectedCategory, setSelectedCategory] = useState<CategoryView|undefined>(undefined);
 
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
+    const monthPlannedIncome = useAppSelector((state) => state.budgetReducer.value.plannedIncome.find((pi: any) => pi.month === budgetMonth)?.incomeStreams) || [];
     const categories = useAppSelector((state) => state.budgetReducer.value.categories) as CategoryView[];
 
     useSetInitialStore({budget});
@@ -59,7 +60,7 @@ export default function PlannerView ({budget}: {budget: BudgetView}) {
                 </div>
             </FullSizeCard>
             
-            <PlannerIncomeList addIncomeClick={() => toggleDrawer("incomePlanner")}/>
+            <PlannerIncomeList addIncomeClick={() => toggleDrawer("incomePlanner")} incomeStreams={monthPlannedIncome}/>
 
             <PlannerCategoriesList categories={categories}
                                    editCategoriesClick={handleCategoryEditorClick}

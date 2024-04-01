@@ -25,6 +25,7 @@ export default function DashboardView({budget }: {budget: BudgetView }) {
     const accounts = useAppSelector((state) => state.budgetReducer.value.accounts)
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
     const balance = useAppSelector((state) => state.budgetReducer.value.balance) || 0
+    const totalPlannedIncome = useAppSelector((state) => state.budgetReducer.value.totalPlannedIncome) || 0
     const totalIncome = useAppSelector((state) => state.budgetReducer.value.totalIncome) || 0
     const totalExpenses = useAppSelector((state) => state.budgetReducer.value.totalExpenses) || 0
     const transactions = useAppSelector(selectTransactions).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0,10)
@@ -107,8 +108,8 @@ export default function DashboardView({budget }: {budget: BudgetView }) {
                     <div className="flex items-center p-2 bg-green-800 w-45 gap-2 rounded-md">
                         <div className="rounded-full w-10 h-10 bg-slate-300"></div>
                         <div>
-                            <p className="text-xs">Total budget</p>
-                            <p>$0.00</p>
+                            <p className="text-xs">Planned Income</p>
+                            <p>{currencyFormat(totalPlannedIncome)}</p>
                         </div>
                     </div>
 
@@ -116,7 +117,7 @@ export default function DashboardView({budget }: {budget: BudgetView }) {
                         <div className="rounded-full w-10 h-10 bg-slate-300"></div>
                         <div>
                             <p className="text-xs">Remaining Budget</p>
-                            <p>$0.00</p>
+                            <p>{currencyFormat(totalPlannedIncome - totalExpenses)}</p>
                         </div>
                     </div>
 

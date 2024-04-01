@@ -37,6 +37,7 @@ export default async function Planner () {
             accounts: normalizeMongooseObjects(data.accounts),
             income: normalizeMongooseObjects(data.income),
             expenses: normalizeMongooseObjects(data.expenses),
+            plannedIncome: normalizeMongooseObjects(data.plannedIncome),
             minDate: data.minDate,
             maxDate: data.maxDate,
             isShared: data.isShared,

@@ -24,6 +24,7 @@ type BudgetState = {
     shareCode?: string | null;
     joinRequests?: any[],
     balance?: number,
+    totalPlannedIncome?: number,
     totalIncome?: number,
     totalExpenses?: number
 }
@@ -43,10 +44,16 @@ const initialState = {
         shareCode: null,
         joinRequests: [],
         balance: 0,
+        totalPlannedIncome: 0,
         totalIncome: 0,
         totalExpenses: 0
     } as BudgetState
 } as InitialState
+
+const getTotalPlannedIncome = (budget: any): number => {
+    return budget.plannedIncome.find((pi:any) => pi.month === budget.minDate)
+    ?.incomeStreams.reduce((acc: number, current: any) => acc + current.amount, 0)
+}
 
 const getTotalIncome = (budget:any): number => {
     return budget.income.reduce((total:number, current: Income) => {
@@ -73,6 +80,7 @@ export const budget = createSlice({
                 value: {
                     ...state.value,
                     ...action.payload,
+                    totalPlannedIncome: getTotalPlannedIncome(action.payload),
                     totalIncome: getTotalIncome(action.payload),
                     totalExpenses: getTotalExpenses(action.payload),
                     balance: getBalance(action.payload),
