@@ -181,12 +181,12 @@ export async function addPlannedIncome (userId: mongoose.Types.ObjectId, monthIn
             throw new Error(`No budget found for user ID: ${userId}`)
         }
 
-        const plannedIncomeMonthList = budget.plannedIncome.find((pi:any) => pi.month === monthIndex);
+        const plannedIncomeMonthList = budget._doc.plannedIncome.find((doc:any) => doc.month === monthIndex);
         // If the month index does not exist, create one and push our new source
-        if (!plannedIncomeMonthList.length) {
+        if (!plannedIncomeMonthList) {
             budget.plannedIncome.push({month: monthIndex, incomeStreams: [{source: newIncomeStream.source, amount: newIncomeStream.amount}]});
         } else {
-            plannedIncomeMonthList.push({source: newIncomeStream.source, amount: newIncomeStream.amount});
+            plannedIncomeMonthList.incomeStreams.push({source: newIncomeStream.source, amount: newIncomeStream.amount});
         }
 
         await budget.save();
@@ -204,10 +204,10 @@ export async function removePlannedIncome (userId: mongoose.Types.ObjectId, mont
             throw new Error(`No budget found for user ID: ${userId}`)
         }
 
-        const plannedIncomeMonthList = budget.plannedIncome.find((pi:any) => pi.month === monthIndex);
+        const plannedIncomeMonthList = budget._doc.plannedIncome.find((doc:any) => doc.month === monthIndex);
 
         // If the month index does not exist, create one and push our new source
-        if (!plannedIncomeMonthList.length) {
+        if (!plannedIncomeMonthList) {
             throw new Error("Month index does not exist!");
         }
 

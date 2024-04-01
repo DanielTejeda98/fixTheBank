@@ -37,7 +37,7 @@ const BudgetSchema = new mongoose.Schema<Budget>({
     }],
     income: [{type: mongoose.Schema.Types.ObjectId, ref: "Income"}],
     plannedIncome: [{
-        type: [{
+        type: {
             month: String,
             incomeStreams: [{
                 type: {
@@ -45,7 +45,7 @@ const BudgetSchema = new mongoose.Schema<Budget>({
                     amount: Number
                 }
             }]
-        }]
+        }
     }],
     expenses: [{type: mongoose.Schema.Types.ObjectId, ref: "Expense"}],
     isShared: {

@@ -1,3 +1,6 @@
+import { setBudget } from "@/redux/features/budget-slice";
+import { store } from "@/redux/store";
+
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_FTB_HOST}/api`
 
 const createExpense = async (headers: any, expense: any) => {
@@ -94,22 +97,46 @@ const getRequestersList = async (headers: any, budgetId: string) => {
     return await res.json();
 }
 
-const createPlannedIncome = async (headers: any, pIncome: any) => {
+const createPlannedIncome = async (headers: any, monthIndex: String, pIncome: any) => {
     const res = await fetch(`${API_BASE_URL}/budget/planned-income`, {
         headers,
         method: "POST",
-        body: pIncome
+        body: JSON.stringify({
+            monthIndex,
+            newIncomeSource: pIncome
+        })
     })
-    return await res.json();
+
+    const parsedRes = await res.json()
+    if (!parsedRes.success) {
+        throw Error(parsedRes.error);
+    }
+
+    const budgetRes = await getBudget({ userId: headers.userId })
+    store.dispatch(setBudget(budgetRes.data));
+
+    return parsedRes;
 }
 
-const deletePlannedIncome = async (headers: any, pIncomeToDelete: any) => {
+const deletePlannedIncome = async (headers: any, monthIndex: String, incomeSourceId: any) => {
     const res = await fetch(`${API_BASE_URL}/budget/planned-income`, {
         headers,
         method: "DELETE",
-        body: pIncomeToDelete
+        body: JSON.stringify({
+            monthIndex,
+            incomeSourceId
+        })
     })
-    return await res.json();
+
+    const parsedRes = await res.json()
+    if (!parsedRes.success) {
+        throw Error(parsedRes.error);
+    }
+
+    const budgetRes = await getBudget({ userId: headers.userId })
+    store.dispatch(setBudget(budgetRes.data));
+
+    return parsedRes;
 }
 
 export {

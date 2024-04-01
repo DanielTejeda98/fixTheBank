@@ -13,6 +13,7 @@ import { useAppSelector } from "@/redux/store";
 import PlannerIncomeList from "./PlannerIncomeList";
 import PlannerCategoriesEditor from "./PlannerCategoriesEditor";
 import PlannerCategoryView from "./PlannerCategoryView";
+import PlannerIncomeEditor from "./PlannerIncomeEditor";
 
 export default function PlannerView ({budget}: {budget: BudgetView}) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -29,7 +30,7 @@ export default function PlannerView ({budget}: {budget: BudgetView}) {
         account: <Account closeDrawer={() => setIsDrawerOpen(false)} />,
         categoriesEditor: <PlannerCategoriesEditor categories={categories} />,
         categoryExplorer: <PlannerCategoryView key={selectedCategory?._id} category={selectedCategory} closeDrawer={() => setIsDrawerOpen(false)}/>,
-        incomePlanner: <div>Income Planner</div>
+        incomePlanner: <PlannerIncomeEditor closeDrawer={() => setIsDrawerOpen(false)} />
     }
     type ComponentString = "selectBudget" | "account" | "categoryExplorer" | "incomePlanner" | "categoriesEditor"
     const toggleDrawer = (component: ComponentString) => {
