@@ -16,7 +16,7 @@ export default function PlannerCategoriesCard ({category, onClick}: PlannerCateg
         return acc + current.amount;
     }, 0)
 
-    const percentageUsage = usedAmount < maxAmount ? usedAmount / maxAmount : 100;
+    const percentageUsage = usedAmount < maxAmount ? (usedAmount / maxAmount) * 100 : 100;
     console.log(usedAmount)
     console.log("max amount", maxAmount)
     console.log(percentageUsage)
