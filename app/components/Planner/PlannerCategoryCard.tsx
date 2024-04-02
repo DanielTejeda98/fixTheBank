@@ -17,6 +17,9 @@ export default function PlannerCategoriesCard ({category, onClick}: PlannerCateg
     }, 0)
 
     const percentageUsage = usedAmount < maxAmount ? usedAmount / maxAmount : 100;
+    console.log(usedAmount)
+    console.log("max amount", maxAmount)
+    console.log(percentageUsage)
     return (
         <li className="flex flex-wrap items-center mb-2 p-2 bg-slate-800 gap-2 rounded-md"
             onClick={() => { onClick && onClick(category) } }>
@@ -32,7 +35,7 @@ export default function PlannerCategoriesCard ({category, onClick}: PlannerCateg
                 </div>
             </div>
             <div className="rounded-full w-full mb-5 h-1 bg-gray-200">
-                <div className="h-1 bg-purple-500" style={{width: `${percentageUsage || 100}%`}}></div>
+                <div className="h-1 bg-purple-500" style={{width: `${percentageUsage}%`}}></div>
             </div>
         </li>
     )

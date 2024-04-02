@@ -57,8 +57,8 @@ export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId
 
         return {
             ...budget._doc,
-            minDate,
-            maxDate,
+            minDate: minDate.toLocaleString("en-us", {dateStyle: "short", timeZone: "UTC"}),
+            maxDate: maxDate.toLocaleString("en-us", {dateStyle: "short", timeZone: "UTC"}),
             isOwner: budget._doc.owner.toString() === userId.toString()
         };
     } catch (error) {
@@ -227,8 +227,8 @@ function getBudgetMinMaxDates (budgetMonth: Date) {
         console.log(`[getBudgetMinMaxDates]: Received call with budgetMonth ${budgetMonth}`);
     } 
     return {
-        minDate: new Date(budgetMonth.getUTCFullYear(), budgetMonth.getUTCMonth(), 1).toLocaleDateString("en-US", { timeZone: "America/New_York" }),
-        maxDate: new Date(budgetMonth.getUTCFullYear(), budgetMonth.getUTCMonth() + 1, 0).toLocaleDateString("en-US", { timeZone: "America/New_York" })
+        minDate: new Date(Date.UTC(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1, 0, 0, 0, 0)),
+        maxDate: new Date(Date.UTC(budgetMonth.getFullYear(), budgetMonth.getMonth() + 1, 0, 23, 59, 59, 999))
     }
 }
 

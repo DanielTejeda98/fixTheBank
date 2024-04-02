@@ -54,7 +54,7 @@ export default function PlannerView ({budget}: {budget: BudgetView}) {
                     <button className="bg-slate-500 p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("account")}><FontAwesomeIcon icon={faUser} /></button>
                     <div className="text-center">
                         <h1>Planner</h1>
-                        <p className="text-sm">Planning for Month: <br /> {new Date(budgetMonth).toLocaleDateString("en-us", {month: "long", year: "numeric"})}</p>
+                        <p className="text-sm">Planning for Month: <br /> {new Date(budgetMonth).toLocaleDateString("en-us", {month: "long", year: "numeric", timeZone: "UTC"})}</p>
                     </div>
                     <button className="bg-slate-500 p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("selectBudget")}><FontAwesomeIcon icon={faGear} /></button>
                 </div>

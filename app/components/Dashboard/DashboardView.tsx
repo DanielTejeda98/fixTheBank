@@ -57,7 +57,7 @@ export default function DashboardView({budget }: {budget: BudgetView }) {
                 account = accounts.find(account => account._id === transaction.account)?.name || ""
             }
 
-            return <TransactionCard key={transaction._id} id={transaction._id} type={type} account={account} category={category} amount={transaction.amount} date={transaction.date} />
+            return <TransactionCard key={transaction._id} id={transaction._id} type={type} account={account} category={category} amount={transaction.amount} description={transaction.description} date={transaction.date} />
         })
     }
 
@@ -66,7 +66,7 @@ export default function DashboardView({budget }: {budget: BudgetView }) {
             <FullSizeCard>
                 <div className="flex justify-between">
                     <button className="bg-slate-500 p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("account")}><FontAwesomeIcon icon={faUser} /></button>
-                    <p>Month: {new Date(budgetMonth).toLocaleDateString("en-us", {month: "long", year: "numeric"})}</p>
+                    <p>Month: {new Date(budgetMonth).toLocaleDateString("en-us", {month: "long", year: "numeric", timeZone: "UTC"})}</p>
                     <button className="bg-slate-500 p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("selectBudget")}><FontAwesomeIcon icon={faGear} /></button>
                 </div>
                 <div className="flex mt-5 pt-5 items-end">
