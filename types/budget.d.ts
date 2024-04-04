@@ -31,3 +31,14 @@ export interface PlannedIncomeView {
     month: string,
     incomeStreams: any[]
 }
+
+export interface TransactionView {
+    _id: string,
+    type: string,
+    category?: string
+    account?: string,
+    source?: string,
+    amount: number,
+    description: string,
+    date: Date
+}

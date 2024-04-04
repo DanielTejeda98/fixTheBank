@@ -6,11 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/config/authOptions";
 import Navigation from "../components/Navigation";
 import { BudgetView } from "@/types/budget";
-
-
-const normalizeMongooseObjects = (object: any) => {
-    return JSON.parse(JSON.stringify(object))
-}
+import normalizeMongooseObjects from "../lib/normalizeMongooseObjects";
 
 export default async function Dashboard() {
     const session = await getServerSession(authOptions)

@@ -44,7 +44,15 @@ const deleteExpense = async (headers: any, expenseId: string) => {
             expenseId
         })
     })
-    return await res.json();
+    const parsedRes = await res.json()
+    if (!parsedRes.success) {
+        throw Error(parsedRes.error);
+    }
+
+    const budgetRes = await getBudget({ userId: headers.userId })
+    store.dispatch(setBudget(budgetRes.data));
+
+    return parsedRes;
 }
 
 const deleteIncome = async (headers: any, incomeId: string) => {
@@ -55,7 +63,15 @@ const deleteIncome = async (headers: any, incomeId: string) => {
             incomeId
         })
     })
-    return await res.json();
+    const parsedRes = await res.json()
+    if (!parsedRes.success) {
+        throw Error(parsedRes.error);
+    }
+
+    const budgetRes = await getBudget({ userId: headers.userId })
+    store.dispatch(setBudget(budgetRes.data));
+
+    return parsedRes;
 }
 
 const toggleBudgetShareSettings = async (headers: any) => {

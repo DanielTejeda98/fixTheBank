@@ -1,17 +1,16 @@
-import Navigation from "../components/Navigation";
-import PlannerView from "../components/Planner/PlannerView";
+import { authOptions } from "@/config/authOptions";
 import { getBudgetRequesters, getUserFullBudgetDocument } from "@/controllers/budgetController";
+import { BudgetView } from "@/types/budget";
 import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/config/authOptions";
 import { redirect } from "next/navigation";
-import { BudgetView } from "@/types/budget";
+import Navigation from "../components/Navigation";
 import normalizeMongooseObjects from "../lib/normalizeMongooseObjects";
+import TransactionsView from "../components/Transactions/TransactionsView";
 
-export default async function Planner () {
+export default async function Transactions () {
     const session = await getServerSession(authOptions)
     const userId = new mongoose.Types.ObjectId(session?.user?.id)
-
     try {
         const data = await getUserFullBudgetDocument(userId, new Date())
         if (!data) {
@@ -27,7 +26,6 @@ export default async function Planner () {
                 console.log(error)
             }
         }
-
         const mappedBudget = {
             _id: data._id.toString(),
             categories: normalizeMongooseObjects(data.categories),
@@ -41,14 +39,14 @@ export default async function Planner () {
             shareCode: data.shareCode,
             isOwner: data.isOwner,
             joinRequests: requesters,
-        } as BudgetView
-
+        } as BudgetView;
         return (
             <>
-                <PlannerView budget={mappedBudget}/>
+                <TransactionsView budget={mappedBudget} />
                 <Navigation />
             </>
         )
+
     } catch (error) {
         console.log(error);
         return (
@@ -59,6 +57,4 @@ export default async function Planner () {
             </>
             )
     }
-
-    
-}
+} 
