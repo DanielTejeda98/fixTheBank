@@ -20,7 +20,7 @@ export default function AddIncome ({closeDrawer, budgetId}: {closeDrawer: Functi
     const [formData, formDispatch] = useReducer((state: FormData, action: FormData):FormData => {
         return {...state, ...action}
     }, {
-        amount: 0,
+        amount: undefined,
         source: "",
         date: ""
     })
@@ -74,13 +74,13 @@ export default function AddIncome ({closeDrawer, budgetId}: {closeDrawer: Functi
 
             <div className="mt-2">
                 <label htmlFor="date">Date</label>
-                <input type="date" name="date" className="ml-2 bg-slate-700" value={formData.date} onChange={e => formDispatch({date: new Date(e.target.value).toLocaleDateString("en-US")})}/>
+                <input type="date" name="date" className="ml-2 bg-slate-700" value={formData.date} onChange={e => formDispatch({date: e.target.value})}/>
                 {validator.current.message("date", formData.date, "alpha_num_dash_space|required")}
             </div>
             
             <div className="flex justify-end gap-3 w-full mt-5">
-                <button type="submit" className="bg-slate-500 rounded-md p-1">Add Income</button>
                 <button type="reset" className="bg-red-700 rounded-md p-1">Clear</button>
+                <button type="submit" className="bg-slate-500 rounded-md p-1">Add Income</button>
             </div>
         </form>
     )

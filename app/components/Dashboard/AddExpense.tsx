@@ -109,8 +109,8 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
             </div>
 
             <div className="flex justify-end gap-3 w-full mt-5">
-                <button type="submit" className="bg-slate-500 rounded-md p-1">Add Expense</button>
                 <button type="reset" className="bg-red-700 rounded-md p-1">Clear</button>
+                <button type="submit" className="bg-slate-500 rounded-md p-1">Add Expense</button>
             </div>
         </form>
     )

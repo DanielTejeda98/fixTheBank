@@ -17,9 +17,7 @@ export default function PlannerCategoriesCard ({category, onClick}: PlannerCateg
     }, 0)
 
     const percentageUsage = usedAmount < maxAmount ? (usedAmount / maxAmount) * 100 : 100;
-    console.log(usedAmount)
-    console.log("max amount", maxAmount)
-    console.log(percentageUsage)
+    const isOverdrafted = usedAmount > maxAmount;
     return (
         <li className="flex flex-wrap items-center mb-2 p-2 bg-slate-800 gap-2 rounded-md"
             onClick={() => { onClick && onClick(category) } }>
@@ -28,10 +26,11 @@ export default function PlannerCategoriesCard ({category, onClick}: PlannerCateg
             </div>
             <div className="flex justify-between w-full">
                 <div className="text-sm">
-                    <p>{currencyFormat(usedAmount)}</p>
+                    <p className={`${isOverdrafted ? "text-red-500" : null}`}>{currencyFormat(usedAmount)}</p>
                 </div>
-                <div className="text-sm">
-                    <p>{currencyFormat(maxAmount)}</p>
+                <div className="text-sm text-end">
+                    <p>Allotted amount: {currencyFormat(maxAmount)}</p>
+                    <p>Remaining amount: {currencyFormat(maxAmount - usedAmount)}</p>
                 </div>
             </div>
             <div className="rounded-full w-full mb-5 h-1 bg-gray-200">

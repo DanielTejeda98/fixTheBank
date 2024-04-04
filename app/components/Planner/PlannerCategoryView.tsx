@@ -1,5 +1,7 @@
 import useReactValidator from "@/app/hooks/useReactValidator";
 import { deleteCategory, updateCategoryWithMaxAmount } from "@/app/lib/categoriesApi";
+import { currencyFormat } from "@/app/lib/renderHelper";
+import { selectUnallocatedFunds } from "@/redux/features/budget-slice";
 import { useAppSelector } from "@/redux/store";
 import { CategoryView } from "@/types/budget"
 import { useSession } from "next-auth/react";
@@ -10,6 +12,7 @@ export default function PlannerCategoryView ({category, closeDrawer}: {category?
     const validator = useReactValidator();
     const forceUpdate = useReducer(x => x + 1, 0)[1];
     const currentMonth = useAppSelector((state) => state.budgetReducer.value.minDate);
+    const unallocatedFunds = useAppSelector((state) => selectUnallocatedFunds(state));
 
     const [maxAmount, setMaxAmount] = useState(category?.maxMonthExpectedAmount.find((c:any) => c.month === currentMonth)?.amount || 0)
 
@@ -49,8 +52,12 @@ export default function PlannerCategoryView ({category, closeDrawer}: {category?
     return (
         <div className="flex flex-col min-h-60">
             <h2 className="w-full">{category.name}</h2>
+            <div className="mt-2 p-2 w-full border rounded-md border-slate-500">
+                <p>Remaining unallocated planned income</p>
+                <p>{currencyFormat(unallocatedFunds)}</p>
+            </div>
             <div className="mt-2 w-full">
-                <label htmlFor="amount">Amount $</label>
+                <label htmlFor="amount">Allocate amount $</label>
                 <input type="number" name="amount" className="ml-2 bg-slate-700" value={maxAmount} onChange={e => setMaxAmount(Number(e.target.value))} />
                 {validator.current.message("amount", maxAmount, "numeric|required")}
             </div>

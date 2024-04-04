@@ -25,8 +25,9 @@ type BudgetState = {
     joinRequests?: any[],
     balance?: number,
     totalPlannedIncome?: number,
+    totalAllocated?: number,
     totalIncome?: number,
-    totalExpenses?: number
+    totalExpenses?: number,
 }
 
 const initialState = {
@@ -45,6 +46,7 @@ const initialState = {
         joinRequests: [],
         balance: 0,
         totalPlannedIncome: 0,
+        totalAllocated: 0,
         totalIncome: 0,
         totalExpenses: 0
     } as BudgetState
@@ -53,6 +55,15 @@ const initialState = {
 const getTotalPlannedIncome = (budget: any): number => {
     return budget.plannedIncome.find((pi:any) => pi.month === budget.minDate)
     ?.incomeStreams.reduce((acc: number, current: any) => acc + current.amount, 0)
+}
+
+const getTotalAllocated = (budget: any): number => {
+    return budget.categories.map((x:any) => x.maxMonthExpectedAmount.find((x:any) => x.month === budget.minDate)).reduce((acc: number, curr:any) => {
+        if (!curr) {
+            return acc;
+        }
+        return acc + curr.amount;
+    }, 0);
 }
 
 const getTotalIncome = (budget:any): number => {
@@ -81,6 +92,7 @@ export const budget = createSlice({
                     ...state.value,
                     ...action.payload,
                     totalPlannedIncome: getTotalPlannedIncome(action.payload),
+                    totalAllocated: getTotalAllocated(action.payload),
                     totalIncome: getTotalIncome(action.payload),
                     totalExpenses: getTotalExpenses(action.payload),
                     balance: getBalance(action.payload),
@@ -104,6 +116,10 @@ const selectExpense = (state:RootState) => state.budgetReducer.value.expenses;
 export const selectTransactions = createSelector([selectIncome, selectExpense], (income, expenses) => {
     return [...income, ...expenses]
 })
+
+export const selectUnallocatedFunds = (state:RootState) => {
+    return (state.budgetReducer.value.totalPlannedIncome || 0) - (state.budgetReducer.value.totalAllocated || 0);
+}
 
 export function useSetInitialStore({budget }: {budget: BudgetView }) {
     const dispatch = useDispatch();
