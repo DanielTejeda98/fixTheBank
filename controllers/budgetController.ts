@@ -7,7 +7,7 @@ import incomeModel from "@/models/incomeModel";
 import expenseModel from "@/models/expenseModel";
 import userModel from "@/models/userModel";
 import categoriesModel from "@/models/categoriesModel";
-import accountModel from "@/models/accountModel";
+import accountModel, { Account } from "@/models/accountModel";
 
 export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId, budgetMonth: Date) {
     if(process.env.DEBUG === 'debug') {
@@ -41,8 +41,10 @@ export async function getUserFullBudgetDocument (userId: mongoose.Types.ObjectId
         if (!budget) {
             return null;
         }
-
         // Create default account if no accounts exist
+        if (!budget.accounts) {
+            budget.accounts = new mongoose.Types.Array<Account>();
+        }
         if (!budget.accounts.length) {
             const account = await accountModel.create({
                 budgetId: budget._id,
