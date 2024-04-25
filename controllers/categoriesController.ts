@@ -1,7 +1,8 @@
 import dbConnect from "@/app/lib/dbConnect";
 import mongoose from "mongoose";
 import categoriesModel, { Category } from "@/models/categoriesModel";
-import budgetModel, { Budget } from "@/models/budgetModel";
+import { Budget } from "@/models/budgetModel";
+import { findBudget } from "@/helpers/budgetHelpers";
 
 export async function createCategory (budgetId: string, userId: string, name: string): Promise<Category> {
     try {
@@ -77,16 +78,6 @@ export async function deleteCategory (categoryId: string, userId: string): Promi
     } catch (error) {
         throw error;
     }
-}
-
-async function findBudget (userId: string): Promise<Budget> {
-    const budget = await budgetModel.findOne().or([{owner: userId }, {allowed: userId}]);
-
-    if (!budget) {
-        throw Error("No budget found for user!");
-    }
-
-    return budget;
 }
 
 function canAccessCategoryCheck (categoryId: string, budget: Budget): Boolean {
