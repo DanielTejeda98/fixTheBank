@@ -3,17 +3,27 @@ import {
   selectTransactions,
   useSetInitialStore,
 } from "@/redux/features/budget-slice";
-import { BudgetView, TransactionView } from "@/types/budget";
+import { BudgetView, CategoryView, TransactionView } from "@/types/budget";
 import FullSizeCard from "../FullSizeCard";
 import { useAppSelector } from "@/redux/store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Drawer from "../Drawer";
 import SelectBudget from "../Dashboard/SelectBudget";
 import Account from "../Account";
 import TransactionCard from "../TransactionCard";
 import TransactionViewer from "./TransactionViewer";
+import Filter from "./Filter";
+
+const useTransactionFilter = (
+  categories: CategoryView[],
+  setFilterBy: Function
+) => {
+  useEffect(() => {
+    setFilterBy(categories.map((cat: CategoryView) => cat._id));
+  }, [categories]);
+};
 
 export default function TransactionsView({ budget }: { budget: BudgetView }) {
   useSetInitialStore({ budget });
@@ -27,6 +37,11 @@ export default function TransactionsView({ budget }: { budget: BudgetView }) {
     (state) => state.budgetReducer.value.minDate
   );
   const transactions = useAppSelector(selectTransactions) as [TransactionView];
+  const categories = useAppSelector(
+    (state) => state.budgetReducer.value.categories
+  );
+  const [filterBy, setFilterBy] = useState(categories.map((cat) => cat._id));
+  useTransactionFilter(categories, setFilterBy);
 
   const DrawerComponents = {
     selectBudget: <SelectBudget closeDrawer={() => setIsDrawerOpen(false)} />,
@@ -37,9 +52,21 @@ export default function TransactionsView({ budget }: { budget: BudgetView }) {
         closeDrawer={() => setIsDrawerOpen(false)}
       />
     ),
+    filter: (
+      <Filter
+        categories={categories}
+        filteredBy={filterBy}
+        setFilteredBy={setFilterBy}
+        closeDrawer={() => setIsDrawerOpen(false)}
+      ></Filter>
+    ),
   };
 
-  type ComponentString = "selectBudget" | "account" | "transactionViewer";
+  type ComponentString =
+    | "selectBudget"
+    | "account"
+    | "transactionViewer"
+    | "filter";
 
   const toggleDrawer = (component: ComponentString) => {
     setDrawerComponent(component);
@@ -52,13 +79,18 @@ export default function TransactionsView({ budget }: { budget: BudgetView }) {
   };
 
   const renderTransactionsList = () => {
-    return transactions.map((transaction) => (
-      <TransactionCard
-        key={transaction._id}
-        transaction={transaction}
-        onClick={() => openTransaction(transaction)}
-      />
-    ));
+    return transactions
+      .filter(
+        (transaction) =>
+          transaction.category && filterBy.includes(transaction.category)
+      )
+      .map((transaction) => (
+        <TransactionCard
+          key={transaction._id}
+          transaction={transaction}
+          onClick={() => openTransaction(transaction)}
+        />
+      ));
   };
 
   return (
@@ -88,8 +120,14 @@ export default function TransactionsView({ budget }: { budget: BudgetView }) {
         </div>
       </FullSizeCard>
 
-      <div className="m-3 flex flex-col">
+      <div className="m-3 flex justify-between items-center">
         <h1>Transactions</h1>
+        <button
+          className="bg-slate-500 px-2 py-1 text-center rounded-md"
+          onClick={() => toggleDrawer("filter")}
+        >
+          Filter
+        </button>
       </div>
 
       <div className="flex flex-col gap-2 p-3 m-3 border border-slate-500 rounded-md">
