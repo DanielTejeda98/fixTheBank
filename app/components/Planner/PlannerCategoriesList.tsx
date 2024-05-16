@@ -1,5 +1,6 @@
 import { CategoryView } from "@/types/budget"
 import PlannerCategoriesCard from "./PlannerCategoryCard"
+import { Button } from "../ui/button"
 
 type PlannerCategoriesList = {
     categories: CategoryView[],
@@ -26,11 +27,11 @@ export default function PlannerCategoriesList ({categories, editCategoriesClick,
 
     return (
         <section className="m-3">
-            <div className="flex w-full justify-between">
+            <div className="flex w-full justify-between items-center">
                 <h2 className="mb-2">Planned Categorized Expenses</h2>
-                <button onClick={() => editCategoriesClick()} className="text-xs">Edit Categories</button>
+                <Button onClick={() => editCategoriesClick()} className="text-xs">Edit Categories</Button>
             </div>
-            <ul>
+            <ul className="mt-2">
                 {mapCategoriesToComponents(categories)}
             </ul>
         </section>

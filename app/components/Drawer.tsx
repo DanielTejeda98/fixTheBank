@@ -34,10 +34,10 @@ export default function Drawer({ children, isOpen, closeDrawer }: Props) {
     useSetDrawerState(isOpen, closeDrawer);
 
     return (
-        <div className={`fixed inset-x-0 bottom-0 h-full transition-all z-10 ${!isOpen ? 'translate-y-full' : ''}`} onClick={() => closeDrawer()}>
+        <div className={`fixed inset-x-0 bottom-0 h-full transition-all z-10 backdrop-blur-sm ${!isOpen ? 'translate-y-full' : ''}`} onClick={() => closeDrawer()}>
             <div className="h-full relative">
-                <div className="bg-slate-500 h-full opacity-50"></div>
-                <div className="absolute bottom-0 bg-slate-800 w-full min-h-60 max-h-[80dvh] py-5 px-2 rounded-t-lg overflow-y-auto" onClick={e => e.stopPropagation()}>
+                <div className="h-full opacity-50"></div>
+                <div className="absolute bottom-0 w-full min-h-60 max-h-[80dvh] py-5 px-2 rounded-t-lg overflow-y-auto bg-background border-t" onClick={e => e.stopPropagation()}>
                     {children}
                 </div>
             </div>

@@ -1,4 +1,5 @@
 import { CategoryView } from "@/types/budget";
+import { Button } from "../ui/button";
 
 type Props = {
   categories: CategoryView[];
@@ -25,7 +26,7 @@ export default function Filter({
       return (
         <div
           key={category._id}
-          className="flex justify-between bg-slate-700 rounded-md p-2 mb-2 last:mb-0"
+          className="flex justify-between rounded-md p-2 mb-2 last:mb-0"
         >
           <label>{category.name}</label>
           <input
@@ -39,7 +40,10 @@ export default function Filter({
   };
   return (
     <div>
-      <h2 className="mb-2">Filter</h2>
+      <div className="flex w-full justify-between items-center">
+        <h2 className="mb-2">Filter</h2>
+        <Button variant="outline" className="text-xs" onClick={() => setFilteredBy([])}>Deselect All</Button>
+      </div>
       {renderCategoriesList()}
     </div>
   );

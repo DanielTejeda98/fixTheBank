@@ -11,19 +11,19 @@ export default function Navigation() {
     const pathname = usePathname();
 
     return (
-        <nav className="sticky bottom-0 inset-x-0 h-20 bg-slate-800 pt-1 w-full self-end transition-all">
+        <nav className="sticky bottom-0 inset-x-0 h-20 pt-1 w-full self-end transition-all border-t">
             <ul className="grid grid-row-4 grid-flow-col mt-2 mx-2">
                 <li>
-                    <Link href="/dashboard" className={`flex flex-col p-1 gap-1 items-center ${pathname?.includes('/dashboard') ? 'bg-slate-700 rounded-lg' : ''}`}>
-                        <div className="w-7 h-7 rounded-full bg-slate-500 text-center">
+                    <Link href="/dashboard" className={`flex flex-col p-1 gap-1 items-center ${pathname?.includes('/dashboard') ? 'rounded-lg border' : ''}`}>
+                        <div className="w-7 h-7 rounded-full text-center">
                             <FontAwesomeIcon icon={faHouse} />
                         </div>
                         <p className="text-xs">Home</p>
                     </Link>
                 </li>
                 <li>
-                    <Link href="/planner" className={`flex flex-col p-1 gap-1 items-center ${pathname?.includes('/planner') ? 'bg-slate-700 rounded-lg' : ''}`}>
-                        <div className="w-7 h-7 rounded-full bg-slate-500 text-center">
+                    <Link href="/planner" className={`flex flex-col p-1 gap-1 items-center ${pathname?.includes('/planner') ? 'rounded-lg border' : ''}`}>
+                        <div className="w-7 h-7 rounded-full text-center">
                             <FontAwesomeIcon icon={faClipboard} />
                         </div>
                         <p className="text-xs">Plan</p>
@@ -31,7 +31,7 @@ export default function Navigation() {
                 </li>
                 <li>
                     <Link href="#" className="flex flex-col p-1 gap-1 items-center">
-                        <div className="w-7 h-7 rounded-full bg-slate-500 text-center">
+                        <div className="w-7 h-7 rounded-full text-center">
                             <FontAwesomeIcon icon={faCoins} />
                         </div>
                         <p className="text-xs">Savings</p>
@@ -39,7 +39,7 @@ export default function Navigation() {
                 </li>
                 <li>
                     <Link href="#" className="flex flex-col p-1 gap-1 items-center">
-                        <div className="w-7 h-7 rounded-full bg-slate-500 text-center">
+                        <div className="w-7 h-7 rounded-full text-center">
                             <FontAwesomeIcon icon={faGear} />
                         </div>
                         <p className="text-xs">Settings</p>

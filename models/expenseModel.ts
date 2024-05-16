@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
-import { User } from "./userModel";
 
 export interface Expense extends mongoose.Document {
-    createdBy: User,
-    updatedBy: User,
+    createdBy: mongoose.Types.ObjectId,
+    updatedBy: mongoose.Types.ObjectId,
     amount: number,
     account: mongoose.Types.ObjectId,
     category: mongoose.Types.ObjectId,

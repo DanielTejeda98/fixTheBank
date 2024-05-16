@@ -15,6 +15,7 @@ import Account from "../Account";
 import TransactionCard from "../TransactionCard";
 import TransactionViewer from "./TransactionViewer";
 import Filter from "./Filter";
+import { Button } from "../ui/button";
 
 const useTransactionFilter = (
   categories: CategoryView[],
@@ -98,7 +99,7 @@ export default function TransactionsView({ budget }: { budget: BudgetView }) {
       <FullSizeCard>
         <div className="flex justify-between">
           <button
-            className="bg-slate-500 p-2 w-10 h-10 text-center rounded-full"
+            className="p-2 w-10 h-10 text-center rounded-full"
             onClick={() => toggleDrawer("account")}
           >
             <FontAwesomeIcon icon={faUser} />
@@ -112,7 +113,7 @@ export default function TransactionsView({ budget }: { budget: BudgetView }) {
             })}
           </p>
           <button
-            className="bg-slate-500 p-2 w-10 h-10 text-center rounded-full"
+            className="p-2 w-10 h-10 text-center rounded-full"
             onClick={() => toggleDrawer("selectBudget")}
           >
             <FontAwesomeIcon icon={faGear} />
@@ -122,12 +123,12 @@ export default function TransactionsView({ budget }: { budget: BudgetView }) {
 
       <div className="m-3 flex justify-between items-center">
         <h1>Transactions</h1>
-        <button
-          className="bg-slate-500 px-2 py-1 text-center rounded-md"
+        <Button variant="outline"
+          className="text-xs"
           onClick={() => toggleDrawer("filter")}
         >
           Filter
-        </button>
+        </Button>
       </div>
 
       <div className="flex flex-col gap-2 p-3 m-3 border border-slate-500 rounded-md">

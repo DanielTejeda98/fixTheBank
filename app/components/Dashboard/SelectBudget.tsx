@@ -6,6 +6,10 @@ import { useDispatch } from "react-redux";
 import SimpleReactValidator from "simple-react-validator";
 import ToggleSlider from "../ToggleSlider";
 import { useSession } from "next-auth/react";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { formatDateInput } from "@/app/lib/renderHelper";
 
 export default function SelectBudget ({closeDrawer}: {closeDrawer: Function}) {
     const userId = useSession().data?.user.id;
@@ -78,18 +82,21 @@ export default function SelectBudget ({closeDrawer}: {closeDrawer: Function}) {
     }
 
     return (
-    <form className="flex flex-wrap" onSubmit={submitBudgetUpdates}>
-        <div>
-            <label className="text-sm">Set the date for the budget you would like to see</label>
-            <input type="date" className="ml-2 bg-slate-700" pattern="\d{1,2}\/d{4}" value={budgetDate} onChange={e => setBudgetDate(e.target.value)}/>
+    <form className="flex flex-wrap w-full" onSubmit={submitBudgetUpdates}>
+        <div className="w-full">
+            <Label htmlFor="date">Budget Date</Label>
+            <div className="flex w-full gap-2">
+                <Input type="date" name="date" value={budgetDate} onChange={e => setBudgetDate(e.target.value)}/>
+                <Button type="button" onClick={e => setBudgetDate(formatDateInput(new Date()))}>Today</Button>
+            </div>
             { validator.current.message("date", budgetDate, "required") }
         </div>
         
         {renderShareOptions()}
 
         <div className="flex justify-end gap-3 w-full mt-5">
-            <button type="submit" className="bg-slate-500 rounded-md p-1">Confirm</button>
-            <button type="reset" className="bg-red-700 rounded-md p-1">Clear</button>
+            <Button type="reset" variant="destructive" className="rounded-md p-1 min-w-32">Clear</Button>
+            <Button type="submit" className="rounded-md p-1 min-w-32">Confirm</Button>
         </div>
     </form>
     );

@@ -1,6 +1,6 @@
 export default function FullSizeCard ({children}: {children: React.ReactNode}) {
     return (
-        <section className="bg-slate-900 m-3 p-3 rounded-lg">
+        <section className="m-3 p-3 rounded-lg border shadow-sm">
             {children}
         </section>
     )

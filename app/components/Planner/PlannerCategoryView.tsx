@@ -6,6 +6,9 @@ import { useAppSelector } from "@/redux/store";
 import { CategoryView } from "@/types/budget"
 import { useSession } from "next-auth/react";
 import { useReducer, useState } from "react";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 
 export default function PlannerCategoryView ({category, closeDrawer}: {category?: CategoryView, closeDrawer: Function}) {
     const userId = useSession().data?.user?.id;
@@ -57,13 +60,13 @@ export default function PlannerCategoryView ({category, closeDrawer}: {category?
                 <p>{currencyFormat(unallocatedFunds)}</p>
             </div>
             <div className="mt-2 w-full">
-                <label htmlFor="amount">Allocate amount $</label>
-                <input type="number" name="amount" className="ml-2 bg-slate-700" value={maxAmount} onChange={e => setMaxAmount(Number(e.target.value))} />
+                <Label htmlFor="amount">Allocate amount</Label>
+                <Input type="number" name="amount" value={maxAmount} onChange={e => setMaxAmount(Number(e.target.value))} />
                 {validator.current.message("amount", maxAmount, "numeric|required")}
             </div>
             <div className="flex w-full grow justify-end gap-2">
-                <button className="bg-red-500 rounded-md p-1 self-end" onClick={handleDeleteClick}>Delete Category</button>
-                <button className="bg-slate-500 rounded-md p-1 self-end" onClick={handleSubmitClick}>Save Changes</button>
+                <Button className="rounded-md p-1 self-end min-w-32" variant="destructive" onClick={handleDeleteClick}>Delete Category</Button>
+                <Button className="rounded-md p-1 self-end min-w-32" onClick={handleSubmitClick}>Save Changes</Button>
             </div>
         </div>
     )

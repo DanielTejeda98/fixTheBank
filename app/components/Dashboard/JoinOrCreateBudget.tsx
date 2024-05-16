@@ -10,6 +10,7 @@ import { useState } from "react";
 import Account from "../Account";
 import JoinBudget from "./JoinBudget";
 import { useSession } from "next-auth/react";
+import { Button } from "../ui/button";
 
 export default function JoinOrCreateBudget() {
     const userId = useSession().data?.user.id;
@@ -44,14 +45,14 @@ export default function JoinOrCreateBudget() {
         <div>
             <FullSizeCard>
                 <div>
-                    <button className="bg-slate-500 p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("account")}><FontAwesomeIcon icon={faUser} /></button>
+                    <button className="p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("account")}><FontAwesomeIcon icon={faUser} /></button>
                 </div>
                 <div className="mt-5">
                     <p>No budget found for user, create one or join one</p>
                 </div>
                 <div className="flex flex-wrap gap-1 justify-center mt-2">
-                    <button onClick={createNewBudget} className="bg-slate-500 rounded-md p-1">Create budget</button>
-                    <button className="bg-slate-500 rounded-md p-1" onClick={() => toggleDrawer("join")}>Join budget</button>
+                    <Button onClick={createNewBudget} className="Buttonrounded-md p-1">Create budget</Button>
+                    <Button className="rounded-md p-1" onClick={() => toggleDrawer("join")}>Join budget</Button>
                 </div>
             </FullSizeCard>
             <Drawer isOpen={isDrawerOpen}

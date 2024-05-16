@@ -3,6 +3,9 @@ import { createPlannedIncome } from "@/app/lib/budgetApi";
 import { useAppSelector } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import { FormEvent, useReducer } from "react";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 
 type FormData = {
     source?: string,
@@ -54,18 +57,18 @@ export default function PlannerIncomeEditor ({closeDrawer}: {closeDrawer: Functi
         <form className="flex flex-col min-h-60" onSubmit={formSubmit} onReset={clearForm}>
             <h2>Add Planned Income</h2>
             <div className="mt-2 w-full">
-                <label htmlFor="amount">Source</label>
-                <input type="text" name="source" className="ml-2 bg-slate-700" value={formData.source} onChange={e => formDispatch({ source: e.target.value })} />
+                <Label htmlFor="amount">Source</Label>
+                <Input type="text" name="source" value={formData.source} onChange={e => formDispatch({ source: e.target.value })} />
                 {validator.current.message("source", formData.source, "alpha_num_dash_space|required")}
             </div>
             <div className="mt-2 w-full">
-                <label htmlFor="amount">Amount $</label>
-                <input type="number" name="amount" className="ml-2 bg-slate-700" value={formData.amount?.toString()} onChange={e => formDispatch({ amount: Number(e.target.value) })} />
+                <Label htmlFor="amount">Amount</Label>
+                <Input type="number" name="amount" value={formData.amount?.toString()} onChange={e => formDispatch({ amount: Number(e.target.value) })} />
                 {validator.current.message("amount", formData.amount, "numeric|required")}
             </div>
             <div className="flex w-full grow justify-end gap-2">
-                <button className="bg-red-500 rounded-md p-1 self-end" type="reset">Reset</button>
-                <button className="bg-slate-500 rounded-md p-1 self-end" type="submit">Save</button>
+                <Button variant="destructive" className="rounded-md p-1 self-end min-w-32" type="reset">Reset</Button>
+                <Button className="rounded-md p-1 self-end min-w-32" type="submit">Save</Button>
             </div>
         </form>
     )
