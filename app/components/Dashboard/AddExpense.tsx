@@ -99,13 +99,13 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
             <div className="mt-2 w-full">
                 <label htmlFor="date">Date</label>
                 <input type="date" name="date" className="ml-2 bg-slate-700" value={formData.date} onChange={e => dispatch({ date: e.target.value })} />
-                {validator.current.message("date", formData.date, "alpha_num_dash_space|required")}
+                {validator.current.message("date", formData.date, "required")}
             </div>
 
             <div className="mt-2 w-full">
                 <label htmlFor="description">Description</label>
                 <input type="text" name="description" className="ml-2 bg-slate-700" value={formData.description} onChange={e => dispatch({ description: e.target.value })} />
-                {validator.current.message("description", formData.description, "alpha_num_dash_space|required")}
+                {validator.current.message("description", formData.description, "required")}
             </div>
 
             <div className="flex justify-end gap-3 w-full mt-5">

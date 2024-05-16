@@ -1,35 +1,30 @@
-import dbConnect from "@/app/lib/dbConnect";
 import { NextRequest, NextResponse } from "next/server";
-import expenseModel from "@/models/expenseModel";
 import mongoose from "mongoose";
-import budgetModel from "@/models/budgetModel";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/config/authOptions";
+import { createExpense, deleteExpense } from "@/controllers/expenseController";
 
 export async function POST(req: NextRequest) {
+    const session = await getServerSession(authOptions)
+    if (!session) {
+        return NextResponse.json({ message: "Must be logged in"}, {status: 401})
+    }
     const headerUserId = req.headers.get("userId");
-    await dbConnect();
+    if (!headerUserId) {
+        return NextResponse.json({ message: "No user ID provided"}, {status: 412})
+    }
+    const userId = new mongoose.Types.ObjectId(headerUserId);
+    
     const request = await req.json();
     const error = validatePOSTFields(request);
     if (error) {
         return NextResponse.json({success: false, error: error.message }, {status: 412})
     }
+
     try {
-        const userId = new mongoose.Types.ObjectId(headerUserId || "");
-        const expense = await expenseModel.create({
-            createdBy: userId,
-            updatedBy: userId,
-            amount: request.amount,
-            category: new mongoose.Types.ObjectId(request.category),
-            date: request.date,
-            description: request.description,
-            account: request.account,
-            budgetId: new mongoose.Types.ObjectId(request.budgetId)
-        })
+        const newExpense = await createExpense(request, userId);
 
-        await budgetModel.findByIdAndUpdate(new mongoose.Types.ObjectId(request.budgetId), {
-            $push: {expenses: expense._id}
-        })
-
-        return NextResponse.json({success: true, data: expense}, {status: 200});
+        return NextResponse.json({success: true, data: newExpense}, {status: 200});
     } catch (error) {
         console.log(error)
         return NextResponse.json({success: false, error }, {status: 400})
@@ -37,34 +32,24 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-    await dbConnect();
+    const session = await getServerSession(authOptions)
+    if (!session) {
+        return NextResponse.json({ message: "Must be logged in"}, {status: 401})
+    }
     const userId = req.headers.get("userId");
+    if (!userId) {
+        return NextResponse.json({ message: "No user ID provided"}, {status: 412})
+    }
     const request = await req.json();
-
     if(!request.expenseId) {
         return NextResponse.json({success: false, error: "No expense ID provided for delete"})
     }
-
+    const userIdAsObjectId = new mongoose.Types.ObjectId(userId);
+    const expenseIdasObjectId = new mongoose.Types.ObjectId(request.expenseId);
     try {
-        const userIdAsObjectId = new mongoose.Types.ObjectId(userId || "");
-        const budget = await budgetModel.findOne({owner: userIdAsObjectId})
-        if (!budget) {
-            return NextResponse.json({success: false, error: "No budget found for user"})
-        }
+        const deletedExpense = await deleteExpense(expenseIdasObjectId, userIdAsObjectId)
 
-        const expenseId = new mongoose.Types.ObjectId(request.expenseId)
-        const expense = await expenseModel.findOneAndDelete({_id: expenseId, budgetId: budget._id})
-        if (!expense) {
-            return NextResponse.json({success: false, error: "No expense found for delete"})
-        }
-
-        await budget.updateOne({
-            $pull: {expenses: expense._id}
-        })
-
-        await budget.save()
-
-        return NextResponse.json({success: true, data: "Successfuly deleted expense"}, {status: 200});
+        return NextResponse.json({success: true, message: deletedExpense}, {status: 200});
     } catch (error) {
         return NextResponse.json({success: false, error }, {status: 400})
     }

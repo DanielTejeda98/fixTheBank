@@ -69,13 +69,13 @@ export default function AddIncome ({closeDrawer, budgetId}: {closeDrawer: Functi
             <div className="mt-2">
                 <label htmlFor="source">Source</label>
                 <input type="text" id="source" name="source" className="ml-2 bg-slate-700" value={formData.source} onChange={e => formDispatch({source: e.target.value})}/>
-                {validator.current.message("source", formData.source, "alpha_num_dash_space|required")}
+                {validator.current.message("source", formData.source, "required")}
             </div>
 
             <div className="mt-2">
                 <label htmlFor="date">Date</label>
                 <input type="date" name="date" className="ml-2 bg-slate-700" value={formData.date} onChange={e => formDispatch({date: e.target.value})}/>
-                {validator.current.message("date", formData.date, "alpha_num_dash_space|required")}
+                {validator.current.message("date", formData.date, "required")}
             </div>
             
             <div className="flex justify-end gap-3 w-full mt-5">
