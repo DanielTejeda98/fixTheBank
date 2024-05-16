@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} flex flex-wrap min-h-dvh`}>
+      <body className={`${inter.className} flex flex-wrap min-h-dvh bg-background dark`}>
         <ReduxProvider>
           <AuthProvider>
             {children}

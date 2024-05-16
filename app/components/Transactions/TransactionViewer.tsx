@@ -3,6 +3,7 @@ import { currencyFormat } from "@/app/lib/renderHelper";
 import { useAppSelector } from "@/redux/store";
 import { TransactionView } from "@/types/budget";
 import { useSession } from "next-auth/react";
+import { Button } from "../ui/button";
 
 export default function TransactionViewer ({transaction, closeDrawer}: {transaction?: TransactionView, closeDrawer: Function}) {
     const userId = useSession().data?.user?.id;
@@ -40,7 +41,7 @@ export default function TransactionViewer ({transaction, closeDrawer}: {transact
                 <p>Date: {new Date(transaction.date).toLocaleDateString("en-us", {timeZone: "UTC"})}</p>
             </div>
             <div className="flex w-full grow justify-end">
-                <button className="bg-red-500 rounded-md p-1 self-end" onClick={() => handleDeleteTransaction()}>Delete Transaction</button>
+                <Button variant="destructive" className="rounded-md p-1 self-end min-w-32" onClick={() => handleDeleteTransaction()}>Delete Transaction</Button>
             </div>
         </div>
     )

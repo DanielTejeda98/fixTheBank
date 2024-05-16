@@ -23,8 +23,8 @@ export default function TransactionCard({
     const category = categories.find(cat => cat._id === transaction.category)?.name || ""
 
     return (
-        <div className="flex items-center p-2 bg-slate-800 gap-2 rounded-md" onClick={() => onClick && onClick()}>
-            <div className="rounded-full w-10 h-10 bg-slate-300"></div>
+        <div className="flex items-center p-2 gap-2 rounded-md border" onClick={() => onClick && onClick()}>
+            <div className="rounded-full w-10 h-10"></div>
             <div>
                 <p className="text-xs">{ type === "expense" ? category : "Income"}</p>
                 <p className="text-sm">{ transaction.description }</p>

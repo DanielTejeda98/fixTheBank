@@ -4,6 +4,10 @@ import { setBudget } from "@/redux/features/budget-slice";
 import { useDispatch } from "react-redux";
 import { useSession } from "next-auth/react";
 import useReactValidator from "@/app/hooks/useReactValidator";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Button } from "../ui/button";
+import { formatDateInput } from "@/app/lib/renderHelper";
 
 interface FormData {
     budgetId?: string,
@@ -27,7 +31,7 @@ export default function AddIncome ({closeDrawer, budgetId}: {closeDrawer: Functi
 
     const clearForm = () => {
         formDispatch({
-            amount: 0,
+            amount: undefined,
             source: "",
             date: ""
         })
@@ -60,27 +64,30 @@ export default function AddIncome ({closeDrawer, budgetId}: {closeDrawer: Functi
         <form onSubmit={formSubmit} onReset={clearForm} className="flex flex-wrap">
             <h2 className="text-lg font-bold w-full">Add Income</h2>
             <p className="text-sm w-full">Add income for this month</p>
-            <div className="mt-2">
-                <label htmlFor="income">Income</label>
-                <input type="number" id="income" name="income" className="ml-2 bg-slate-700" value={formData.amount} onChange={e => formDispatch({amount: Number(e.target.value)})}/>
+            <div className="mt-2 w-full">
+                <Label htmlFor="income">Income</Label>
+                <Input type="number" id="income" name="income" value={formData.amount} onChange={e => formDispatch({amount: Number(e.target.value)})}/>
                 {validator.current.message("income", formData.amount, "numeric|required")}
             </div>
 
-            <div className="mt-2">
-                <label htmlFor="source">Source</label>
-                <input type="text" id="source" name="source" className="ml-2 bg-slate-700" value={formData.source} onChange={e => formDispatch({source: e.target.value})}/>
+            <div className="mt-2 w-full">
+                <Label htmlFor="source">Source</Label>
+                <Input type="text" id="source" name="source" value={formData.source} onChange={e => formDispatch({source: e.target.value})}/>
                 {validator.current.message("source", formData.source, "required")}
             </div>
 
-            <div className="mt-2">
-                <label htmlFor="date">Date</label>
-                <input type="date" name="date" className="ml-2 bg-slate-700" value={formData.date} onChange={e => formDispatch({date: e.target.value})}/>
+            <div className="mt-2 w-full flex flex-wrap">
+                <Label htmlFor="date" className="w-full">Date</Label>
+                <div className="flex w-full gap-2">
+                    <Input type="date" name="date" value={formData.date} onChange={e => formDispatch({date: e.target.value})}/>
+                    <Button type="button" onClick={e => formDispatch({date: formatDateInput(new Date())})}>Today</Button>
+                </div>
                 {validator.current.message("date", formData.date, "required")}
             </div>
             
             <div className="flex justify-end gap-3 w-full mt-5">
-                <button type="reset" className="bg-red-700 rounded-md p-1">Clear</button>
-                <button type="submit" className="bg-slate-500 rounded-md p-1">Add Income</button>
+                <Button variant="destructive" type="reset" className="rounded-md p-1 min-w-32">Clear</Button>
+                <Button type="submit" className="rounded-md p-1 min-w-32">Add Income</Button>
             </div>
         </form>
     )

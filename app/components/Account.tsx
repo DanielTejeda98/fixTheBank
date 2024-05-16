@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setJoinRequestList } from "@/redux/features/budget-slice";
 import { signOut, useSession } from "next-auth/react";
+import { Button } from "./ui/button";
 
 export default function Account({ closeDrawer }: { closeDrawer: Function }) {
   const router = useRouter();
@@ -74,19 +75,19 @@ export default function Account({ closeDrawer }: { closeDrawer: Function }) {
           <div className="flex flex-wrap border-solid border-gray-500 border-b-2 pb-2">
             <p>{requester.username} would like to join your budget!</p>
             <div className="flex gap-3 mt-1">
-              <button
-                className="text-sm bg-slate-500 rounded-md p-1"
+              <Button
+                className="text-sm rounded-md p-1"
                 onClick={() => approveRequestee(requester._id)}
                 disabled={pending}
               >
                 Approve
-              </button>
-              <button
-                className="text-sm bg-red-700 rounded-md p-1"
+              </Button>
+              <Button variant="destructive"
+                className="text-sm rounded-md p-1"
                 disabled={pending}
               >
                 Deny
-              </button>
+              </Button>
             </div>
           </div>
         </NotificationCard>
@@ -97,12 +98,12 @@ export default function Account({ closeDrawer }: { closeDrawer: Function }) {
   return (
     <div>
       <div className="flex flex-wrap">
-        <button
-          className="p-2 bg-red-500 text-sm rounded-md ml-auto"
+        <Button variant="destructive"
+          className="p-2 text-sm rounded-md ml-auto"
           onClick={logout}
         >
           Log out
-        </button>
+        </Button>
       </div>
 
       <div className="grid gap-3 mt-3 overflow-auto border p-1 rounded-md">
