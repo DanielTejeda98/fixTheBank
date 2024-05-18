@@ -17,15 +17,6 @@ import TransactionViewer from "./TransactionViewer";
 import Filter from "./Filter";
 import { Button } from "../ui/button";
 
-const useTransactionFilter = (
-  categories: CategoryView[],
-  setFilterBy: Function
-) => {
-  useEffect(() => {
-    setFilterBy(categories.map((cat: CategoryView) => cat._id));
-  }, [categories]);
-};
-
 export default function TransactionsView({ budget }: { budget: BudgetView }) {
   useSetInitialStore({ budget });
 
@@ -42,7 +33,6 @@ export default function TransactionsView({ budget }: { budget: BudgetView }) {
     (state) => state.budgetReducer.value.categories
   );
   const [filterBy, setFilterBy] = useState(categories.map((cat) => cat._id));
-  useTransactionFilter(categories, setFilterBy);
 
   const DrawerComponents = {
     selectBudget: <SelectBudget closeDrawer={() => setIsDrawerOpen(false)} />,
@@ -83,7 +73,7 @@ export default function TransactionsView({ budget }: { budget: BudgetView }) {
     return transactions
       .filter(
         (transaction) =>
-          transaction.category && filterBy.includes(transaction.category)
+          transaction.category && (filterBy.length > 0 ? filterBy.includes(transaction.category) : true)
       )
       .map((transaction) => (
         <TransactionCard
