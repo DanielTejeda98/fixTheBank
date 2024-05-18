@@ -10,6 +10,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { formatDateInput } from "@/app/lib/renderHelper";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { useAppSelector } from "@/redux/store";
 
 interface FormData {
     amount?: number,
@@ -24,6 +25,7 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
     const validator = useReactValidator();
     const forceUpdate = useReducer(x => x + 1, 0)[1];
     const reduxDispatch = useDispatch();
+    const dateButtonOnLeft = useAppSelector((state) => state.settingsReducer.value.dateTodayButtonOnLeft);
     const [formData, dispatch] = useReducer((state: FormData, action: FormData): FormData => {
         return { ...state, ...action }
     }, {
@@ -113,9 +115,10 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
 
             <div className="mt-2 w-full">
                 <Label htmlFor="date">Date</Label>
-                <div className="flex w-full gap-2">
+                <div className="flex w-full gap-2 mt-1">
+                    { dateButtonOnLeft ? <Button type="button" onClick={e => dispatch({date: formatDateInput(new Date())})}>Today</Button> : null }
                     <Input type="date" name="date" value={formData.date} onChange={e => dispatch({date: e.target.value})}/>
-                    <Button type="button" onClick={e => dispatch({date: formatDateInput(new Date())})}>Today</Button>
+                    { !dateButtonOnLeft ? <Button type="button" onClick={e => dispatch({date: formatDateInput(new Date())})}>Today</Button> : null }
                 </div>
                 {validator.current.message("date", formData.date, "required")}
             </div>

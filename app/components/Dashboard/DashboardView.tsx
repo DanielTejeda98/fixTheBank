@@ -56,7 +56,7 @@ export default function DashboardView({budget }: {budget: BudgetView }) {
     }
 
     return (
-        <main className="w-full dark bg-background text-primary">
+        <main className="w-full bg-background text-primary">
             <FullSizeCard>
                 <div className="flex justify-between">
                     <Button className="p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("account")}><FontAwesomeIcon icon={faUser} /></Button>
