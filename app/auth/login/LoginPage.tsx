@@ -83,6 +83,8 @@ export default function LoginPage () {
         const redirectUrl = formData.redirect?.toString();
         if (redirectUrl) {
             router.replace(redirectUrl)
+        } else {
+            router.replace(DEFAULT_REDIRECT)
         }
         
         setLoading(false)
