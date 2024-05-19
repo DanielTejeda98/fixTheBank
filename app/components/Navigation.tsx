@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useAppSelector } from "@/redux/store";
 import { faClipboard } from "@fortawesome/free-regular-svg-icons";
 import { faCoins } from "@fortawesome/free-solid-svg-icons/faCoins";
@@ -6,20 +6,22 @@ import { faGear } from "@fortawesome/free-solid-svg-icons/faGear";
 import { faHouse } from "@fortawesome/free-solid-svg-icons/faHouse";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import { usePathname } from "next/navigation"
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 const useDarkMode = () => {
-    const darkModeEnabled = useAppSelector((state) => state.settingsReducer.value.useDarkMode);
-    
-    useEffect(() => {
-        if (darkModeEnabled) {
-            document.body.classList.add('dark')
-        } else {
-            document.body.classList.remove('dark')
-        }
-    }, [darkModeEnabled])
-}
+  const darkModeEnabled = useAppSelector(
+    (state) => state.settingsReducer.value.useDarkMode
+  );
+
+  useEffect(() => {
+    if (darkModeEnabled) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, [darkModeEnabled]);
+};
 
 export default function Navigation() {
     const pathname = usePathname();
@@ -50,12 +52,12 @@ export default function Navigation() {
                     </Link>
                 </li>
                 <li>
-                    <Link href="#" className="flex flex-col p-1 gap-1 items-center">
-                        <div className="w-7 h-7 rounded-full text-center">
-                            <FontAwesomeIcon icon={faCoins} />
-                        </div>
-                        <p className="text-xs">Savings</p>
-                    </Link>
+                  <Link href="/savings" className={`flex flex-col p-1 gap-1 items-center ${pathname?.includes("/savings") ? "rounded-lg border" : ""}`}>
+                    <div className="w-7 h-7 rounded-full text-center">
+                      <FontAwesomeIcon icon={faCoins} />
+                    </div>
+                    <p className="text-xs">Savings</p>
+                  </Link>
                 </li>
                 <li>
                     <Link href="/settings" className={`flex flex-col p-1 gap-1 items-center ${pathname?.includes('/settings') ? 'rounded-lg border' : ''}`}>
