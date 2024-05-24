@@ -42,7 +42,7 @@ export default function Filter({
     <div>
       <div className="flex w-full justify-between items-center">
         <h2 className="mb-2">Filter</h2>
-        <Button variant="outline" className="text-xs" onClick={() => setFilteredBy([])}>Deselect All</Button>
+        <Button variant="outline" className="text-xs" disabled={filteredBy.length === 0} onClick={() => setFilteredBy([])}>Deselect All</Button>
       </div>
       {renderCategoriesList()}
     </div>

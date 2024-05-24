@@ -8,8 +8,10 @@ import {
 
 export default function SavingsAccountView({
   closeDrawer,
+  openCreateBucket
 }: {
   closeDrawer: () => void;
+  openCreateBucket: () => void;
 }) {
   const [isBucketsExpanded, setBucketExpanded] = useState(false);
   const [isTransactionsExpanded, setTransactionsExpanded] = useState(false);
@@ -19,7 +21,7 @@ export default function SavingsAccountView({
       <h2 className="w-full">Account 1</h2>
       <div className="flex flex-wrap w-full mt-3">
         <div className="ml-auto flex gap-2">
-          <Button>Create bucket</Button>
+          <Button onClick={() => openCreateBucket()}>Create bucket</Button>
           <Button variant="secondary">Distribute</Button>
         </div>
         <Collapsible
