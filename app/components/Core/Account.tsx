@@ -2,12 +2,12 @@
 import { useAppSelector } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import NotificationCard from "./NotificationCard";
-import { approveJoinRequest, getRequestersList } from "../lib/budgetApi";
+import { approveJoinRequest, getRequestersList } from "../../lib/budgetApi";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setJoinRequestList } from "@/redux/features/budget-slice";
 import { signOut, useSession } from "next-auth/react";
-import { Button } from "./ui/button";
+import { Button } from ".././ui/button";
 
 export default function Account({ closeDrawer }: { closeDrawer: Function }) {
   const router = useRouter();
