@@ -4,14 +4,14 @@ import {
   useSetInitialStore,
 } from "@/redux/features/budget-slice";
 import { BudgetView, CategoryView, TransactionView } from "@/types/budget";
-import FullSizeCard from "../FullSizeCard";
+import FullSizeCard from "../Core/FullSizeCard";
 import { useAppSelector } from "@/redux/store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import Drawer from "../Drawer";
+import Drawer from "../Core/Drawer";
 import SelectBudget from "../Dashboard/SelectBudget";
-import Account from "../Account";
+import Account from "../Core/Account";
 import TransactionCard from "../TransactionCard";
 import TransactionViewer from "./TransactionViewer";
 import Filter from "./Filter";

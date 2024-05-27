@@ -1,10 +1,10 @@
 import { BudgetView } from "@/types/budget";
-import FullSizeCard from "../FullSizeCard";
+import FullSizeCard from "../Core/FullSizeCard";
 import { Button } from "../ui/button";
-import Drawer from "../Drawer";
+import Drawer from "../Core/Drawer";
 import { useState } from "react";
 import SelectBudget from "../Dashboard/SelectBudget";
-import Account from "../Account";
+import Account from "../Core/Account";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
 import SavingsAccountView from "./SavingsAccountView";
