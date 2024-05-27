@@ -26,7 +26,7 @@ export default function PlannerCategoriesList ({categories, editCategoriesClick,
     }
 
     return (
-        <section className="m-3">
+        <section className="m-3 border rounded-md p-3">
             <div className="flex w-full justify-between items-center">
                 <h2 className="mb-2">Planned Categorized Expenses</h2>
                 <Button onClick={() => editCategoriesClick()} className="text-xs">Edit Categories</Button>
