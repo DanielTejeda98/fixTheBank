@@ -39,6 +39,7 @@ export default function SelectBudget ({closeDrawer}: {closeDrawer: Function}) {
             const res = await getBudget({userId}, budgetDate)
             if (res.success) {
                 sessionStorage.setItem("selectedBudgetDate", budgetDate);
+                document.cookie = `selectedBudgetDate=${budgetDate}`;
                 // Set store values
                 reduxDispatch(setBudget(res.data));
             }

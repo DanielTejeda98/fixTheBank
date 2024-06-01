@@ -35,7 +35,8 @@ export default function PlannerCategoriesEditor ({categories}: {categories: any[
                     budgetId,
                     name: newCategoryName
                 })
-                const res = await getBudget({ userId })
+                const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
+                const res = await getBudget({ userId }, budgetDate)
                 // Set store values
                 reduxDispatch(setBudget(res.data));
             } catch (error) {

@@ -51,7 +51,8 @@ export default function AddIncome ({closeDrawer, budgetId}: {closeDrawer: Functi
         
         try {
             await createIncome({userId}, {...formData, budgetId});
-            const res = await getBudget({userId})
+            const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
+            const res = await getBudget({ userId }, budgetDate)
             // Set store values
             reduxDispatch(setBudget(res.data));
         } catch (error) {

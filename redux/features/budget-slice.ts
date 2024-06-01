@@ -28,6 +28,7 @@ type BudgetState = {
     totalAllocated?: number,
     totalIncome?: number,
     totalExpenses?: number,
+    lastFetched: number
 }
 
 const initialState = {
@@ -48,7 +49,8 @@ const initialState = {
         totalPlannedIncome: 0,
         totalAllocated: 0,
         totalIncome: 0,
-        totalExpenses: 0
+        totalExpenses: 0,
+        lastFetched: new Date().getTime()
     } as BudgetState
 } as InitialState
 

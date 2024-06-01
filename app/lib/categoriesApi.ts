@@ -23,7 +23,8 @@ const updateCategory = async (headers: any, categoryUpdate: any) => {
         })
     })
     const parsedRes = await res.json();
-    const budgetRes = await getBudget({ userId: headers.userId })
+    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
+    const budgetRes = await getBudget({ userId: headers.userId }, budgetDate)
     store.dispatch(setBudget(budgetRes.data));
 
     return parsedRes;
@@ -44,7 +45,8 @@ const updateCategoryWithMaxAmount = async (headers: any, categoryUpdate: any) =>
     if (!parsedRes.success) {
         throw Error(parsedRes.error)
     }
-    const budgetRes = await getBudget({ userId: headers.userId })
+    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
+    const budgetRes = await getBudget({ userId: headers.userId }, budgetDate)
     store.dispatch(setBudget(budgetRes.data));
 
     return parsedRes;
@@ -61,7 +63,8 @@ const deleteCategory = async (headers: any, categoryId: string) => {
         throw Error(parsedRes.error);
     }
 
-    const budgetRes = await getBudget({ userId: headers.userId })
+    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
+    const budgetRes = await getBudget({ userId: headers.userId }, budgetDate)
     store.dispatch(setBudget(budgetRes.data));
 
     return parsedRes;

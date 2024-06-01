@@ -4,13 +4,21 @@ import mongoose from "mongoose"
 import { getServerSession } from "next-auth"
 import normalizeMongooseObjects from "./normalizeMongooseObjects"
 import { BudgetView } from "@/types/budget"
+import { cookies } from "next/headers"
 
 export async function getInitialData () {
+    const cookieStore = cookies();
     const session = await getServerSession(authOptions)
     const userId = new mongoose.Types.ObjectId(session?.user?.id)
-
+    const cookieSelectedDate = cookieStore.get("selectedBudgetDate")?.value
+    let selectedBudgetDate;
     try {
-        const data = await getUserFullBudgetDocument(userId, new Date())
+        selectedBudgetDate = cookieSelectedDate ? new Date(cookieSelectedDate) : new Date();
+    } catch {
+        selectedBudgetDate = new Date();
+    }
+    try {
+        const data = await getUserFullBudgetDocument(userId, selectedBudgetDate)
         if (!data) {
             return { mappedBudget: null, error: "No budget found" };
         }
@@ -38,6 +46,7 @@ export async function getInitialData () {
             shareCode: data.shareCode,
             isOwner: data.isOwner,
             joinRequests: requesters,
+            lastFetched: new Date().getTime()
         } as BudgetView;
 
         return { mappedBudget, error: null };

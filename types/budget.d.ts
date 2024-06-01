@@ -12,7 +12,8 @@ export interface BudgetView {
     isOwner: boolean,
     isShared: boolean,
     shareCode: string,
-    joinRequests: any[]
+    joinRequests: any[],
+    lastFetched: number
 }
 
 export interface CategoryView {

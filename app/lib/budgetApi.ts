@@ -25,7 +25,9 @@ const getBudget = async (headers: any, budgetDate?: String) => {
     const res = await fetch(`${API_BASE_URL}/budget${budgetDate ? "?budgetDate=" + budgetDate : ""}`, {
         headers
     })
-    return await res.json()
+    const parsedData = await res.json()
+    localStorage.setItem("budgetData", JSON.stringify({lastFetched: new Date().getTime(), ...parsedData.data}));
+    return parsedData;
 }
 
 const createBudget = async (headers: any) => {
@@ -48,8 +50,8 @@ const deleteExpense = async (headers: any, expenseId: string) => {
     if (!parsedRes.success) {
         throw Error(parsedRes.error);
     }
-
-    const budgetRes = await getBudget({ userId: headers.userId })
+    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
+    const budgetRes = await getBudget({ userId: headers.userId }, budgetDate)
     store.dispatch(setBudget(budgetRes.data));
 
     return parsedRes;
@@ -68,7 +70,8 @@ const deleteIncome = async (headers: any, incomeId: string) => {
         throw Error(parsedRes.error);
     }
 
-    const budgetRes = await getBudget({ userId: headers.userId })
+    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
+    const budgetRes = await getBudget({ userId: headers.userId }, budgetDate)
     store.dispatch(setBudget(budgetRes.data));
 
     return parsedRes;
@@ -128,7 +131,8 @@ const createPlannedIncome = async (headers: any, monthIndex: String, pIncome: an
         throw Error(parsedRes.error);
     }
 
-    const budgetRes = await getBudget({ userId: headers.userId })
+    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
+    const budgetRes = await getBudget({ userId: headers.userId }, budgetDate)
     store.dispatch(setBudget(budgetRes.data));
 
     return parsedRes;
@@ -149,7 +153,8 @@ const deletePlannedIncome = async (headers: any, monthIndex: String, incomeSourc
         throw Error(parsedRes.error);
     }
 
-    const budgetRes = await getBudget({ userId: headers.userId })
+    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
+    const budgetRes = await getBudget({ userId: headers.userId }, budgetDate)
     store.dispatch(setBudget(budgetRes.data));
 
     return parsedRes;

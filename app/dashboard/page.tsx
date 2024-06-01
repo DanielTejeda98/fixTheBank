@@ -3,10 +3,20 @@ import { useContext } from "react";
 import DashboardView from "../components/Dashboard/DashboardView";
 import JoinOrCreateBudget from "../components/Dashboard/JoinOrCreateBudget";
 import { InitialBudgetDataContext } from "../providers/BudgetProvider";
+import { BudgetView } from "@/types/budget";
 
 export default function Dashboard() {
     const context = useContext(InitialBudgetDataContext)
-    const { mappedBudget, error} = context?.initialData;
+    const { mappedBudget, error}: {mappedBudget: BudgetView, error: any} = context?.initialData;
+    // Handle the fact that NextJS caches our data from inital load
+    let useLocalData = false;
+    const cachedBudget = localStorage.getItem("budgetData");
+    const parsedCachedBudget = JSON.parse(cachedBudget || "") as BudgetView;
+
+    if (parsedCachedBudget && (mappedBudget.lastFetched < parsedCachedBudget.lastFetched)) {
+        useLocalData = true;
+    }
+    
     try {
         if (error) {
             if (error === 'No budget found') {
@@ -21,7 +31,7 @@ export default function Dashboard() {
 
         return (
             <>
-                <DashboardView budget={mappedBudget} />
+                <DashboardView budget={useLocalData ? parsedCachedBudget : mappedBudget} />
             </>
         )
 
