@@ -1,6 +1,6 @@
 // Defines budget logic
 import dbConnect from "@/app/lib/dbConnect";
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 import budgetModel, { Budget } from "@/models/budgetModel";
 import shareableBudgetModel, { ShareableBudget } from "@/models/shareableBudgets";
 import incomeModel from "@/models/incomeModel";
@@ -284,7 +284,7 @@ async function syncBudgetWithShareableBudgetInfo (budgetDocument: Budget, shared
         if (sharedBudgetInfo) {
             budgetDocument.shareCode = sharedBudgetInfo.joinCode;
             budgetDocument.isShared = true;
-            budgetDocument.shareId = sharedBudgetInfo._id;
+            budgetDocument.shareId = sharedBudgetInfo._id as mongoose.Types.ObjectId;
         } else {
             budgetDocument.shareCode = null;
             budgetDocument.isShared = false;
