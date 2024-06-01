@@ -11,7 +11,7 @@ export default function Transactions () {
     // Handle the fact that NextJS caches our data from inital load
     let useLocalData = false;
     const cachedBudget = localStorage.getItem("budgetData");
-    const parsedCachedBudget = JSON.parse(cachedBudget || "") as BudgetView;
+    const parsedCachedBudget = cachedBudget ? JSON.parse(cachedBudget) as BudgetView : null;
 
     if (parsedCachedBudget && (mappedBudget.lastFetched < parsedCachedBudget.lastFetched)) {
         useLocalData = true;
@@ -22,7 +22,7 @@ export default function Transactions () {
     
     return (
         <>
-            <TransactionsView budget={useLocalData ? parsedCachedBudget : mappedBudget} />
+            <TransactionsView budget={(useLocalData && parsedCachedBudget) ? parsedCachedBudget : mappedBudget} />
         </>
     )
 } 
