@@ -7,8 +7,11 @@ import { BudgetView } from "@/types/budget"
 
 export async function getInitialData () {
     const session = await getServerSession(authOptions)
-    const userId = new mongoose.Types.ObjectId(session?.user?.id)
-
+    const userId = !!session?.user?.id ? new mongoose.Types.ObjectId(session?.user?.id) : undefined;
+    if (!userId)
+    {
+        return { mappedBudget: null, error: "No userId provided"}
+    }
     try {
         const data = await getUserFullBudgetDocument(userId, new Date())
         if (!data) {

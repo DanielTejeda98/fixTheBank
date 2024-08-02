@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({success: true, data: budget}, {status: 200});
     } catch (error) {
         console.log(error)
-        return NextResponse.json({success: false, error }, {status: 400})
+        return NextResponse.json({success: false, error }, {status: 500})
     }
 }
 
