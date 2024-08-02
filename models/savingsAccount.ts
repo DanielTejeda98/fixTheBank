@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 
 export interface SavingsTransaction extends mongoose.Document {
-    amount: Number,
+    amount: number,
+    name: string,
     date: Date,
     transactionType: "deposit" | "withdraw",
     bucket: mongoose.Types.ObjectId,
@@ -11,17 +12,22 @@ export interface SavingsTransaction extends mongoose.Document {
 
 export interface SavingsAccount extends mongoose.Document {
     savings: mongoose.Types.ObjectId,
+    name: String,
     addedBy: mongoose.Types.ObjectId,
     updatedBy: mongoose.Types.ObjectId,
     buckets: mongoose.Types.Array<mongoose.Types.ObjectId>,
     ledger: mongoose.Types.Array<SavingsTransaction>,
-    currentTotal: Number,
+    currentTotal: number,
 }
 
 const SavingsAccountSchema = new mongoose.Schema<SavingsAccount>({
     savings: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Savings"
+    },
+    name: {
+        type: String,
+        default: ""
     },
     addedBy: {
         type: mongoose.Schema.Types.ObjectId,
@@ -37,6 +43,14 @@ const SavingsAccountSchema = new mongoose.Schema<SavingsAccount>({
     }],
     ledger: [{
         type: {
+            _id: {
+                type: mongoose.Schema.ObjectId,
+                required: true
+            },
+            name: {
+                type: String,
+                default: ""
+            },
             amount: {
                 type: Number,
                 required: true,
@@ -49,7 +63,7 @@ const SavingsAccountSchema = new mongoose.Schema<SavingsAccount>({
             transactionType: {
                 type: String,
                 validate: {
-                    validator: (value: string) => ["deposit", "withdraw"].includes(value),
+                    validator: (value: string) => ["deposit", "withdraw"].includes(value.toLocaleLowerCase()),
                     message: (props: any) => `${props.value} is not a valid TransactionType option!`
                 },
                 required: true

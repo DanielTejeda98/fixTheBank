@@ -24,8 +24,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const initialData = await getInitialData(); 
-
+  const initialData = await getInitialData();
+  
   return (
     <html lang="en">
       <body className={`${inter.className} flex flex-wrap min-h-dvh bg-background dark`}>
