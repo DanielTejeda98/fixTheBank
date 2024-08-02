@@ -2,6 +2,7 @@ import { authOptions } from "@/config/authOptions";
 import { getAllSavingsDetails } from "@/controllers/savingsController";
 import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 
 export async function GET (req: NextRequest) {
     const session = await getServerSession(authOptions)
@@ -9,7 +10,7 @@ export async function GET (req: NextRequest) {
         return NextResponse.json({ message: "Must be logged in"}, {status: 401})
     }
 
-    const userId = mongoose.Types.ObjectId(session.user.id);
+    const userId = new mongoose.Types.ObjectId(session.user.id);
 
     try {
         const savings = await getAllSavingsDetails(userId);
