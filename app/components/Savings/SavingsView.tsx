@@ -13,12 +13,20 @@ import SavingsWithdrawFunds from "./SavingsWithdrawFunds";
 import SavingsCreateAccount from "./SavingsCreateAccount";
 import SavingsManageAccounts from "./SavingsManageAccounts";
 import SavingsCreateAccountBucket from "./SavingsCreateAccountBucket";
+import { useAppSelector } from "@/redux/store";
+import { useRouter } from "next/navigation";
 
 export default function SavingsView({
   mappedBudget,
 }: {
   mappedBudget: BudgetView;
 }) {
+  const router = useRouter();
+  const enableSavingsBeta = useAppSelector((state) => state.settingsReducer.value.enableSavingsBeta);
+  if (!enableSavingsBeta) {
+    router.push("/");
+  }
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState({id: "1"});
   const [drawerComponent, setDrawerComponent] = useState(

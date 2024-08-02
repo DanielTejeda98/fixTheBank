@@ -6,13 +6,15 @@ type InitialState = {
 
 export type SettingsState = {
     useDarkMode: boolean,
-    dateTodayButtonOnLeft: boolean
+    dateTodayButtonOnLeft: boolean,
+    enableSavingsBeta: boolean
 }
 
 const initialState = {
     value: {
         useDarkMode: false,
-        dateTodayButtonOnLeft: false
+        dateTodayButtonOnLeft: false,
+        enableSavingsBeta: false
     } as SettingsState
 } as InitialState
 

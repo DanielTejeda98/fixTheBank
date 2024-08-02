@@ -46,6 +46,13 @@ export default function SettingsView () {
                         </div>
                         <Switch checked={settingsData.dateTodayButtonOnLeft} onCheckedChange={() => settingsDataDispatch({...settingsData, dateTodayButtonOnLeft: !settingsData.dateTodayButtonOnLeft})} />
                     </div>
+                    <div className="flex items-center mt-3">
+                        <div>
+                            <p className="text-sm font-medium">Enable Savings Beta</p>
+                            <p className="text-sm text-muted-foreground">Enable savings feature beta. This feature is still being developed and can require further changes. USE AT YOUR OWN RISK.</p>
+                        </div>
+                        <Switch checked={settingsData.enableSavingsBeta} onCheckedChange={() => settingsDataDispatch({...settingsData, enableSavingsBeta: !settingsData.enableSavingsBeta})} />
+                    </div>
                 </CardContent>
                 <CardFooter>
                     <Button variant="outline" className="w-full" onClick={() => saveSettings()}>Save Settings</Button>
