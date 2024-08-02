@@ -2,14 +2,15 @@ import { authOptions } from "@/config/authOptions";
 import { deleteSavingsTransaction, updateSavingsTransaction } from "@/controllers/savingsController";
 import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 
-export async function POST (req: NextRequest, { params }: { params: { id: string }}) {
+export async function PUT (req: NextRequest, { params }: { params: { id: string }}) {
     const session = await getServerSession(authOptions)
     if (!session) {
         return NextResponse.json({ message: "Must be logged in"}, {status: 401})
     }
 
-    const userId = mongoose.Types.ObjectId(session.user.id);
+    const userId = new mongoose.Types.ObjectId(session.user.id);
 
     try {
         const request = await req.json();
@@ -32,7 +33,7 @@ export async function DELETE (req: NextRequest, { params }: { params: { id: stri
         return NextResponse.json({ message: "Must be logged in"}, {status: 401})
     }
 
-    const userId = mongoose.Types.ObjectId(session.user.id);
+    const userId = new mongoose.Types.ObjectId(session.user.id);
 
     try {
         const request = await req.json();

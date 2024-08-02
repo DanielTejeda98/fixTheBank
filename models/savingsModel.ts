@@ -40,11 +40,7 @@ const SavingsSchema = new mongoose.Schema<Savings>({
                 }
             }]
         }
-    }],
-    totalSavings: {
-        type: Number,
-        default: 0
-    }
+    }]
 })
 
 export default mongoose.models.Savings || mongoose.model<Savings>("Savings", SavingsSchema)

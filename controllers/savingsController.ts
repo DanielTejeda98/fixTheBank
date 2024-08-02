@@ -13,7 +13,8 @@ export async function getAllSavingsDetails (userId: mongoose.Types.ObjectId): Pr
         const savingsDoc = await savingsModel.findById(userBudget.savings)
         .populate({
             path: "savingsAccounts",
-            model: savingsAccount
+            model: savingsAccount,
+            populate: { path: 'buckets', model: savingsAccountBucket}
         })
 
         if (!savingsDoc) {
@@ -26,10 +27,15 @@ export async function getAllSavingsDetails (userId: mongoose.Types.ObjectId): Pr
                 throw Error("Unable to create Savings document for budgetID: " + userBudget._id);
             }
 
+            userBudget.savings = newSavingsDoc._id;
+
+            await userBudget.save();
+
             return newSavingsDoc;
         }
+        const totalSavings = savingsDoc._doc.savingsAccounts.reduce((agg: number, curr: SavingsAccount) => agg += curr.currentTotal, 0)
 
-        return savingsDoc;
+        return { ...savingsDoc._doc, totalSavings};
     } catch (e) {
         throw e;
     }
@@ -114,7 +120,20 @@ export async function createSavingsTransaction (userId: mongoose.Types.ObjectId,
 
         currSavingsAccount.ledger.push(newTransaction)
 
-        currSavingsAccount.currentTotal += request.amount || 0;
+        if (newTransaction.transactionType === "deposit") {
+            currSavingsAccount.currentTotal += request.amount || 0;
+        } else {
+            currSavingsAccount.currentTotal -= request.amount || 0;
+        }
+
+        // Update Assigned Bucket
+        const bucket = await savingsAccountBucket.findById(newTransaction.bucket);
+        if (newTransaction.transactionType === "deposit") {
+            bucket.currentTotal += request.amount || 0;
+        } else {
+            bucket.currentTotal -= request.amount || 0;
+        }
+        await bucket.save();
 
         await currSavingsAccount.save();
 
@@ -247,6 +266,8 @@ export async function createSavingsAccountBucket (userId: mongoose.Types.ObjectI
         }
 
         currSavingsAccount.buckets.push(newBucket._id);
+
+        await currSavingsAccount.save();
 
         return newBucket;
     } catch (e) {
