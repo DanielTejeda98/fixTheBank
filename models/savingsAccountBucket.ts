@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 export interface SavingsBuckets extends mongoose.Document {
+    savingsAccount: mongoose.Types.ObjectId,
     name: String,
     goal: Number,
     goalBy: Date,
@@ -8,6 +9,10 @@ export interface SavingsBuckets extends mongoose.Document {
 }
 
 const SavingsAccountBucketSchema = new mongoose.Schema<SavingsBuckets>({
+    savingsAccount: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SavingsAccount"
+    },
     name: {
         type: String,
         required: true,

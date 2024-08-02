@@ -9,9 +9,13 @@ import { cookies } from "next/headers"
 export async function getInitialData () {
     const cookieStore = cookies();
     const session = await getServerSession(authOptions)
-    const userId = new mongoose.Types.ObjectId(session?.user?.id)
     const cookieSelectedDate = cookieStore.get("selectedBudgetDate")?.value
     let selectedBudgetDate;
+    const userId = !!session?.user?.id ? new mongoose.Types.ObjectId(session?.user?.id) : undefined;
+    if (!userId)
+    {
+        return { mappedBudget: null, error: "No userId provided"}
+    }
     try {
         selectedBudgetDate = cookieSelectedDate ? new Date(cookieSelectedDate) : new Date();
     } catch {
