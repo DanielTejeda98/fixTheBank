@@ -9,7 +9,7 @@ import { Button } from "../ui/button";
 
 type FormData = {
     source?: string,
-    amount?: Number
+    amount?: number
 }
 
 export default function PlannerIncomeEditor ({closeDrawer}: {closeDrawer: Function}) {
@@ -21,13 +21,13 @@ export default function PlannerIncomeEditor ({closeDrawer}: {closeDrawer: Functi
     const [formData, formDispatch] = useReducer((state: FormData, action: FormData):FormData => {
         return {...state, ...action}
     }, {
-        amount: 0,
+        amount: undefined,
         source: ""
     })
 
     const clearForm = () => {
         formDispatch({
-            amount: 0,
+            amount: undefined,
             source: ""
         })
         validator.current.hideMessages();
@@ -63,7 +63,7 @@ export default function PlannerIncomeEditor ({closeDrawer}: {closeDrawer: Functi
             </div>
             <div className="mt-2 w-full">
                 <Label htmlFor="amount">Amount</Label>
-                <Input type="number" name="amount" value={formData.amount?.toString()} onChange={e => formDispatch({ amount: Number(e.target.value) })} />
+                <Input type="number" name="amount" value={formData.amount || ""} onChange={e => formDispatch({ amount: Number(e.target.value) })} />
                 {validator.current.message("amount", formData.amount, "numeric|required")}
             </div>
             <div className="flex w-full grow justify-end gap-2">

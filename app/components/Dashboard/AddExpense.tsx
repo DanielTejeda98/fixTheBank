@@ -84,7 +84,7 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
             <p className="text-sm w-full">Add an expense for this month</p>
             <div className="mt-2 w-full">
                 <Label htmlFor="amount">Amount</Label>
-                <Input type="number" name="amount" value={formData.amount} onChange={e => dispatch({ amount: Number(e.target.value) })} />
+                <Input type="number" name="amount" value={formData.amount || ""} onChange={e => dispatch({ amount: Number(e.target.value) })} />
                 {validator.current.message("amount", formData.amount, "numeric|required")}
             </div>
 

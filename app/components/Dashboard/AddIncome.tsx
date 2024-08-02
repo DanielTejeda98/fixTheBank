@@ -69,7 +69,7 @@ export default function AddIncome ({closeDrawer, budgetId}: {closeDrawer: Functi
             <p className="text-sm w-full">Add income for this month</p>
             <div className="mt-2 w-full">
                 <Label htmlFor="income">Income</Label>
-                <Input type="number" id="income" name="income" value={formData.amount} onChange={e => formDispatch({amount: Number(e.target.value)})}/>
+                <Input type="number" id="income" name="income" value={formData.amount || ""} onChange={e => formDispatch({amount: Number(e.target.value)})}/>
                 {validator.current.message("income", formData.amount, "numeric|required")}
             </div>
 

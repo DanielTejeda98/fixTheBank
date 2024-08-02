@@ -72,7 +72,7 @@ export default function PlannerCategoryView ({category, closeDrawer}: {category?
             <div className="mt-2 w-full flex items-end">
                 <div className="w-full">
                     <Label htmlFor="amount">Allocate amount</Label>
-                    <Input type="number" name="amount" value={maxAmount} onChange={e => setMaxAmount(Number(e.target.value))} />
+                    <Input type="number" name="amount" value={maxAmount || ""} onChange={e => setMaxAmount(Number(e.target.value))} />
                     {validator.current.message("amount", maxAmount, "numeric|required")}
                 </div>
                 <div className="ml-2 max-w-32">
