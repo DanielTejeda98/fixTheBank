@@ -16,6 +16,16 @@ export default function PlannerCategoryView ({category, closeDrawer}: {category?
     const forceUpdate = useReducer(x => x + 1, 0)[1];
     const currentMonth = useAppSelector((state) => state.budgetReducer.value.minDate);
     const unallocatedFunds = useAppSelector((state) => selectUnallocatedFunds(state));
+    
+    // Get last month planned amount
+    const lastMonth = new Date(currentMonth);
+    lastMonth.setMonth(lastMonth.getMonth() - 1, 1);
+    const lastMonthString = lastMonth.toLocaleString("en-us", {dateStyle: "short"});
+    const previousMonthPlannedAmount = category?.maxMonthExpectedAmount.find((planned: {month: string, amount: number}) => {
+        if (planned.month === lastMonthString) {
+            return true;
+        }
+    })?.amount || 0;
 
     const [maxAmount, setMaxAmount] = useState(category?.maxMonthExpectedAmount.find((c:any) => c.month === currentMonth)?.amount || 0)
 
@@ -59,11 +69,17 @@ export default function PlannerCategoryView ({category, closeDrawer}: {category?
                 <p>Remaining unallocated planned income</p>
                 <p>{currencyFormat(unallocatedFunds)}</p>
             </div>
-            <div className="mt-2 w-full">
-                <Label htmlFor="amount">Allocate amount</Label>
-                <Input type="number" name="amount" value={maxAmount} onChange={e => setMaxAmount(Number(e.target.value))} />
-                {validator.current.message("amount", maxAmount, "numeric|required")}
+            <div className="mt-2 w-full flex items-end">
+                <div className="w-full">
+                    <Label htmlFor="amount">Allocate amount</Label>
+                    <Input type="number" name="amount" value={maxAmount} onChange={e => setMaxAmount(Number(e.target.value))} />
+                    {validator.current.message("amount", maxAmount, "numeric|required")}
+                </div>
+                <div className="ml-2 max-w-32">
+                    <Button onClick={() => setMaxAmount(previousMonthPlannedAmount)}>Use last month <br /> {currencyFormat(previousMonthPlannedAmount)}</Button>
+                </div>
             </div>
+            
             <div className="flex w-full grow justify-end gap-2">
                 <Button className="rounded-md p-1 self-end min-w-32" variant="destructive" onClick={handleDeleteClick}>Delete Category</Button>
                 <Button className="rounded-md p-1 self-end min-w-32" onClick={handleSubmitClick}>Save Changes</Button>
