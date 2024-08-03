@@ -9,12 +9,20 @@ async function createExpense (request: any, userId: mongoose.Types.ObjectId) {
 
         const budget = await findBudget(userId) as Budget;
 
+        if(request.borrowFromNextMonth) {
+            request.transactionDate = request.date;
+            const expenseNextMonth = new Date(request.date);
+            expenseNextMonth.setMonth(expenseNextMonth.getMonth() + 1, 1);
+            request.date = expenseNextMonth;
+        }
+
         const expense = await expenseModel.create({
             createdBy: userId,
             updatedBy: userId,
             amount: request.amount,
             category: new mongoose.Types.ObjectId(request.category),
             date: request.date,
+            transactionDate: request.transactionDate || request.date,
             description: request.description,
             account: request.account,
             budgetId: new mongoose.Types.ObjectId(request.budgetId)

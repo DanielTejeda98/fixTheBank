@@ -7,6 +7,7 @@ export interface Expense extends mongoose.Document {
     account: mongoose.Types.ObjectId,
     category: mongoose.Types.ObjectId,
     date: Date,
+    transactionDate: Date,
     description: string,
     budgetId: mongoose.Schema.Types.ObjectId
 }
@@ -37,6 +38,9 @@ const ExpenseSchema = new mongoose.Schema<Expense>({
     date: {
         type: Date,
         required: [true, "Please provide a date for the expense"]
+    },
+    transactionDate: {
+        type: Date
     },
     description: {
         type: String

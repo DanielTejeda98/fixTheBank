@@ -75,7 +75,7 @@ export default function TransactionsView({ budget }: { budget: BudgetView }) {
         (transaction) =>
           transaction.category && (filterBy.length > 0 ? filterBy.includes(transaction.category) : true)
       )
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .sort((a, b) => new Date(a.transactionDate).getTime() - new Date(b.transactionDate).getTime())
       .map((transaction) => (
         <TransactionCard
           key={transaction._id}

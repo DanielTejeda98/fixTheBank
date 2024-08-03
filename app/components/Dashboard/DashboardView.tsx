@@ -29,7 +29,7 @@ export default function DashboardView({budget }: {budget: BudgetView }) {
     const totalPlannedIncome = useAppSelector((state) => state.budgetReducer.value.totalPlannedIncome) || 0
     const totalIncome = useAppSelector((state) => state.budgetReducer.value.totalIncome) || 0
     const totalExpenses = useAppSelector((state) => state.budgetReducer.value.totalExpenses) || 0
-    const transactions = useAppSelector(selectTransactions).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0,10)
+    const transactions = useAppSelector(selectTransactions).sort((a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()).slice(0,10)
 
     const DrawerComponents = {
         addIncome: <AddIncome closeDrawer={() => setIsDrawerOpen(false)} budgetId={budget._id}/>,

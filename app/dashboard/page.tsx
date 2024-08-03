@@ -10,7 +10,8 @@ export default function Dashboard() {
     const { mappedBudget, error}: {mappedBudget: BudgetView, error: any} = context?.initialData;
     // Handle the fact that NextJS caches our data from inital load
     let useLocalData = false;
-    const cachedBudget = localStorage.getItem("budgetData");
+    // Check that local storage exists, in case we run in the server
+    const cachedBudget = typeof localStorage != "undefined" ? localStorage.getItem("budgetData") : null;
     const parsedCachedBudget = cachedBudget ? JSON.parse(cachedBudget) as BudgetView : null;
 
     if (parsedCachedBudget && (mappedBudget.lastFetched < parsedCachedBudget.lastFetched)) {

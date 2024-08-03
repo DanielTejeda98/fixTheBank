@@ -32,7 +32,7 @@ export default function TransactionCard({
             </div>
             <div className="ml-auto">
                 <p className={`text-right ${type === "income" ? "text-green-500" : "text-red-500"}`}>{ currencyFormat(transaction.amount) }</p>
-                <p className="text-xs text-end text-neutral-400">{new Date(transaction.date).toLocaleString("en-us", {dateStyle: "full", timeZone: "UTC"})}</p>
+                <p className="text-xs text-end text-neutral-400">{new Date(transaction.transactionDate || transaction.date).toLocaleString("en-us", {dateStyle: "full", timeZone: "UTC"})}</p>
             </div>
         </div>
     )

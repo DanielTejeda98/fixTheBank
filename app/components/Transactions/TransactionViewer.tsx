@@ -38,7 +38,7 @@ export default function TransactionViewer ({transaction, closeDrawer}: {transact
                 {transaction.account ? <p>Account: {account}</p> : null}
                 {transaction.category ? <p>Category: {category}</p> : null}
                 {transaction.source ? <p>Income</p> : null}
-                <p>Date: {new Date(transaction.date).toLocaleDateString("en-us", {timeZone: "UTC"})}</p>
+                <p>Date: {new Date(transaction.transactionDate).toLocaleDateString("en-us", {timeZone: "UTC"})}</p>
             </div>
             <div className="flex w-full grow justify-end">
                 <Button variant="destructive" className="rounded-md p-1 self-end min-w-32" onClick={() => handleDeleteTransaction()}>Delete Transaction</Button>

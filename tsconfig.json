@@ -1,4 +1,9 @@
 {
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  },
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -21,6 +26,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "types/*.d.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "types/*.d.ts", "migrations-utils/ts-compiler.js"],
   "exclude": ["node_modules"],
 }

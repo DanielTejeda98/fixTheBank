@@ -1,4 +1,4 @@
-import { FormEvent, useReducer, useRef } from "react";
+import { FormEvent, useReducer, useRef, useState } from "react";
 import { createExpense, getBudget } from "@/app/lib/budgetApi";
 import { setBudget } from "@/redux/features/budget-slice";
 import { useDispatch } from "react-redux";
@@ -11,6 +11,11 @@ import { Button } from "../ui/button";
 import { formatDateInput } from "@/app/lib/renderHelper";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { useAppSelector } from "@/redux/store";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import { Card, CardContent } from "../ui/card";
+import { Switch } from "../ui/switch";
 
 interface FormData {
     amount?: number,
@@ -18,6 +23,7 @@ interface FormData {
     category?: string,
     date?: string
     description?: string
+    borrowFromNextMonth?: boolean
 }
 
 export default function AddExpense({ closeDrawer, budgetId, accounts, categories }: { closeDrawer: Function, budgetId: string, accounts: AccountView[], categories: CategoryView[] }) {
@@ -26,6 +32,7 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
     const forceUpdate = useReducer(x => x + 1, 0)[1];
     const reduxDispatch = useDispatch();
     const dateButtonOnLeft = useAppSelector((state) => state.settingsReducer.value.dateTodayButtonOnLeft);
+    const [furtherOptionsOpen, setFurtherOptionsOpen] = useState(false);
     const [formData, dispatch] = useReducer((state: FormData, action: FormData): FormData => {
         return { ...state, ...action }
     }, {
@@ -33,7 +40,8 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
         account: accounts?.length > 0 ? accounts[0]._id : "",
         category: categories?.length > 0 ? categories[0]._id : "",
         date: "",
-        description: ""
+        description: "",
+        borrowFromNextMonth: false
     })
 
     const clearForm = () => {
@@ -42,7 +50,8 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
             account: accounts?.length > 0 ? accounts[0]._id : "",
             category: categories?.length > 0 ? categories[0]._id : "",
             date: "",
-            description: ""
+            description: "",
+            borrowFromNextMonth: false
         })
         validator.current.hideMessages();
     }
@@ -129,6 +138,30 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
                 <Input type="text" name="description" value={formData.description} onChange={e => dispatch({ description: e.target.value })} />
                 {validator.current.message("description", formData.description, "required")}
             </div>
+
+            <Collapsible asChild open={furtherOptionsOpen} onOpenChange={setFurtherOptionsOpen}>
+                <div className="w-full mb-2">
+                    <CollapsibleTrigger asChild>
+                        <div className="my-2 w-full flex justify-between items-center w-full">
+                            <h4 className="text-md font-bold">Further options</h4>
+                            <FontAwesomeIcon icon={furtherOptionsOpen ? faChevronUp : faChevronDown} />
+                        </div>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        <Card>
+                            <CardContent>
+                            <div className="flex items-center mt-2">
+                                <div>
+                                    <p className="text-sm font-medium">Borrow from next month</p>
+                                    <p className="text-sm text-muted-foreground">Use this option to count this expense towards next months budget.</p>
+                                </div>
+                                <Switch checked={formData.borrowFromNextMonth} onCheckedChange={() => dispatch({ borrowFromNextMonth: !formData.borrowFromNextMonth })} />
+                            </div>
+                            </CardContent>
+                        </Card>
+                    </CollapsibleContent>
+                </div>
+            </Collapsible>
 
             <div className="flex justify-end gap-3 w-full mt-5">
                 <Button type="reset" variant="destructive" className="rounded-md p-1 min-w-32">Clear</Button>
