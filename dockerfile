@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci
+RUN yarn install --frozen-lockfile
 
 COPY . .
 
@@ -14,4 +14,4 @@ EXPOSE 3721
 
 ENV TZ "America/New_York"
 
-CMD npm run build && next start -p 3721
+CMD yarn migrate:up && yarn build && next start -p 3721
