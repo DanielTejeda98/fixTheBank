@@ -8,6 +8,8 @@ Write-Host "Creating image for commit ID:" $gitCommitId
 
 & "docker" tag kaiyrous/fixthebank-alpha:$gitCommitId kaiyrous/fixthebank-alpha:latest
 
-& "docker" push --all-tags kaiyrous/fixthebank-alpha:latest
+& "docker" push kaiyrous/fixthebank-alpha:$gitCommitId
+
+& "docker" push kaiyrous/fixthebank-alpha:latest
 
 cd ./scripts
