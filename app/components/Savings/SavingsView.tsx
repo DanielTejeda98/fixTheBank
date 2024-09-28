@@ -15,6 +15,8 @@ import SavingsManageAccounts from "./SavingsManageAccounts";
 import SavingsCreateAccountBucket from "./SavingsCreateAccountBucket";
 import { useAppSelector } from "@/redux/store";
 import { useRouter } from "next/navigation";
+import SavingsAccountCard from "./SavingsAccountCard";
+import { SavingsAccount } from "@/types/savings";
 
 export default function SavingsView({
   mappedBudget,
@@ -23,12 +25,14 @@ export default function SavingsView({
 }) {
   const router = useRouter();
   const enableSavingsBeta = useAppSelector((state) => state.settingsReducer.value.enableSavingsBeta);
+
+  const savingsAccounts = useAppSelector((state) => state.savingsReducer.value.savingsAccounts);
   if (!enableSavingsBeta) {
     router.push("/");
   }
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedAccount, setSelectedAccount] = useState({id: "1"});
+  const [selectedAccount, setSelectedAccount] = useState({} as SavingsAccount);
   const [drawerComponent, setDrawerComponent] = useState(
     "addIncome" as keyof typeof DrawerComponents
   );
@@ -41,7 +45,7 @@ export default function SavingsView({
     savingsWithdrawFunds: <SavingsWithdrawFunds closeDrawer={() => setIsDrawerOpen(false)} />,
     savingsCreateAccount: <SavingsCreateAccount closeDrawer={() => setIsDrawerOpen(false)} />,
     savingsManageAccounts: <SavingsManageAccounts openCreateAccount={() => openDrawer(null, "savingsCreateAccount")}/>,
-    savingsCreateAccountBucket: <SavingsCreateAccountBucket closeDrawer={() => setIsDrawerOpen(false)} savingsAccountId={selectedAccount.id}/>
+    savingsCreateAccountBucket: <SavingsCreateAccountBucket closeDrawer={() => setIsDrawerOpen(false)} savingsAccountId={selectedAccount._id}/>
   };
 
   const openDrawer = (e: React.MouseEvent|null, component: keyof typeof DrawerComponents) => {
@@ -50,10 +54,14 @@ export default function SavingsView({
     setIsDrawerOpen(true);
   };
 
-  const handleAccountClick = (account: any) => {
+  const handleAccountClick = (account: SavingsAccount) => {
     setSelectedAccount(account);
     openDrawer(null, "savingsAccount");
   }
+
+  const renderSavingsAccountList = () => {
+    return savingsAccounts.map(account => (<SavingsAccountCard key={account._id} account={account} handleAccountClick={handleAccountClick} openDrawer={openDrawer}></SavingsAccountCard>))
+  } 
 
   return (
     <main className="w-full">
@@ -83,28 +91,7 @@ export default function SavingsView({
           <Button className="ml-auto" variant="outline" onClick={() => openDrawer(null, "savingsManageAccounts")}>Manage account(s)</Button>
         </div>
         <ul className="mt-3 w-full">
-          <li
-            className="flex flex-wrap items-center mb-2 p-2 gap-2 rounded-md border mb-3 last-of-type:mb-0"
-            onClick={() => handleAccountClick({id: "1"})}
-          >
-            <div className="w-full">Account 1</div>
-            <div className="flex justify-between w-full">
-              <div className="text-sm">
-                <p>Funds: $200</p>
-              </div>
-            </div>
-            <Button onClick={(e) => openDrawer(e, "savingsAddFunds")}>Add Funds</Button>
-            <Button onClick={(e) => openDrawer(e, "savingsWithdrawFunds")} variant="secondary">Withdraw Funds</Button>
-          </li>
-
-          <li className="flex flex-wrap items-center mb-2 p-2 gap-2 rounded-md border mb-3 last-of-type:mb-0">
-            <div className="w-full">Account 2</div>
-            <div className="flex justify-between w-full">
-              <div className="text-sm">
-                <p>Funds: $200</p>
-              </div>
-            </div>
-          </li>
+          {renderSavingsAccountList()}
         </ul>
       </section>
 

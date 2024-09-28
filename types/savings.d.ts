@@ -20,6 +20,7 @@ export interface SavingsBuckets {
 
 export interface SavingsAccount {
     _id: string;
+    name: string;
     savings: string;
     addedBy: string;
     updatedBy: string;
