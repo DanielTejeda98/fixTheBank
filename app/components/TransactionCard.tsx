@@ -23,11 +23,13 @@ export default function TransactionCard({
     const category = categories.find(cat => cat._id === transaction.category)?.name || ""
 
     return (
-        <div className="flex items-center p-2 gap-2 rounded-md border" onClick={() => onClick && onClick()}>
-            <div className="rounded-full w-10 h-10"></div>
+        <div className="flex items-center p-2 gap-2 rounded-md border max-w-[calc(100vw-3rem)]" onClick={() => onClick && onClick()}>
+            <div className="flex rounded-full min-w-10 h-10 justify-center items-center bg-slate-700">
+                { type === "expense" ? category.substring(0,2).toUpperCase() : "I" }
+            </div>
             <div>
                 <p className="text-xs">{ type === "expense" ? category : "Income"}</p>
-                <p className="text-sm">{ transaction.description }</p>
+                <p className="text-sm break-words max-w-[calc(100vw-3rem-12rem)]">{ transaction.description }</p>
                 <p className="text-xs">{ account }</p>
             </div>
             <div className="ml-auto">
