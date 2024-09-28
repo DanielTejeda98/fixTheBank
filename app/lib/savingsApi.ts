@@ -32,3 +32,18 @@ export const getSavings = async (useCache?: boolean): Promise<Savings> => {
     store.dispatch(setSavings(parsedData.data));
     return parsedData.data;
 }
+
+export const createSavingsAccount = async (data: {name: string}) => {
+    const res = await fetch(`${API_BASE_URL}/account`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    })
+
+    if (res.ok) {
+        getSavings();
+    } else {
+        console.error("There was an error creating the account", res);
+    }
+
+    return;
+}
