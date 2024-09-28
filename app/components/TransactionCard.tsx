@@ -24,7 +24,7 @@ export default function TransactionCard({
 
     return (
         <div className="flex items-center p-2 gap-2 rounded-md border max-w-[calc(100vw-3rem)]" onClick={() => onClick && onClick()}>
-            <div className="flex rounded-full min-w-10 h-10 justify-center items-center bg-slate-700">
+            <div className="flex rounded-full min-w-10 h-10 justify-center items-center outline outline-1 outline-slate-700 dark:outline-none dark:bg-slate-700 dark:text-white">
                 { type === "expense" ? category.substring(0,2).toUpperCase() : "I" }
             </div>
             <div>
