@@ -5,13 +5,13 @@ interface GetBudgetOptions {
 }
 
 class BudgetCacheProvider {
-        /**
-         * Use this method to get the cached budget and determine if the age of the cache is better than the NextJS cached version
-         * @param options - The options object
-         * @param options.lastFetched - Last fetched time that can be compared against to determine if to use the last fetched
-         * @returns 
-         */
-        static getBudget ({...options}: GetBudgetOptions) {
+    /**
+     * Use this method to get the cached budget and determine if the age of the cache is better than the NextJS cached version
+     * @param options - The options object
+     * @param options.lastFetched - Last fetched time that can be compared against to determine if to use the last fetched
+     * @returns Object with the parsed budget, and the flag to use it or not depending on the lastFetched option
+     */
+    static getBudget ({...options}: GetBudgetOptions) {
             // Handle the fact that NextJS caches our data from inital load
         let useCachedData = false;
         // Check that local storage exists, in case we run in the server
