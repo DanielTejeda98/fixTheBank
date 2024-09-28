@@ -3,9 +3,9 @@ import { FormEvent, useReducer } from "react"
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { createSavingsAccount } from "@/app/lib/savingsApi";
 
 interface FormData {
-    budgetId?: string,
     name?: string,
 }
 
@@ -34,8 +34,7 @@ export default function SavingsCreateAccount ({closeDrawer}: {closeDrawer: () =>
             return;
         }
         
-        // Todo API call
-        
+        await createSavingsAccount({ name: formData.name || "" });
         closeDrawer();
         clearForm();
     }
@@ -45,7 +44,7 @@ export default function SavingsCreateAccount ({closeDrawer}: {closeDrawer: () =>
                 Create Savings Account
             </h2>
             <div className="mt-2 w-full">
-                <Label htmlFor="name">Income</Label>
+                <Label htmlFor="name">Name</Label>
                 <Input type="text" id="name" name="name" value={formData.name} onChange={e => formDispatch({name: e.target.value})}/>
                 {validator.current.message("name", formData.name, "required")}
             </div>
