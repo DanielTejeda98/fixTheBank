@@ -1,22 +1,17 @@
-"use client"
+"use client";
 import { useContext } from "react";
 import DashboardView from "../components/Dashboard/DashboardView";
 import JoinOrCreateBudget from "../components/Dashboard/JoinOrCreateBudget";
 import { InitialBudgetDataContext } from "../providers/BudgetProvider";
 import { BudgetView } from "@/types/budget";
+import BudgetCacheProvider from "../lib/budgetCache";
 
 export default function Dashboard() {
     const context = useContext(InitialBudgetDataContext)
     const { mappedBudget, error}: {mappedBudget: BudgetView, error: any} = context?.initialData;
-    // Handle the fact that NextJS caches our data from inital load
-    let useLocalData = false;
-    // Check that local storage exists, in case we run in the server
-    const cachedBudget = typeof localStorage != "undefined" ? localStorage.getItem("budgetData") : null;
-    const parsedCachedBudget = cachedBudget ? JSON.parse(cachedBudget) as BudgetView : null;
-
-    if (parsedCachedBudget && (mappedBudget.lastFetched < parsedCachedBudget.lastFetched)) {
-        useLocalData = true;
-    }
+    const { budget, useCachedData} = BudgetCacheProvider.getBudget({
+        lastFetched: mappedBudget.lastFetched
+    })
     
     try {
         if (error) {
@@ -32,7 +27,7 @@ export default function Dashboard() {
 
         return (
             <>
-                <DashboardView budget={(useLocalData && !!parsedCachedBudget) ? parsedCachedBudget : mappedBudget} />
+                <DashboardView budget={(useCachedData && !!budget) ? budget : mappedBudget} />
             </>
         )
 
