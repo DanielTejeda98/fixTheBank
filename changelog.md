@@ -23,3 +23,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Number input fields changing to zero when input is erased
 - Server side error when trying to access localstorage
 - Login page: default redirect was not working
+- Select closing when selecting any values that overlapped the background overlays of the drawer
