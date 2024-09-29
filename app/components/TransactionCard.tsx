@@ -29,7 +29,7 @@ export default function TransactionCard({
             </div>
             <div>
                 <p className="text-xs">{ type === "expense" ? category : "Income"}</p>
-                <p className="text-sm">{ transaction.description }</p>
+                <p className="text-sm break-words max-w-[calc(100vw-3rem-12rem)]">{ transaction.description }</p>
                 <p className="text-xs">{ account }</p>
             </div>
             <div className="ml-auto">
