@@ -4,14 +4,14 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN yarn install --frozen-lockfile
+RUN npm install
 
 COPY . .
 
-RUN yarn global add next
+RUN npm install -g next
 
 EXPOSE 3721
 
 ENV TZ "America/New_York"
 
-CMD yarn migrate:up && yarn build && next start -p 3721
+CMD npm run migrate:up && npm run build && npm run start
