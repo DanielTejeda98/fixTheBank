@@ -8,8 +8,6 @@ RUN npm install
 
 COPY . .
 
-RUN npm install -g next
-
 EXPOSE 3721
 
 ENV TZ "America/New_York"
