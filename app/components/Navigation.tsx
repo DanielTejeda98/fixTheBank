@@ -24,7 +24,12 @@ const useDarkMode = () => {
 export default function Navigation() {
     const pathname = usePathname();
     useDarkMode();
-    
+    const isAuthPage = pathname?.includes('/auth/');
+
+    if (isAuthPage) {
+        return null;
+    }
+
     return (
         <nav className="sticky bottom-0 inset-x-0 h-20 pt-1 w-full self-end transition-all backdrop-blur-sm border-t">
             <ul className="grid grid-row-4 grid-flow-col mt-2 mx-2">
