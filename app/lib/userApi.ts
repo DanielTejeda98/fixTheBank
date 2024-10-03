@@ -1,3 +1,5 @@
+
+import { signOut } from "next-auth/react";
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_FTB_HOST}/api`
 
 const createUser = async (userData: any) => {
@@ -8,4 +10,13 @@ const createUser = async (userData: any) => {
     return await res.json();
 }
 
-export {createUser}
+const signUserOut = () => {
+    localStorage.removeItem("budgetData");
+    localStorage.removeItem("userSettings");
+    signOut();
+}
+
+export {
+    createUser,
+    signUserOut
+}
