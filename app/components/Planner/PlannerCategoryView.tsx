@@ -27,7 +27,18 @@ export default function PlannerCategoryView ({category, closeDrawer}: {category?
         }
     })?.amount || 0;
 
-    const [maxAmount, setMaxAmount] = useState(category?.maxMonthExpectedAmount.find((c:any) => c.month === currentMonth)?.amount || 0)
+    const [maxAmount, setMaxAmount] = useState(category?.maxMonthExpectedAmount.find((c:any) => c.month === currentMonth)?.amount as Number)
+
+    const getMaxAmount = () => {
+        const amount = maxAmount.toString();
+        if (amount.includes('.') && amount.split('.')[1].length > 2) {
+            const splitString = amount.split('.');
+            const correctedString = `${splitString[0]}.${splitString[1].substring(0,2)}`;
+            setMaxAmount(Number(correctedString));
+            return correctedString;
+        } 
+        return amount;
+    }
 
     const handleSubmitClick = async () => {
         if (!validator.current.allValid()) {
@@ -72,7 +83,7 @@ export default function PlannerCategoryView ({category, closeDrawer}: {category?
             <div className="mt-2 w-full flex items-end">
                 <div className="w-full">
                     <Label htmlFor="amount">Allocate amount</Label>
-                    <Input type="number" name="amount" value={maxAmount || ""} onChange={e => setMaxAmount(Number(e.target.value))} />
+                    <Input type="number" name="amount" value={maxAmount != null ? getMaxAmount() : ""} onChange={e => setMaxAmount(Number(e.target.value))} />
                     {validator.current.message("amount", maxAmount, "numeric|required")}
                 </div>
                 <div className="ml-2 max-w-32">

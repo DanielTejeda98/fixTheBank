@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import categoriesModel, { Category } from "@/models/categoriesModel";
 import { Budget } from "@/models/budgetModel";
 import { findBudget } from "@/helpers/budgetHelpers";
+import { isNotNullOrUndefined } from "@/lib/utils";
 
 export async function createCategory (budgetId: string, userId: string, name: string): Promise<Category> {
     try {
@@ -44,7 +45,8 @@ export async function updateCategory (categoryId: string, userId: string, name: 
 
         category.name = name;
         category.sortRank = sortRank;
-        if (date && amount) {
+        const hasAmount = isNotNullOrUndefined(amount); 
+        if (date && hasAmount) {
             const existingMax = category.maxMonthExpectedAmount.find(cat => cat.month === date)
             if (!existingMax) {
                 category.maxMonthExpectedAmount.push({
@@ -52,7 +54,8 @@ export async function updateCategory (categoryId: string, userId: string, name: 
                     amount
                 })
             } else {
-                existingMax.amount = amount;
+                // Using non null operator, as isNotNullOrUndefined will check null and undefined for us
+                existingMax.amount = amount!;
             }
         }
 
