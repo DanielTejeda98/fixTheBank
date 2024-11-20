@@ -12,6 +12,15 @@ const createExpense = async (headers: any, expense: any) => {
     return await res.json();
 }
 
+const updateExpense = async (headers: any, expense: any) => {
+    const res = await fetch(`${API_BASE_URL}/expense/${expense.id}`, {
+        headers,
+        method: "PUT",
+        body: JSON.stringify(expense)
+    })
+    return await res.json();
+}
+
 const createIncome = async (headers: any, income: any) => {
     const res = await fetch(`${API_BASE_URL}/income`, {
         headers,
@@ -162,6 +171,7 @@ const deletePlannedIncome = async (headers: any, monthIndex: String, incomeSourc
 
 export {
     createExpense,
+    updateExpense,
     createIncome,
     getBudget,
     createBudget,

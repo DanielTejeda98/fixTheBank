@@ -1,5 +1,5 @@
-import { FormEvent, useReducer, useRef, useState } from "react";
-import { createExpense, getBudget } from "@/app/lib/budgetApi";
+import { FormEvent, useEffect, useReducer, useState } from "react";
+import { createExpense, getBudget, updateExpense } from "@/app/lib/budgetApi";
 import { setBudget } from "@/redux/features/budget-slice";
 import { useDispatch } from "react-redux";
 import { useSession } from "next-auth/react";
@@ -26,7 +26,29 @@ interface FormData {
     borrowFromNextMonth?: boolean
 }
 
-export default function AddExpense({ closeDrawer, budgetId, accounts, categories }: { closeDrawer: Function, budgetId: string, accounts: AccountView[], categories: CategoryView[] }) {
+const getIntitalFormData = (accounts: AccountView[], categories: CategoryView[], transaction?: any): FormData => {
+    if (transaction) {
+        return {
+            amount: transaction.amount,
+            account: accounts.find(acc => acc._id === transaction.account)?._id || accounts[0]?._id || "",
+            category: categories.find(cat => cat._id === transaction.account)?._id || categories[0]?._id || "",
+            date: formatDateInput(new Date(transaction.transactionDate.split("T")[0].replaceAll("-", "/") || transaction.date.split("T")[0].replaceAll("-", "/"))),
+            description: transaction.description,
+            borrowFromNextMonth: !transaction.transactionDate ? false : new Date(transaction.transactionDate) < new Date(transaction.date)
+        }
+    }
+
+    return {
+        amount: undefined,
+        account: accounts?.length > 0 ? accounts[0]._id : "",
+        category: categories?.length > 0 ? categories[0]._id : "",
+        date: "",
+        description: "",
+        borrowFromNextMonth: false
+    }
+}
+
+export default function ExpenseEditor({ closeDrawer, budgetId, accounts, categories, transaction }: { closeDrawer: Function, budgetId: string, accounts: AccountView[], categories: CategoryView[], transaction?: any }) {
     const userId = useSession().data?.user?.id;
     const validator = useReactValidator();
     const forceUpdate = useReducer(x => x + 1, 0)[1];
@@ -35,15 +57,13 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
     const [furtherOptionsOpen, setFurtherOptionsOpen] = useState(false);
     const [formData, dispatch] = useReducer((state: FormData, action: FormData): FormData => {
         return { ...state, ...action }
-    }, {
-        amount: undefined,
-        account: accounts?.length > 0 ? accounts[0]._id : "",
-        category: categories?.length > 0 ? categories[0]._id : "",
-        date: "",
-        description: "",
-        borrowFromNextMonth: false
-    })
+    }, {...getIntitalFormData(accounts, categories, transaction)})
 
+    // Handles the drawer opening and closing between edit and non edit states
+    useEffect(() => {
+        dispatch({...getIntitalFormData(accounts, categories, transaction)});
+    }, [transaction, accounts, categories])
+    
     const clearForm = () => {
         dispatch({
             amount: undefined,
@@ -56,6 +76,7 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
         validator.current.hideMessages();
     }
 
+
     const formSubmit = async (form: FormEvent) => {
         form.preventDefault();
 
@@ -66,7 +87,11 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
         }
 
         try {
-            await createExpense({ userId }, { ...formData, budgetId });
+            if (!isEdit) {
+                await createExpense({ userId }, { ...formData, budgetId });
+            } else {
+                await updateExpense({ userId }, { ...formData, id: transaction._id});
+            }
             const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
             const res = await getBudget({ userId }, budgetDate)
             // Set store values
@@ -87,10 +112,13 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
         return categories.map((category: CategoryView) => <SelectItem key={category._id} value={category._id}>{category.name}</SelectItem>)
     }
 
+    const isEdit = !!transaction;
+    const actionPrefix = isEdit ? "Edit" : "Add"
+
     return (
         <form onSubmit={formSubmit} onReset={clearForm} className="flex flex-wrap">
-            <h2 className="text-lg font-bold w-full">Add Expense</h2>
-            <p className="text-sm w-full">Add an expense for this month</p>
+            <h2 className="text-lg font-bold w-full">{actionPrefix} Expense</h2>
+            <p className="text-sm w-full">{actionPrefix} an expense for this month</p>
             <div className="mt-2 w-full">
                 <Label htmlFor="amount">Amount</Label>
                 <Input type="number" name="amount" value={formData.amount || ""} onChange={e => dispatch({ amount: Number(e.target.value) })} />
@@ -99,7 +127,7 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
 
             <div className="mt-2 w-full">
                 <Label htmlFor="account">Account</Label>
-                <Select defaultValue={formData.account} onValueChange={(e: string) => dispatch({ account: e})}>
+                <Select value={formData.account} onValueChange={(e: string) => dispatch({ account: e})}>
                     <SelectTrigger>
                         <SelectValue placeholder="Select an account"></SelectValue>
                     </SelectTrigger>
@@ -112,7 +140,7 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
 
             <div className="mt-2 w-full">
                 <Label htmlFor="category">Category</Label>
-                <Select defaultValue={formData.category} onValueChange={(e: string) => dispatch({ category: e})}>
+                <Select value={formData.category} onValueChange={(e: string) => dispatch({ category: e})}>
                     <SelectTrigger>
                         <SelectValue placeholder="Select a category"></SelectValue>
                     </SelectTrigger>
@@ -165,7 +193,7 @@ export default function AddExpense({ closeDrawer, budgetId, accounts, categories
 
             <div className="flex justify-end gap-3 w-full mt-5">
                 <Button type="reset" variant="destructive" className="rounded-md p-1 min-w-32">Clear</Button>
-                <Button type="submit" className="rounded-md p-1 min-w-32">Add Expense</Button>
+                <Button type="submit" className="rounded-md p-1 min-w-32">{actionPrefix} Expense</Button>
             </div>
         </form>
     )

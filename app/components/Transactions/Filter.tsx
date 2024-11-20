@@ -26,7 +26,7 @@ export default function Filter({
       return (
         <div
           key={category._id}
-          className="flex justify-between rounded-md p-2 mb-2 last:mb-0"
+          className="flex justify-between rounded-md p-2 mb-2 last:mb-0 border-b"
         >
           <label>{category.name}</label>
           <input

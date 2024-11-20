@@ -7,7 +7,7 @@ import { selectTransactions, useSetInitialStore } from "@/redux/features/budget-
 import { useAppSelector } from "@/redux/store";
 import Drawer from "../Drawer";
 import AddIncome from "./AddIncome";
-import AddExpense from "./AddExpense";
+import ExpenseEditor from "./ExpenseEditor";
 import React from "react";
 import TransactionCard from "../TransactionCard";
 import SelectBudget from "./SelectBudget";
@@ -18,10 +18,10 @@ import Link from "next/link";
 import TransactionViewer from "../Transactions/TransactionViewer";
 import { Button, buttonVariants } from "../ui/button";
 
-export default function DashboardView({budget }: {budget: BudgetView }) {
+export default function DashboardView({ budget }: { budget: BudgetView }) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const [drawerComponent, setDrawerComponent] = useState("addIncome");
-    const [transactionView, settransactionView] = useState<TransactionView|undefined>(undefined);
+    const [drawerComponent, setDrawerComponent] = useState("addIncome" as keyof typeof DrawerComponents);
+    const [selectedTransaction, setSelectedTransaction] = useState<TransactionView|undefined>(undefined);
 
     useSetInitialStore({ budget })
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
@@ -33,22 +33,25 @@ export default function DashboardView({budget }: {budget: BudgetView }) {
 
     const DrawerComponents = {
         addIncome: <AddIncome closeDrawer={() => setIsDrawerOpen(false)} budgetId={budget._id}/>,
-        addExpense: <AddExpense closeDrawer={() => setIsDrawerOpen(false)} budgetId={budget._id} accounts={budget.accounts} categories={budget.categories} />,
+        expenseEditor: <ExpenseEditor closeDrawer={() => setIsDrawerOpen(false)} budgetId={budget._id} accounts={budget.accounts} categories={budget.categories} transaction={selectedTransaction}/>,
         selectBudget: <SelectBudget closeDrawer={() => setIsDrawerOpen(false)} />,
         account: <Account closeDrawer={() => setIsDrawerOpen(false)} />,
-        transactionViewer: <TransactionViewer transaction={transactionView} closeDrawer={() => setIsDrawerOpen(false)} />
+        transactionViewer: <TransactionViewer transaction={selectedTransaction} closeDrawer={() => setIsDrawerOpen(false)} openEditor={() => setDrawerComponent("expenseEditor")} />
     }
 
-    type ComponentString = "addIncome" | "addExpense" | "selectBudget" | "account" | "transactionViewer"
-
-    const toggleDrawer = (component: ComponentString) => {
+    const toggleDrawer = (component: keyof typeof DrawerComponents) => {
         setDrawerComponent(component);
         setIsDrawerOpen(!isDrawerOpen);
     }
 
     const openTransaction = (transaction: any) => {
-        settransactionView(transaction);
+        setSelectedTransaction(transaction);
         toggleDrawer("transactionViewer")
+    }
+
+    const openNewExpense = () => {
+        setSelectedTransaction(undefined)
+        toggleDrawer("expenseEditor");
     }
 
     const renderTransactionsList = () => {
@@ -89,7 +92,7 @@ export default function DashboardView({budget }: {budget: BudgetView }) {
                 </div>
                 <div className="flex justify-center gap-2 mt-5">
                     <Button variant="secondary" onClick={() => toggleDrawer("addIncome")}>(+) Add funds</Button>
-                    <Button onClick={() => toggleDrawer("addExpense")}>(-) Add Expense</Button>
+                    <Button onClick={() => openNewExpense()}>(-) Add Expense</Button>
                 </div>
             </FullSizeCard>
 

@@ -47,11 +47,19 @@ async function updateExpense (request: any, expenseId: mongoose.Types.ObjectId, 
         // Will handle validation for if user can access the budget
         await findBudget(userId) as Budget;
 
+        if(request.borrowFromNextMonth) {
+            request.transactionDate = request.date;
+            const expenseNextMonth = new Date(request.date);
+            expenseNextMonth.setMonth(expenseNextMonth.getMonth() + 1, 1);
+            request.date = expenseNextMonth;
+        }
+
         const updateRequest = {
             amount: request.amount,
             account: request.account ? new mongoose.Types.ObjectId(request.account) : null,
             category: request.category ? new mongoose.Types.ObjectId(request.category) : null,
-            date: request.date ? new Date(request.date) : null,
+            transactionDate: request.transactionDate || request.date || null,
+            date: request.date || null,
             description: request.description
         } as Expense;
     
