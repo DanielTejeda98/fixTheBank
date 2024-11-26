@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setJoinRequestList } from "@/redux/features/budget-slice";
 import { useSession } from "next-auth/react";
-import { signUserOut } from "../lib/userApi";
+import { signUserOut } from "../../lib/userApi";
 import { Button } from ".././ui/button";
 
 export default function Account({ closeDrawer }: { closeDrawer: Function }) {

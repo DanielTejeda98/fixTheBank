@@ -2,7 +2,7 @@ export interface SavingsTransaction {
     _id: string;
     name: string;
     amount: number;
-    date: Date;
+    date: string;
     transactionType: "depost" | "withdraw";
     bucket: string;
     addedBy: string;
@@ -14,7 +14,7 @@ export interface SavingsBuckets {
     savingsAccount: string;
     name: string;
     goal: number;
-    goalBy: Date;
+    goalBy: string;
     currentTotal: number;
 }
 

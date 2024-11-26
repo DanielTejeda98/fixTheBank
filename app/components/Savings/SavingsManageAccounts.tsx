@@ -5,7 +5,7 @@ export default function SavingsManageAccounts ({openCreateAccount}: {openCreateA
     const savingsAccounts = useAppSelector((state) => state.savingsReducer.value.savingsAccounts)
 
     const renderAccountsList = () => {
-        return savingsAccounts.map(account => (<li>{account.name}</li>))
+        return savingsAccounts.map((account, index) => (<li key={index}>{account.name}</li>))
     }
 
     return (

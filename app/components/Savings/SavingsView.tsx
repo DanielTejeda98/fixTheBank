@@ -40,7 +40,7 @@ export default function SavingsView({
   const DrawerComponents = {
     selectBudget: <SelectBudget closeDrawer={() => setIsDrawerOpen(false)} />,
     account: <Account closeDrawer={() => setIsDrawerOpen(false)} />,
-    savingsAccount: <SavingsAccountView closeDrawer={() => setIsDrawerOpen(false)} openCreateBucket={() => openDrawer(null, "savingsCreateAccountBucket")} />,
+    savingsAccount: <SavingsAccountView account={selectedAccount} closeDrawer={() => setIsDrawerOpen(false)} openCreateBucket={() => openDrawer(null, "savingsCreateAccountBucket")} />,
     savingsAddFunds: <SavingsAddFunds closeDrawer={() => setIsDrawerOpen(false)} />,
     savingsWithdrawFunds: <SavingsWithdrawFunds closeDrawer={() => setIsDrawerOpen(false)} />,
     savingsCreateAccount: <SavingsCreateAccount closeDrawer={() => setIsDrawerOpen(false)} />,
