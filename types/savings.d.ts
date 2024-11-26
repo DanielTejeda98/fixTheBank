@@ -1,12 +1,22 @@
+type TransactionType = "deposit" | "withdraw"; 
+
 export interface SavingsTransaction {
     _id: string;
     name: string;
     amount: number;
     date: string;
-    transactionType: "depost" | "withdraw";
+    transactionType: TransactionType;
     bucket: string;
     addedBy: string;
     updatedBy: string;
+}
+
+export interface SavingsTransactionRequest {
+    accountId: string;
+    name: string;
+    amount: number;
+    date: string;
+    transactionType: TransactionType;
 }
 
 export interface SavingsBuckets {

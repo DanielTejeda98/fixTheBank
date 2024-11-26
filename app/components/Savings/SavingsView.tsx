@@ -41,14 +41,14 @@ export default function SavingsView({
     selectBudget: <SelectBudget closeDrawer={() => setIsDrawerOpen(false)} />,
     account: <Account closeDrawer={() => setIsDrawerOpen(false)} />,
     savingsAccount: <SavingsAccountView account={selectedAccount} closeDrawer={() => setIsDrawerOpen(false)} openCreateBucket={() => openDrawer(null, "savingsCreateAccountBucket")} />,
-    savingsAddFunds: <SavingsAddFunds closeDrawer={() => setIsDrawerOpen(false)} />,
-    savingsWithdrawFunds: <SavingsWithdrawFunds closeDrawer={() => setIsDrawerOpen(false)} />,
+    savingsAddFunds: <SavingsAddFunds account={selectedAccount} closeDrawer={() => setIsDrawerOpen(false)} />,
+    savingsWithdrawFunds: <SavingsWithdrawFunds account={selectedAccount} closeDrawer={() => setIsDrawerOpen(false)} />,
     savingsCreateAccount: <SavingsCreateAccount closeDrawer={() => setIsDrawerOpen(false)} />,
-    savingsManageAccounts: <SavingsManageAccounts openCreateAccount={() => openDrawer(null, "savingsCreateAccount")}/>,
-    savingsCreateAccountBucket: <SavingsCreateAccountBucket closeDrawer={() => setIsDrawerOpen(false)} savingsAccountId={selectedAccount._id}/>
+    savingsManageAccounts: <SavingsManageAccounts openCreateAccount={() => openDrawer(null, "savingsCreateAccount")} />,
+    savingsCreateAccountBucket: <SavingsCreateAccountBucket closeDrawer={() => setIsDrawerOpen(false)} savingsAccountId={selectedAccount._id} />
   };
 
-  const openDrawer = (e: React.MouseEvent|null, component: keyof typeof DrawerComponents) => {
+  const openDrawer = (e: React.MouseEvent | null, component: keyof typeof DrawerComponents) => {
     e?.stopPropagation();
     setDrawerComponent(component);
     setIsDrawerOpen(true);
@@ -59,9 +59,15 @@ export default function SavingsView({
     openDrawer(null, "savingsAccount");
   }
 
+  const handleOpenTransactionsCreators = (e: React.MouseEvent, account: SavingsAccount, action: "savingsAddFunds" | "savingsWithdrawFunds") => {
+    e?.stopPropagation();
+    setSelectedAccount(account);
+    openDrawer(null, action);
+  }
+
   const renderSavingsAccountList = () => {
-    return savingsAccounts.map(account => (<SavingsAccountCard key={account._id} account={account} handleAccountClick={handleAccountClick} openDrawer={openDrawer}></SavingsAccountCard>))
-  } 
+    return savingsAccounts.map((account: SavingsAccount) => (<SavingsAccountCard key={account._id} account={account} handleAccountClick={handleAccountClick} handleOpenTransactionCreators={handleOpenTransactionsCreators}></SavingsAccountCard>))
+  }
 
   return (
     <main className="w-full">

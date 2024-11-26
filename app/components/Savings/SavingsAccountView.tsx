@@ -58,7 +58,7 @@ export default function SavingsAccountView({
     if (!account.ledger || account.ledger.length === 0) {
       return null;
     }
-    const ledger = [...account.ledger].sort((a, b) => new Date(b.date).getDate() - new Date(a.date).getDate());
+    const ledger = [...account.ledger].reverse().sort((a, b) => new Date(b.date).getDate() - new Date(a.date).getDate());
     const firstElement = ledger.shift();
 
     let previousDate = "";
@@ -140,9 +140,14 @@ export default function SavingsAccountView({
           <div className="flex w-full items-center">
             <h3>Transactions</h3>
             <CollapsibleTrigger asChild>
-              <Button variant="ghost" className="ml-auto">
-                {isTransactionsExpanded ? "Show less" : "Show all"}
-              </Button>
+            {account.ledger.length > 1 
+            ? (
+                <Button variant="ghost" className="ml-auto">
+                  {isTransactionsExpanded ? "Show less" : "Show all"}
+                </Button>
+              )
+            : null}
+              
             </CollapsibleTrigger>
           </div>
           { renderLedger() }

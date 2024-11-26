@@ -5,26 +5,30 @@ import useReactValidator from "@/app/hooks/useReactValidator";
 import { useAppSelector } from "@/redux/store";
 import { Button } from "../ui/button";
 import { formatDateInput } from "@/app/lib/renderHelper";
+import { createTransaction } from "@/app/lib/savingsApi";
+import { SavingsAccount } from "@/types/savings";
 
 interface FormData {
-    budgetId?: string,
-    amount?: number,
-    date?: string
+    name?: string;
+    amount?: number;
+    date?: string;
 }
 
-export default function SavingsWithdrawFunds ({closeDrawer}: {closeDrawer: () => void}) {
+export default function SavingsWithdrawFunds ({account, closeDrawer}: {account:SavingsAccount, closeDrawer: () => void}) {
     const validator = useReactValidator();
     const forceUpdate = useReducer(x => x + 1, 0)[1];
     const dateButtonOnLeft = useAppSelector((state) => state.settingsReducer.value.dateTodayButtonOnLeft);
     const [formData, formDispatch] = useReducer((state: FormData, action: FormData):FormData => {
         return {...state, ...action}
     }, {
+        name: "",
         amount: undefined,
         date: ""
     })
 
     const clearForm = () => {
         formDispatch({
+            name: "",
             amount: undefined,
             date: ""
         })
@@ -40,7 +44,13 @@ export default function SavingsWithdrawFunds ({closeDrawer}: {closeDrawer: () =>
             return;
         }
         
-        // Todo API call
+        await createTransaction({
+            transactionType: "withdraw",
+            amount: formData.amount!,
+            date: formData.date!,
+            accountId: account._id,
+            name: formData.name!.trim()
+        })
         
         closeDrawer();
         clearForm();
@@ -51,6 +61,13 @@ export default function SavingsWithdrawFunds ({closeDrawer}: {closeDrawer: () =>
             <h2 className="text-lg font-bold w-full">
                 Withdraw Funds
             </h2>
+
+            <div className="mt-2 w-full">
+                <Label htmlFor="name">Name</Label>
+                <Input type="text" id="name" name="name" value={formData.name} onChange={e => formDispatch({name: e.target.value})}/>
+                {validator.current.message("name", formData.name, "required")}
+            </div>
+            
             <div className="mt-2 w-full">
                 <Label htmlFor="amount">Amount</Label>
                 <Input type="number" id="amount" name="amount" value={formData.amount} onChange={e => formDispatch({amount: Number(e.target.value)})}/>

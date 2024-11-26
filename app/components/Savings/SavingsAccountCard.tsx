@@ -5,13 +5,13 @@ import { currencyFormat } from "@/app/lib/renderHelper";
 interface SavingsAccountCardProps {
     account: SavingsAccount;
     handleAccountClick: (x: SavingsAccount) => void;
-    openDrawer: (e: React.MouseEvent, x: "savingsAddFunds"|"savingsWithdrawFunds") => void;
+    handleOpenTransactionCreators: (e: React.MouseEvent, account: SavingsAccount, x: "savingsAddFunds"|"savingsWithdrawFunds") => void;
 }
 
 export default function SavingsAccountCard ({
     account,
     handleAccountClick,
-    openDrawer
+    handleOpenTransactionCreators
 }: SavingsAccountCardProps) {
     return (
         <li
@@ -24,8 +24,8 @@ export default function SavingsAccountCard ({
                 <p>Funds: {currencyFormat(account.currentTotal)}</p>
               </div>
             </div>
-            <Button onClick={(e:any) => openDrawer(e, "savingsAddFunds")}>Add Funds</Button>
-            <Button onClick={(e:any) => openDrawer(e, "savingsWithdrawFunds")} variant="secondary">Withdraw Funds</Button>
+            <Button onClick={(e:React.MouseEvent) => handleOpenTransactionCreators(e, account, "savingsAddFunds")}>Add Funds</Button>
+            <Button onClick={(e:React.MouseEvent) => handleOpenTransactionCreators(e, account, "savingsWithdrawFunds")} variant="secondary">Withdraw Funds</Button>
           </li>
     )
 }
