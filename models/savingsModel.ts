@@ -2,11 +2,13 @@ import mongoose from "mongoose";
 
 export interface PlannedSavings {
     month: String,
-    plannedSavings: mongoose.Types.Array<{
-        account: mongoose.Types.ObjectId,
-        bucket: mongoose.Types.ObjectId | null,
-        amount: Number
-    }>
+    savingsPlans: mongoose.Types.Array<PlannedSaving>
+}
+
+export interface PlannedSaving extends mongoose.Document {
+    account: mongoose.Types.ObjectId,
+    bucket: mongoose.Types.ObjectId | null,
+    amount: Number
 }
 
 export interface Savings extends mongoose.Document {

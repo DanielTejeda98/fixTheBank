@@ -2,7 +2,8 @@ import dbConnect from "@/app/lib/dbConnect";
 import budgetModel, { Budget } from "@/models/budgetModel";
 import savingsAccount, { SavingsAccount, SavingsTransaction } from "@/models/savingsAccount";
 import savingsAccountBucket, { SavingsBuckets } from "@/models/savingsAccountBucket";
-import savingsModel, { Savings } from "@/models/savingsModel";
+import savingsModel, { PlannedSavings, Savings } from "@/models/savingsModel";
+import { PlannedSaving } from "@/types/savings";
 import mongoose from "mongoose";
 
 export async function getAllSavingsDetails (userId: mongoose.Types.ObjectId): Promise<Savings> {
@@ -272,6 +273,118 @@ export async function createSavingsAccountBucket (userId: mongoose.Types.ObjectI
         return newBucket;
     } catch (e) {
         throw e;
+    }
+}
+
+export async function getSavingsPlannerByMonth (userId: mongoose.Types.ObjectId, month: string): Promise<PlannedSavings|undefined> {
+    try {
+        await dbConnect();
+        const userBudget = await findBudget(userId);
+        
+        const savingsDoc = await savingsModel.findById(userBudget.savings) as Savings;
+
+        if (!savingsDoc) {
+            throw Error("No savings found with the following ID: " + userBudget.savings);
+        }
+
+        return savingsDoc.plannedSavings.find(ps => ps.month === month);
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function addSavingsPlan (userId: mongoose.Types.ObjectId, month: string, newSavingsPlanRequest: PlannedSaving) {
+    try {
+        await dbConnect();
+        const userBudget = await findBudget(userId);
+        
+        const savingsDoc = await savingsModel.findById(userBudget.savings) as Savings;
+
+        if (!savingsDoc) {
+            throw Error("No savings found with the following ID: " + userBudget.savings);
+        }
+
+        const plannedSavingsMonthList = savingsDoc.plannedSavings.find(ps => ps.month === month);
+        const mappedSavingsObj = { 
+            account: newSavingsPlanRequest.account, 
+            amount: newSavingsPlanRequest.amount, 
+            bucket: newSavingsPlanRequest.bucket 
+        } 
+        
+        // If the month index does not exist, create one and push our new source
+        if (!plannedSavingsMonthList) {
+            savingsDoc.plannedSavings.push({ month: month, savingsPlans: [mappedSavingsObj] });
+        } else {
+            plannedSavingsMonthList.savingsPlans.push(mappedSavingsObj);
+        }
+
+        await savingsDoc.save();
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function removeSavingsPlan(userId: mongoose.Types.ObjectId, month: string, savingsPlanId: mongoose.Types.ObjectId) {
+    try {
+        await dbConnect();
+        const userBudget = await findBudget(userId);
+        
+        const savingsDoc = await savingsModel.findById(userBudget.savings) as Savings;
+
+        if (!savingsDoc) {
+            throw Error("No savings found with the following ID: " + userBudget.savings);
+        }
+
+        const plannedSavingsMonthList = savingsDoc.plannedSavings.find(ps => ps.month === month);
+
+        // If the month index does not exist, create one and push our new source
+        if (!plannedSavingsMonthList) {
+            throw new Error("Month index does not exist!");
+        }
+
+        plannedSavingsMonthList.savingsPlans.pull(savingsPlanId);
+
+        savingsDoc.save();
+
+    } catch (error) {
+        throw error
+    }
+}
+
+export async function updateSavingsPlan(userId: mongoose.Types.ObjectId, month: string, updateSavingsPlanRequest: PlannedSaving) {
+    try {
+        await dbConnect();
+        const userBudget = await findBudget(userId);
+        
+        const savingsDoc = await savingsModel.findById(userBudget.savings) as Savings;
+
+        if (!savingsDoc) {
+            throw Error("No savings found with the following ID: " + userBudget.savings);
+        }
+
+        const plannedSavingsMonthList = savingsDoc.plannedSavings.find(ps => ps.month === month);
+
+        // If the month index does not exist, create one and push our new source
+        if (!plannedSavingsMonthList) {
+            throw new Error("Month index does not exist!");
+        }
+
+        const sp = plannedSavingsMonthList.savingsPlans.find(sp => sp._id === updateSavingsPlanRequest._id);
+
+        if (!sp) {
+            throw Error(`No savings plan found in ${month} with ${updateSavingsPlanRequest._id}`);
+        }
+
+        sp.account = new mongoose.Types.ObjectId(updateSavingsPlanRequest.account);
+        sp.bucket = new mongoose.Types.ObjectId(updateSavingsPlanRequest.bucket);
+        sp.amount = updateSavingsPlanRequest.amount;
+
+        sp.save();
+
+    } catch (error) {
+        throw error
     }
 }
 

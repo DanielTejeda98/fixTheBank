@@ -40,6 +40,7 @@ export interface SavingsAccount {
 }
 
 export interface PlannedSaving {
+    _id: string;
     account: string;
     bucket: string;
     amount: number;
