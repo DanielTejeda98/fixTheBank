@@ -1,4 +1,3 @@
-
 import { signOut } from "next-auth/react";
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_FTB_HOST}/api`
 

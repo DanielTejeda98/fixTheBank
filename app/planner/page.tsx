@@ -1,21 +1,23 @@
 "use client"
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import PlannerView from "../components/Planner/PlannerView";
 import { redirect } from "next/navigation";
 import { InitialBudgetDataContext } from "../providers/BudgetProvider";
 import { BudgetView } from "@/types/budget";
+import BudgetCacheProvider from "../lib/budgetCache";
+import { getSavings } from "../lib/savingsApi";
 
 export default function Planner () {
     const context = useContext(InitialBudgetDataContext)
     const { mappedBudget, error}: {mappedBudget: BudgetView, error: any} = context?.initialData;
-    // Handle the fact that NextJS caches our data from inital load
-    let useLocalData = false;
-    const cachedBudget = localStorage.getItem("budgetData");
-    const parsedCachedBudget = cachedBudget ? JSON.parse(cachedBudget) as BudgetView : null;
+    const { budget, useCachedData} = BudgetCacheProvider.getBudget({
+        lastFetched: mappedBudget.lastFetched
+    })
 
-    if (parsedCachedBudget && (mappedBudget.lastFetched < parsedCachedBudget.lastFetched)) {
-        useLocalData = true;
-    }
+    // TODO: this should be a part of the initial data load
+    useEffect(() => {
+        getSavings(true);
+    })
     
     if (error) {
         redirect(`${process.env.NEXT_PUBLIC_FTB_HOST}`);
@@ -23,7 +25,7 @@ export default function Planner () {
 
     return (
         <>
-            <PlannerView budget={(parsedCachedBudget && useLocalData) ? parsedCachedBudget : mappedBudget}/>
+            <PlannerView budget={(useCachedData && !!budget) ? budget : mappedBudget}/>
         </>
     )
 }

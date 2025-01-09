@@ -7,7 +7,7 @@ import { AuthProvider } from "./providers/AuthProvider";
 import ReduxProvider from "@/redux/provider";
 import { getInitialData } from "./lib/getInitialData";
 import BudgetProvider from "./providers/BudgetProvider";
-import Navigation from "./components/Navigation";
+import Navigation from "./components/Core/Navigation";
 import ReduxInitializer from "./components/ReduxInitializer";
 
 config.autoAddCss = false
@@ -24,8 +24,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const initialData = await getInitialData(); 
-
+  const initialData = await getInitialData();
+  
   return (
     <html lang="en">
       <body className={`${inter.className} flex flex-wrap min-h-dvh bg-background dark`}>
