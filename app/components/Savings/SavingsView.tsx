@@ -23,13 +23,7 @@ export default function SavingsView({
 }: {
   mappedBudget: BudgetView;
 }) {
-  const router = useRouter();
-  const enableSavingsBeta = useAppSelector((state) => state.settingsReducer.value.enableSavingsBeta);
-
   const savingsAccounts = useAppSelector((state) => state.savingsReducer.value.savingsAccounts);
-  if (!enableSavingsBeta) {
-    router.push("/");
-  }
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState({} as SavingsAccount);
