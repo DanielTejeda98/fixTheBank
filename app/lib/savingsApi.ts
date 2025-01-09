@@ -1,7 +1,7 @@
 import { setSavings, updatePlannedSavings } from "@/redux/features/savings-slice";
 import { store } from "@/redux/store";
 import { SavingsCacheProvider } from "./savingsCache";
-import { PlannedSavingRequest, PlannedSavings, Savings, SavingsTransactionRequest } from "@/types/savings";
+import { PlannedSavingRequest, PlannedSavings, Savings, SavingsBucketRequest, SavingsTransactionRequest } from "@/types/savings";
 
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_FTB_HOST}/api/savings`;
 
@@ -61,6 +61,19 @@ export const createTransaction = async (data: SavingsTransactionRequest) => {
     }
 
     return;
+}
+
+export const createSavingsBucket = async (accountId: string, data: SavingsBucketRequest) => {
+    const res = await fetch(`${API_BASE_URL}/account/${accountId}/buckets`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    })
+
+    if (res.ok) {
+        getSavings();
+    } else {
+        console.error("There was an error creating the bucket", res)
+    }
 }
 
 export const getSavingsPlans = async (month?: string) => {

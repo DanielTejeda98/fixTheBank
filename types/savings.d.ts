@@ -29,6 +29,12 @@ export interface SavingsBuckets {
     currentTotal: number;
 }
 
+export interface SavingsBucketRequest {
+    name: string,
+    goal: number,
+    goalBy: string
+}
+
 export interface SavingsAccount {
     _id: string;
     name: string;

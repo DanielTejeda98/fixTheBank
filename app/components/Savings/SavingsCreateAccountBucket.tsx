@@ -3,12 +3,12 @@ import { FormEvent, useReducer } from "react"
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { createSavingsBucket } from "@/app/lib/savingsApi";
 
 interface FormData {
-    savingsAccountId?: string,
     name?: string,
     goal?: number,
-    achieveBy?: string
+    goalBy?: string
 }
 
 export default function SavingsCreateAccountBucket ({savingsAccountId, closeDrawer}: {savingsAccountId: string, closeDrawer: () => void}) {
@@ -17,17 +17,16 @@ export default function SavingsCreateAccountBucket ({savingsAccountId, closeDraw
     const [formData, formDispatch] = useReducer((state: FormData, action: FormData):FormData => {
         return {...state, ...action}
     }, {
-        savingsAccountId: savingsAccountId,
         name: "",
         goal: undefined,
-        achieveBy: ""
+        goalBy: ""
     })
 
     const clearForm = () => {
         formDispatch({
             name: "",
             goal: undefined,
-            achieveBy: ""
+            goalBy: ""
         })
         validator.current.hideMessages();
     }
@@ -41,7 +40,11 @@ export default function SavingsCreateAccountBucket ({savingsAccountId, closeDraw
             return;
         }
         
-        // Todo API call
+        await createSavingsBucket(savingsAccountId, {
+            name: formData.name!,
+            goal: formData.goal!,
+            goalBy: formData.goalBy!
+        })
         
         closeDrawer();
         clearForm();
@@ -66,7 +69,7 @@ export default function SavingsCreateAccountBucket ({savingsAccountId, closeDraw
             <div className="mt-2 w-full flex flex-wrap">
                 <Label htmlFor="date" className="w-full">Achieve Goal By</Label>
                 <div className="flex w-full gap-2 mt-1">
-                    <Input type="date" name="date" value={formData.achieveBy} onChange={e => formDispatch({achieveBy: e.target.value})}/>
+                    <Input type="date" name="date" value={formData.goalBy} onChange={e => formDispatch({goalBy: e.target.value})}/>
                 </div>
             </div>
 
