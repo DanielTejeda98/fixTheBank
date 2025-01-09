@@ -39,11 +39,19 @@ export interface SavingsAccount {
     currentTotal: number;
 }
 
+export interface PlannedSavingRequest {
+    account: string;
+    bucket: string;
+    amount: number;
+    description: string;
+}
+
 export interface PlannedSaving {
     _id: string;
     account: string;
     bucket: string;
     amount: number;
+    description: string;
 }
 
 export interface PlannedSavings {
@@ -55,5 +63,5 @@ export interface Savings {
     _id: string;
     budget: string;
     savingsAccounts: SavingsAccount[];
-    plannedSavings: any[];
+    plannedSavings: PlannedSavings[];
 }

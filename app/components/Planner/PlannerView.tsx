@@ -17,11 +17,13 @@ import PlannerIncomeEditor from "./PlannerIncomeEditor";
 import { Button } from "../ui/button";
 import PlannerSavingsList from "./PlannerSavingsList";
 import PlannerSavingsEditor from "./PlannerSavingsEditor";
+import { PlannedSaving } from "@/types/savings";
 
 export default function PlannerView ({budget}: {budget: BudgetView}) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [drawerComponent, setDrawerComponent] = useState("addIncome" as keyof typeof DrawerComponents);
     const [selectedCategory, setSelectedCategory] = useState<CategoryView|undefined>(undefined);
+    const [selectedPlannedSavings, setSelectedPlannedSavings] = useState<PlannedSaving|undefined>(undefined);
 
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
     const monthPlannedIncome = useAppSelector((state) => state.budgetReducer.value.plannedIncome.find((pi: any) => pi.month === budgetMonth)?.incomeStreams) || [];
@@ -35,7 +37,7 @@ export default function PlannerView ({budget}: {budget: BudgetView}) {
         categoriesEditor: <PlannerCategoriesEditor categories={categories} />,
         categoryExplorer: <PlannerCategoryView key={selectedCategory?._id} category={selectedCategory} closeDrawer={() => setIsDrawerOpen(false)}/>,
         incomePlanner: <PlannerIncomeEditor closeDrawer={() => setIsDrawerOpen(false)} />,
-        savingsPlanner: <PlannerSavingsEditor closeDrawer={() => setIsDrawerOpen(false)} />
+        savingsPlanner: <PlannerSavingsEditor closeDrawer={() => setIsDrawerOpen(false)} savingsTransaction={selectedPlannedSavings}/>
     }
     const toggleDrawer = (component: keyof typeof DrawerComponents) => {
         setDrawerComponent(component);
@@ -45,6 +47,11 @@ export default function PlannerView ({budget}: {budget: BudgetView}) {
     const handleCategoryClick = (category: CategoryView) => {
         setSelectedCategory(category)
         toggleDrawer("categoryExplorer");
+    }
+
+    const handleOpenSavingsPlannerClick = (savings?: PlannedSaving) => {
+        setSelectedPlannedSavings(savings);
+        toggleDrawer("savingsPlanner");
     }
 
     const handleCategoryEditorClick = () => {
@@ -69,7 +76,7 @@ export default function PlannerView ({budget}: {budget: BudgetView}) {
                                    editCategoriesClick={handleCategoryEditorClick}
                                    cardOnClick={handleCategoryClick}/>
 
-            <PlannerSavingsList openSavingsPlanner={() => toggleDrawer("savingsPlanner")}/>
+            <PlannerSavingsList openSavingsPlanner={handleOpenSavingsPlannerClick}/>
 
             <Drawer isOpen={isDrawerOpen}
                     closeDrawer={() => setIsDrawerOpen(false)}>

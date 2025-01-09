@@ -13,13 +13,13 @@ export async function GET (req: NextRequest) {
 
     const userId = new mongoose.Types.ObjectId(session.user.id);
 
-    let requestMonth = req.nextUrl.searchParams.get("month") || `${new Date().getMonth() + 1}/${new Date().getFullYear()}`
+    const requestMonth = req.nextUrl.searchParams.get("month") || `${new Date().getMonth() + 1}/1/${new Date().getFullYear().toString().slice(2)}`
 
     try {
         const plannedSavings = await getSavingsPlannerByMonth(userId, requestMonth);
 
         if (!plannedSavings) {
-            return NextResponse.json({success: false, error: "No savings found!"});
+            return NextResponse.json({success: false, error: "No savings found!"}, { status: 404 });
         }
 
         return NextResponse.json(plannedSavings, {status: 200});
@@ -37,7 +37,7 @@ export async function POST (req: NextRequest) {
 
     const userId = new mongoose.Types.ObjectId(session.user.id);
 
-    let requestMonth = req.nextUrl.searchParams.get("month") || `${new Date().getMonth() + 1}/${new Date().getFullYear()}`
+    let requestMonth = req.nextUrl.searchParams.get("month") || `${new Date().getMonth() + 1}/1/${new Date().getFullYear().toString().slice(2)}`
 
     try {
         const request = await req.json();
@@ -69,6 +69,10 @@ const validatePOSTFields = (body: PlannedSaving) => {
 
     if (!body.bucket.length) {
         missingFields.push("bucket")
+    }
+
+    if (!body.description.length) {
+        missingFields.push("description")
     }
 
     if (missingFields.length) {

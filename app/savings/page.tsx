@@ -10,7 +10,7 @@ export default function Savings() {
   const { mappedBudget, error } = context?.initialData;
   // TODO: this should be a part of the initial data load
   useEffect(() => {
-    getSavings();
+    getSavings(true);
   })
   
   if (error) {

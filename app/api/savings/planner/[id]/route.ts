@@ -13,7 +13,7 @@ export async function PUT (req: NextRequest, { params }: { params: { id: string 
 
     const userId = new mongoose.Types.ObjectId(session.user.id);
 
-    let requestMonth = req.nextUrl.searchParams.get("month") || `${new Date().getMonth() + 1}/${new Date().getFullYear()}`
+    let requestMonth = req.nextUrl.searchParams.get("month") || `${new Date().getMonth() + 1}/1/${new Date().getFullYear().toString().slice(2)}`
 
     try {
         const request = await req.json();
@@ -27,8 +27,10 @@ export async function PUT (req: NextRequest, { params }: { params: { id: string 
 
         return NextResponse.json(null, { status: 204 });
         
-    } catch (error) {
-        console.log(error);
+    } catch (error: any) {
+        if (error.message.includes("No savings plan found")) {
+            return NextResponse.json({success: false, error}, {status: 404})
+        }
         return NextResponse.json({success: false, error}, {status: 500})
     }
 }
@@ -41,15 +43,9 @@ export async function DELETE (req: NextRequest, { params }: { params: { id: stri
 
     const userId = new mongoose.Types.ObjectId(session.user.id);
 
-    let requestMonth = req.nextUrl.searchParams.get("month") || `${new Date().getMonth() + 1}/${new Date().getFullYear()}`
+    let requestMonth = req.nextUrl.searchParams.get("month") || `${new Date().getMonth() + 1}/1/${new Date().getFullYear().toString().slice(2)}`
 
     try {
-        const request = await req.json();
-        const error = validatePUTFields(request);
-        if (error) {
-            return NextResponse.json({success: false, error: error.message }, {status: 412})
-        }
-
         await removeSavingsPlan(userId, requestMonth, new mongoose.Types.ObjectId(params.id));
 
         return NextResponse.json(null, { status: 200 });
@@ -73,6 +69,10 @@ const validatePUTFields = (body: PlannedSaving) => {
 
     if (!body.bucket.length) {
         missingFields.push("bucket");
+    }
+
+    if (!body.description.length) {
+        missingFields.push("description")
     }
 
     if (missingFields.length) {

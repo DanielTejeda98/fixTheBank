@@ -5,6 +5,7 @@ import { RootState } from "../store";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { AccountView, BudgetView, CategoryView } from "@/types/budget";
+import { getTotalPlannedSavings } from "./savings-slice";
 
 type InitialState = {
     value: BudgetState;
@@ -120,7 +121,8 @@ export const selectTransactions = createSelector([selectIncome, selectExpense], 
 })
 
 export const selectUnallocatedFunds = (state:RootState) => {
-    return (state.budgetReducer.value.totalPlannedIncome || 0) - (state.budgetReducer.value.totalAllocated || 0);
+    return (state.budgetReducer.value.totalPlannedIncome || 0) 
+    - ((state.budgetReducer.value.totalAllocated || 0) + getTotalPlannedSavings(state.savingsReducer.value, state.budgetReducer.value.minDate));
 }
 
 export function useSetInitialStore({budget }: {budget: BudgetView }) {

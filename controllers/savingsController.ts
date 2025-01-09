@@ -309,7 +309,8 @@ export async function addSavingsPlan (userId: mongoose.Types.ObjectId, month: st
         const mappedSavingsObj = { 
             account: newSavingsPlanRequest.account, 
             amount: newSavingsPlanRequest.amount, 
-            bucket: newSavingsPlanRequest.bucket 
+            bucket: newSavingsPlanRequest.bucket,
+            description: newSavingsPlanRequest.description
         } 
         
         // If the month index does not exist, create one and push our new source
@@ -371,8 +372,8 @@ export async function updateSavingsPlan(userId: mongoose.Types.ObjectId, month: 
             throw new Error("Month index does not exist!");
         }
 
-        const sp = plannedSavingsMonthList.savingsPlans.find(sp => sp._id === updateSavingsPlanRequest._id);
-
+        const sp = plannedSavingsMonthList.savingsPlans.find(sp => (sp._id as mongoose.Types.ObjectId).equals(updateSavingsPlanRequest._id));
+        
         if (!sp) {
             throw Error(`No savings plan found in ${month} with ${updateSavingsPlanRequest._id}`);
         }
@@ -380,8 +381,9 @@ export async function updateSavingsPlan(userId: mongoose.Types.ObjectId, month: 
         sp.account = new mongoose.Types.ObjectId(updateSavingsPlanRequest.account);
         sp.bucket = new mongoose.Types.ObjectId(updateSavingsPlanRequest.bucket);
         sp.amount = updateSavingsPlanRequest.amount;
+        sp.description = updateSavingsPlanRequest.description;
 
-        sp.save();
+        savingsDoc.save();
 
     } catch (error) {
         throw error

@@ -8,7 +8,8 @@ export interface PlannedSavings {
 export interface PlannedSaving extends mongoose.Document {
     account: mongoose.Types.ObjectId,
     bucket: mongoose.Types.ObjectId | null,
-    amount: Number
+    amount: Number,
+    description: string
 }
 
 export interface Savings extends mongoose.Document {
@@ -38,7 +39,8 @@ const SavingsSchema = new mongoose.Schema<Savings>({
                     bucket: { 
                         type: mongoose.Types.ObjectId 
                     },
-                    amount: Number
+                    amount: Number,
+                    description: String
                 }
             }]
         }
