@@ -17,6 +17,7 @@ export interface SavingsTransactionRequest {
     amount: number;
     date: string;
     transactionType: TransactionType;
+    bucket: string;
 }
 
 export interface SavingsBuckets {

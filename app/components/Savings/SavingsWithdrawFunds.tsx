@@ -1,4 +1,4 @@
-import { FormEvent, useReducer } from "react";
+import { FormEvent, ReactNode, useReducer } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import useReactValidator from "@/app/hooks/useReactValidator";
@@ -7,11 +7,13 @@ import { Button } from "../ui/button";
 import { formatDateInput } from "@/app/lib/renderHelper";
 import { createTransaction } from "@/app/lib/savingsApi";
 import { SavingsAccount } from "@/types/savings";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 interface FormData {
     name?: string;
     amount?: number;
     date?: string;
+    bucket?: string
 }
 
 export default function SavingsWithdrawFunds ({account, closeDrawer}: {account:SavingsAccount, closeDrawer: () => void}) {
@@ -23,14 +25,16 @@ export default function SavingsWithdrawFunds ({account, closeDrawer}: {account:S
     }, {
         name: "",
         amount: undefined,
-        date: ""
+        date: "",
+        bucket: ""
     })
 
     const clearForm = () => {
         formDispatch({
             name: "",
             amount: undefined,
-            date: ""
+            date: "",
+            bucket: ""
         })
         validator.current.hideMessages();
     }
@@ -49,11 +53,27 @@ export default function SavingsWithdrawFunds ({account, closeDrawer}: {account:S
             amount: formData.amount!,
             date: formData.date!,
             accountId: account._id,
-            name: formData.name!.trim()
+            name: formData.name!.trim(),
+            bucket: formData.bucket!
         })
         
         closeDrawer();
         clearForm();
+    }
+
+    const handleBucketUpdate = (bucket: string) => {
+        // This if statement takes care of a weird bug where this event was being triggered
+        // and it would push stale formData to the reducer
+        if (bucket === formData.bucket) {
+            return;
+        }
+        formDispatch({...formData, bucket: bucket });
+    }
+
+    const renderBucketOptions = (): ReactNode => {
+        return account.buckets.map(bkt => (
+            <SelectItem value={bkt._id} key={bkt._id}>{bkt.name}</SelectItem>
+        ))
     }
     
     return (
@@ -82,6 +102,19 @@ export default function SavingsWithdrawFunds ({account, closeDrawer}: {account:S
                     { !dateButtonOnLeft ? <Button type="button" onClick={e => formDispatch({date: formatDateInput(new Date())})}>Today</Button> : null}
                 </div>
                 {validator.current.message("date", formData.date, "required")}
+            </div>
+
+            <div className="mt-2 w-full">
+                <Label htmlFor="bucket">To Bucket</Label>
+                <Select value={formData.bucket} onValueChange={(e: string) => handleBucketUpdate(e)}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select a bucket"></SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                        {renderBucketOptions()}
+                    </SelectContent>
+                </Select>
+                {validator.current.message("bucket", formData.bucket, "required")}
             </div>
 
             <div className="flex justify-end gap-3 w-full mt-5">
