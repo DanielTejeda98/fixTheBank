@@ -83,7 +83,7 @@ export default function SelectBudget ({closeDrawer}: {closeDrawer: Function}) {
     }
 
     return (
-    <form className="flex flex-wrap w-full" onSubmit={submitBudgetUpdates}>
+    <form className="flex flex-col w-full min-h-60" onSubmit={submitBudgetUpdates}>
         <div className="w-full">
             <Label htmlFor="date">Budget Date</Label>
             <div className="flex w-full gap-2">
@@ -95,7 +95,7 @@ export default function SelectBudget ({closeDrawer}: {closeDrawer: Function}) {
         
         {renderShareOptions()}
 
-        <div className="flex justify-end gap-3 w-full mt-5">
+        <div className="flex grow items-end justify-end gap-3 w-full mt-5">
             <Button type="reset" variant="destructive" className="rounded-md p-1 min-w-32">Clear</Button>
             <Button type="submit" className="rounded-md p-1 min-w-32">Confirm</Button>
         </div>

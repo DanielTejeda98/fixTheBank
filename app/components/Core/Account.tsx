@@ -3,11 +3,11 @@ import { useAppSelector } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import NotificationCard from "./NotificationCard";
 import { approveJoinRequest, getRequestersList } from "../../lib/budgetApi";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setJoinRequestList } from "@/redux/features/budget-slice";
 import { useSession } from "next-auth/react";
-import { signUserOut } from "../../lib/userApi";
+import { getUser, signUserOut } from "../../lib/userApi";
 import { Button } from ".././ui/button";
 
 export default function Account({ closeDrawer }: { closeDrawer: Function }) {
@@ -17,6 +17,7 @@ export default function Account({ closeDrawer }: { closeDrawer: Function }) {
   const getRequesters = useAppSelector(
     (state) => state.budgetReducer.value.joinRequests
   );
+  const userInformation = useAppSelector((state) => state.userReducer.value);
   const getBudgetId = useAppSelector((state) => state.budgetReducer.value._id);
   const getUserId = useSession().data?.user?.id;
   const logout = () => {
@@ -24,6 +25,13 @@ export default function Account({ closeDrawer }: { closeDrawer: Function }) {
     closeDrawer();
     router.refresh();
   };
+
+  useEffect(() => {
+    async function fetchData () {
+      await getUser();
+    }
+    fetchData();
+  }, [])
 
   const approveRequestee = async (requesterId: string) => {
     try {
@@ -97,19 +105,24 @@ export default function Account({ closeDrawer }: { closeDrawer: Function }) {
   };
 
   return (
-    <div>
-      <div className="flex flex-wrap">
-        <Button variant="destructive"
-          className="p-2 text-sm rounded-md ml-auto"
-          onClick={logout}
-        >
-          Log out
-        </Button>
+    <div className="flex flex-col gap-5 min-h-60">
+      <div className="flex flex-col w-full items-center gap-3">
+        <div className="font-bold text-xl">{userInformation.username}</div>
+        <div className="font-thin">{userInformation.email}</div>
       </div>
 
       <div className="grid gap-3 mt-3 overflow-auto border p-1 rounded-md">
         <h2>Requests</h2>
         {renderJoinRequests()}
+      </div>
+
+      <div className="flex flex-wrap grow w-full items-end">
+        <Button variant="destructive"
+          className="p-2 text-sm rounded-md ml-auto w-full"
+          onClick={logout}
+        >
+          Log out
+        </Button>
       </div>
     </div>
   );

@@ -21,14 +21,14 @@ export default function PlannerIncomeList({addIncomeClick, incomeStreams}: Plann
     }
 
     return (
-        <section className="m-3 p-3 border rounded-md">
+        <section className="flex flex-wrap m-3 p-3 border rounded-md">
             <div className="flex w-full justify-between mb-1">
                 <h2>Planned Income Streams</h2>
             </div>
-            <ul>
+            <ul className="w-full">
                 {renderIncomeStreams()}
             </ul>
-            <Button onClick={() => { addIncomeClick() }} className="text-xs">Add Planned Income</Button>
+            <Button onClick={() => { addIncomeClick() }} className="text-xs ml-auto">Add Planned Income</Button>
         </section>
     )
 }

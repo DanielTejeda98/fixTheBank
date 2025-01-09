@@ -2,15 +2,31 @@ import dbConnect from "@/app/lib/dbConnect";
 import userModel, { User } from "@/models/userModel";
 import { hash } from "@/app/lib/passwordHasher";
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/config/authOptions";
+import mongoose from "mongoose";
 
-export async function GET(req: NextRequest) {
+export async function GET (req: NextRequest) {
     await dbConnect();
-    
+
+    const session = await getServerSession(authOptions)
+    if (!session) {
+        return NextResponse.json({ message: "Must be logged in"}, {status: 401})
+    }
+
+    const userId = new mongoose.Types.ObjectId(session.user.id);
+
     try {
-        const users = await userModel.find({})
-        return NextResponse.json({success: true, data: users}, {status: 200});
+        const user = await userModel.findById(userId, "username email");
+
+        if (!user) {
+            return NextResponse.json({success: false, error: "No savings found!"}, { status: 404 });
+        }
+
+        return NextResponse.json(user)
     } catch (error) {
-        return NextResponse.json({success: false, error }, {status: 400})
+        console.log(error)
+        return NextResponse.json({success: false, error }, {status: 500})
     }
 }
 

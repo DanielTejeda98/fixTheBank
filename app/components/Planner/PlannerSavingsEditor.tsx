@@ -43,10 +43,10 @@ export default function PlannerSavingsEditor ({closeDrawer, savingsTransaction}:
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
 
     const [formData, formDispatch] = useReducer((state: FormData, action: FormData):FormData => {
-        console.log("dispatch", action)
         return {...state, ...action}
     }, {...getIntitalFormData(savingsTransaction)})
 
+    // We purposely do not want to watch formData here as it will cause an infinate loop
     useEffect(() => {
         const dispatch = formDispatch;
         dispatch({...formData, ...getIntitalFormData(savingsTransaction)});
