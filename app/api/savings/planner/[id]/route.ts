@@ -25,9 +25,10 @@ export async function PUT (req: NextRequest, { params }: { params: { id: string 
 
         await updateSavingsPlan(userId, requestMonth, request);
 
-        return NextResponse.json(null, { status: 204 });
+        return new Response(null, { status: 204 })
         
     } catch (error: any) {
+        console.log(error)
         if (error.message.includes("No savings plan found")) {
             return NextResponse.json({success: false, error}, {status: 404})
         }
