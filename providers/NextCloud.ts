@@ -1,5 +1,6 @@
 export interface NextCloudClient {
-    uploadFile(file: Buffer<any>, fileName: string, fileType: string, location: string): Promise<boolean>
+    uploadFile(file: Buffer<any>, fileName: string, fileType: string, location: string): Promise<boolean>,
+    getFile(fileLocation: string): Promise<string>
 }
 
 export class NextCloudClient {
