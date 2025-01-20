@@ -17,7 +17,7 @@ export class StorageClient {
         }
     }
 
-    async uploadFile(file: Buffer<any>, fileName: string, fileType: string, location: string): Promise<boolean> {
+    async uploadFile(file: Buffer<ArrayBufferLike>, fileName: string, fileType: string, location: string): Promise<boolean> {
         try {
             return await this.storageProvider.uploadFile(file, fileName, fileType, location);
         } catch (error) {
