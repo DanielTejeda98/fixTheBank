@@ -1,7 +1,8 @@
 import { NextCloudClient } from "@/providers/NextCloud";
 
 export interface StorageClient {
-    uploadFile(file: Buffer<any>, fileName: string, fileType: string, location: string): Promise<boolean>
+    uploadFile(file: Buffer<any>, fileName: string, fileType: string, location: string): Promise<boolean>,
+    getFile(fileLocation: string): Promise<string>
 }
 
 export class StorageClient {
