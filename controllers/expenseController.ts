@@ -25,7 +25,8 @@ async function createExpense (request: any, userId: mongoose.Types.ObjectId) {
             transactionDate: request.transactionDate || request.date,
             description: request.description,
             account: request.account,
-            budgetId: new mongoose.Types.ObjectId(request.budgetId)
+            budgetId: new mongoose.Types.ObjectId(request.budgetId),
+            receiptImage: request.receiptImage
         })
 
         await budget.updateOne({
@@ -60,7 +61,8 @@ async function updateExpense (request: any, expenseId: mongoose.Types.ObjectId, 
             category: request.category ? new mongoose.Types.ObjectId(request.category) : null,
             transactionDate: request.transactionDate || request.date || null,
             date: request.date || null,
-            description: request.description
+            description: request.description,
+            receiptImage: request.receiptImage
         } as Expense;
     
         for (const key of Object.keys(updateRequest)) {

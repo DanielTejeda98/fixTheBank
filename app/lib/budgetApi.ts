@@ -12,6 +12,19 @@ const createExpense = async (headers: any, expense: any) => {
     return await res.json();
 }
 
+export const createReceiptImage = async (headers: any, receiptImage: File, budgetId: string) => {    
+    const res = await fetch(`${API_BASE_URL}/images/${budgetId}`, {
+        headers: {
+            ...headers,
+            "Content-Type": receiptImage.type
+        },
+        method: 'POST',
+        body: receiptImage
+    })
+
+    return await res.json();;
+}
+
 const updateExpense = async (headers: any, expense: any) => {
     const res = await fetch(`${API_BASE_URL}/expense/${expense.id}`, {
         headers,

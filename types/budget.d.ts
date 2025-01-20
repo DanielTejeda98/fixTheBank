@@ -42,5 +42,6 @@ export interface TransactionView {
     amount: number,
     description: string,
     date: Date,
-    transactionDate: Date
+    transactionDate: Date,
+    receiptImage?: string
 }

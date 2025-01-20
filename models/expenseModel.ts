@@ -10,7 +10,7 @@ export interface Expense extends mongoose.Document {
     transactionDate: Date,
     description: string,
     budgetId: mongoose.Schema.Types.ObjectId,
-    receiptId: string
+    receiptImage: string
 }
 
 const ExpenseSchema = new mongoose.Schema<Expense>({
@@ -50,7 +50,7 @@ const ExpenseSchema = new mongoose.Schema<Expense>({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Budget"
     },
-    receiptId: {
+    receiptImage: {
         type: String,
         default: ""
     }

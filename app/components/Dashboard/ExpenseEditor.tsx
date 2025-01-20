@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useReducer, useState } from "react";
-import { createExpense, getBudget, updateExpense } from "@/app/lib/budgetApi";
+import { createExpense, createReceiptImage, getBudget, updateExpense } from "@/app/lib/budgetApi";
 import { setBudget } from "@/redux/features/budget-slice";
 import { useDispatch } from "react-redux";
 import { useSession } from "next-auth/react";
@@ -23,7 +23,9 @@ interface FormData {
     category?: string,
     date?: string
     description?: string
-    borrowFromNextMonth?: boolean
+    borrowFromNextMonth?: boolean,
+    receiptImage?: string,
+    receiptImageSrc?: string
 }
 
 const getIntitalFormData = (accounts: AccountView[], categories: CategoryView[], transaction?: any): FormData => {
@@ -34,7 +36,9 @@ const getIntitalFormData = (accounts: AccountView[], categories: CategoryView[],
             category: categories.find(cat => cat._id === transaction.account)?._id || categories[0]?._id || "",
             date: formatDateInput(new Date(transaction.transactionDate.split("T")[0].replaceAll("-", "/") || transaction.date.split("T")[0].replaceAll("-", "/"))),
             description: transaction.description,
-            borrowFromNextMonth: !transaction.transactionDate ? false : new Date(transaction.transactionDate) < new Date(transaction.date)
+            borrowFromNextMonth: !transaction.transactionDate ? false : new Date(transaction.transactionDate) < new Date(transaction.date),
+            receiptImage: transaction.receiptImage,
+            receiptImageSrc: ""
         }
     }
 
@@ -44,7 +48,9 @@ const getIntitalFormData = (accounts: AccountView[], categories: CategoryView[],
         category: categories?.length > 0 ? categories[0]._id : "",
         date: "",
         description: "",
-        borrowFromNextMonth: false
+        borrowFromNextMonth: false,
+        receiptImage: "",
+        receiptImageSrc: ""
     }
 }
 
@@ -55,6 +61,7 @@ export default function ExpenseEditor({ closeDrawer, budgetId, accounts, categor
     const reduxDispatch = useDispatch();
     const dateButtonOnLeft = useAppSelector((state) => state.settingsReducer.value.dateTodayButtonOnLeft);
     const [furtherOptionsOpen, setFurtherOptionsOpen] = useState(false);
+    const [isImageUploading, setIsImageUploading] = useState(false);
     const [formData, dispatch] = useReducer((state: FormData, action: FormData): FormData => {
         return { ...state, ...action }
     }, {...getIntitalFormData(accounts, categories, transaction)})
@@ -71,11 +78,23 @@ export default function ExpenseEditor({ closeDrawer, budgetId, accounts, categor
             category: categories?.length > 0 ? categories[0]._id : "",
             date: "",
             description: "",
-            borrowFromNextMonth: false
+            borrowFromNextMonth: false,
+            receiptImage: "",
+            receiptImageSrc: ""
         })
         validator.current.hideMessages();
     }
 
+    const handleReceiptImageUpload = async (image?: File | null) => {
+        if (!image) {
+            return;
+        }
+        setIsImageUploading(true);
+        const res = await createReceiptImage({}, image, budgetId)
+        console.log(res.message);
+        dispatch({ receiptImage: res.message });
+        setIsImageUploading(false);
+    }
 
     const formSubmit = async (form: FormEvent) => {
         form.preventDefault();
@@ -114,6 +133,7 @@ export default function ExpenseEditor({ closeDrawer, budgetId, accounts, categor
 
     const isEdit = !!transaction;
     const actionPrefix = isEdit ? "Edit" : "Add"
+    const receiptLabel = isEdit && formData.receiptImage ? "Update Receipt Image" : "Add Receipt Image"
 
     return (
         <form onSubmit={formSubmit} onReset={clearForm} className="flex flex-wrap">
@@ -167,6 +187,12 @@ export default function ExpenseEditor({ closeDrawer, budgetId, accounts, categor
                 {validator.current.message("description", formData.description, "required")}
             </div>
 
+            <div className="mt-2 w-full">
+                <Label htmlFor="receipt">{ receiptLabel }</Label>
+                <Input type="file" accept=".jpeg,.jpg,.png" name="receipt" value={formData.receiptImageSrc} onChange={e => handleReceiptImageUpload(e.target.files?.item(0))} disabled={isImageUploading} />
+                {validator.current.message("receipt", formData.receiptImage, "")}
+            </div>
+
             <Collapsible asChild open={furtherOptionsOpen} onOpenChange={setFurtherOptionsOpen}>
                 <div className="w-full mb-2">
                     <CollapsibleTrigger asChild>
@@ -192,8 +218,8 @@ export default function ExpenseEditor({ closeDrawer, budgetId, accounts, categor
             </Collapsible>
 
             <div className="flex justify-end gap-3 w-full mt-5">
-                <Button type="reset" variant="destructive" className="rounded-md p-1 min-w-32">Clear</Button>
-                <Button type="submit" className="rounded-md p-1 min-w-32">{actionPrefix} Expense</Button>
+                <Button type="reset" variant="destructive" className="rounded-md p-1 min-w-32" disabled={isImageUploading}>Clear</Button>
+                <Button type="submit" className="rounded-md p-1 min-w-32" disabled={isImageUploading}>{actionPrefix} Expense</Button>
             </div>
         </form>
     )
