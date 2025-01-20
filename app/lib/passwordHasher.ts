@@ -21,7 +21,7 @@ export async function verify (password: string, hash: string): Promise<boolean> 
     })
 }
 
-export const encryptFile = (fileData: Buffer<any>) => {
+export const encryptFile = (fileData: Buffer) => {
     const secretKey = crypto.createHash('sha256').update(String(process.env.FTB_SECRET)).digest('base64').substr(0, 32);;
     if (!secretKey) {
         throw new Error("No FTB_SECRET set up in ENV");

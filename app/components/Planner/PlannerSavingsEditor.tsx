@@ -50,6 +50,7 @@ export default function PlannerSavingsEditor ({closeDrawer, savingsTransaction}:
     useEffect(() => {
         const dispatch = formDispatch;
         dispatch({...formData, ...getIntitalFormData(savingsTransaction)});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [savingsTransaction])
 
     const clearForm = () => {

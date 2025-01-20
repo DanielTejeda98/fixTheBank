@@ -6,7 +6,7 @@ import { Budget } from "@/models/budgetModel";
 import imageModel, { Image } from "@/models/imageModel";
 import mongoose from "mongoose";
 
-export async function uploadImageToBudget (buffer: Buffer<any>, contentType: string, budgetId: string, userId: string) {
+export async function uploadImageToBudget (buffer: Buffer, contentType: string, budgetId: string, userId: string) {
     const filename = `${crypto.randomUUID()}`;
 
     try {

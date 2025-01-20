@@ -1,7 +1,7 @@
 import { NextCloudClient } from "@/providers/NextCloud";
 
 export interface StorageClient {
-    uploadFile(file: Buffer<any>, fileName: string, fileType: string, location: string): Promise<boolean>,
+    uploadFile(file: Buffer, fileName: string, fileType: string, location: string): Promise<boolean>,
     getFile(fileLocation: string): Promise<string>
 }
 
@@ -17,7 +17,7 @@ export class StorageClient {
         }
     }
 
-    async uploadFile(file: Buffer<ArrayBufferLike>, fileName: string, fileType: string, location: string): Promise<boolean> {
+    async uploadFile(file: Buffer, fileName: string, fileType: string, location: string): Promise<boolean> {
         try {
             return await this.storageProvider.uploadFile(file, fileName, fileType, location);
         } catch (error) {

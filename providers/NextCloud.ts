@@ -1,5 +1,5 @@
 export interface NextCloudClient {
-    uploadFile(file: Buffer<ArrayBufferLike>, fileName: string, fileType: string, location: string): Promise<boolean>,
+    uploadFile(file: Buffer, fileName: string, fileType: string, location: string): Promise<boolean>,
     getFile(fileLocation: string): Promise<string>
 }
 
@@ -35,7 +35,7 @@ export class NextCloudClient {
         }
     }
 
-    async uploadFile (file: Buffer<ArrayBufferLike>, fileName: string, fileType: string, location: string) {
+    async uploadFile (file: Buffer, fileName: string, fileType: string, location: string) {
         if (!await this.checkPath(location)) {
             const nextCloudCreateShareResponse = await fetch(`${this.host}/remote.php/dav/files/${this.user}/${this.path}${location}`, {
                 method: "MKCOL",
