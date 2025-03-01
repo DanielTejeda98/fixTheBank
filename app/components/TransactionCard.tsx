@@ -24,7 +24,7 @@ export default function TransactionCard({
     const category = categories.find(cat => cat._id === transaction.category)?.name || ""
 
     function openTransactionDrawer () {
-        setDrawerComponent(<TransactionViewer transaction={transaction} openEditor={() => setDrawerComponent("expenseEditor")} />);
+        setDrawerComponent(<TransactionViewer transaction={transaction} />);
         setDrawerOpen(true);
     }
 

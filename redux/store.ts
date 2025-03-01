@@ -3,6 +3,7 @@ import budgetReducer from "./features/budget-slice";
 import settingsReducer from "./features/settings-slice";
 import savingsReducer from "./features/savings-slice";
 import userReducer from "./features/user-slice";
+import filtersReducer from "./features/filters-slice";
 import { TypedUseSelectorHook, useSelector } from "react-redux";
 
 export const store = configureStore({
@@ -10,7 +11,8 @@ export const store = configureStore({
         budgetReducer,
         settingsReducer,
         savingsReducer,
-        userReducer
+        userReducer,
+        filtersReducer
     }
 })
 

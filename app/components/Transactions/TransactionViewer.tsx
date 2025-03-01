@@ -7,9 +7,10 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 import { DrawerBody, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import ExpenseEditor from "../Dashboard/ExpenseEditor";
 
-export default function TransactionViewer ({transaction, openEditor}: {transaction?: TransactionView, openEditor: Function}) {
-    const { setOpen: setDrawerOpen } = useFTBDrawer();
+export default function TransactionViewer ({transaction}: {transaction?: TransactionView}) {
+    const { setOpen: setDrawerOpen, setDrawerComponent } = useFTBDrawer();
     const userId = useSession().data?.user?.id;
     const categories = useAppSelector((state) => state.budgetReducer.value.categories)
     const accounts = useAppSelector((state) => state.budgetReducer.value.accounts)
@@ -18,6 +19,11 @@ export default function TransactionViewer ({transaction, openEditor}: {transacti
     const category = categories.find(cat => cat._id === transaction?.category)?.name;
 
     const budgetId = useAppSelector((state) => state.budgetReducer.value._id);
+
+    function openEditor () {
+        setDrawerComponent(<ExpenseEditor budgetId={budgetId} accounts={accounts} categories={categories} transaction={transaction} />)
+        setDrawerOpen(true);
+    }
 
     const handleDeleteTransaction = async () => {
         if (!transaction) {

@@ -1,23 +1,24 @@
 import { CategoryView } from "@/types/budget";
 import { Button } from "../ui/button";
+import { DrawerBody, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import { useAppSelector } from "@/redux/store";
+import { setFilters } from "@/redux/features/filters-slice";
+import { useDispatch } from "react-redux";
 
 type Props = {
   categories: CategoryView[];
-  filteredBy: String[];
-  setFilteredBy: Function;
-  closeDrawer: Function;
 };
 export default function Filter({
   categories,
-  filteredBy,
-  setFilteredBy,
-  closeDrawer,
 }: Props) {
+  const filteredBy = useAppSelector((state) => state.filtersReducer.value.categoryFilters);
+  const reduxDispatch = useDispatch();
+
   const toggleCategory = (categoryId: string) => {
     if (filteredBy.includes(categoryId)) {
-      setFilteredBy(filteredBy.filter((cat) => cat != categoryId));
+      reduxDispatch(setFilters({ categoryFilters: filteredBy.filter((cat) => cat != categoryId)}));
     } else {
-      setFilteredBy([...filteredBy, categoryId]);
+      reduxDispatch(setFilters({ categoryFilters: [...filteredBy, categoryId]}));
     }
   };
 
@@ -39,12 +40,14 @@ export default function Filter({
     });
   };
   return (
-    <div>
-      <div className="flex w-full justify-between items-center">
-        <h2 className="mb-2">Filter</h2>
-        <Button variant="outline" className="text-xs" disabled={filteredBy.length === 0} onClick={() => setFilteredBy([])}>Deselect All</Button>
-      </div>
-      {renderCategoriesList()}
+    <div className="overflow-scroll">
+      <DrawerHeader className="flex flex-row w-full justify-between items-center">
+        <DrawerTitle className="mb-2">Filter</DrawerTitle>
+        <Button variant="outline" className="text-xs" disabled={filteredBy.length === 0} onClick={() => reduxDispatch(setFilters({ categoryFilters: []}))}>Deselect All</Button>
+      </DrawerHeader>
+      <DrawerBody className="flex flex-col w-full">
+        {renderCategoriesList()}
+      </DrawerBody>
     </div>
   );
 }
