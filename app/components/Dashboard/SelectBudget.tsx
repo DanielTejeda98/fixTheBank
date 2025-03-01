@@ -10,8 +10,11 @@ import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { formatDateInput } from "@/app/lib/renderHelper";
+import { DrawerBody, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import { useFTBDrawer } from "../ui/ftbDrawer";
 
-export default function SelectBudget ({closeDrawer}: {closeDrawer: Function}) {
+export default function SelectBudget () {
+    const { setOpen: setOpenDrawer } = useFTBDrawer();
     const userId = useSession().data?.user.id;
     const validator = useRef(new SimpleReactValidator());
     const forceUpdate = useReducer(x => x + 1, 0)[1];
@@ -48,7 +51,7 @@ export default function SelectBudget ({closeDrawer}: {closeDrawer: Function}) {
             console.log(error)
         }
 
-        closeDrawer();
+        setOpenDrawer(false);
     }
 
     const processBudgetShareUpdates = async (headers: any) => {
@@ -83,22 +86,28 @@ export default function SelectBudget ({closeDrawer}: {closeDrawer: Function}) {
     }
 
     return (
-    <form className="flex flex-col w-full min-h-60" onSubmit={submitBudgetUpdates}>
-        <div className="w-full">
-            <Label htmlFor="date">Budget Date</Label>
-            <div className="flex w-full gap-2">
-                <Input type="date" name="date" value={budgetDate} onChange={e => setBudgetDate(e.target.value)}/>
-                <Button type="button" onClick={e => setBudgetDate(formatDateInput(new Date()))}>Today</Button>
+    <form className="flex flex-col w-full overflow-scroll" onSubmit={submitBudgetUpdates}>
+        <DrawerHeader>
+            <DrawerTitle>Select the budget month</DrawerTitle>
+        </DrawerHeader>
+        <DrawerBody className="flex flex-col">
+            <div className="w-full">
+                <Label htmlFor="date">Budget Date</Label>
+                <div className="flex w-full gap-2">
+                    <Input type="date" name="date" value={budgetDate} onChange={e => setBudgetDate(e.target.value)}/>
+                    <Button type="button" onClick={e => setBudgetDate(formatDateInput(new Date()))}>Today</Button>
+                </div>
+                { validator.current.message("date", budgetDate, "required") }
             </div>
-            { validator.current.message("date", budgetDate, "required") }
-        </div>
+            {renderShareOptions()}
+        </DrawerBody>
         
-        {renderShareOptions()}
-
-        <div className="flex grow items-end justify-end gap-3 w-full mt-5">
-            <Button type="reset" variant="destructive" className="rounded-md p-1 min-w-32">Clear</Button>
-            <Button type="submit" className="rounded-md p-1 min-w-32">Confirm</Button>
-        </div>
+        <DrawerFooter className="w-full">
+            <div className="flex grow items-end justify-end gap-3 w-full mt-5">
+                <Button type="reset" variant="destructive" className="rounded-md p-1 min-w-32">Clear</Button>
+                <Button type="submit" className="rounded-md p-1 min-w-32">Confirm</Button>
+            </div>
+        </DrawerFooter>
     </form>
     );
 }

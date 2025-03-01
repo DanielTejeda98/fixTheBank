@@ -5,28 +5,25 @@ import { useRouter } from "next/navigation";
 import FullSizeCard from "../Core/FullSizeCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-import Drawer from "../Core/Drawer";
-import { useState } from "react";
 import Account from "../Core/Account";
 import JoinBudget from "./JoinBudget";
 import { useSession } from "next-auth/react";
 import { Button } from "../ui/button";
+import { useFTBDrawer } from "../ui/ftbDrawer";
 
 export default function JoinOrCreateBudget() {
     const userId = useSession().data?.user.id;
     const router = useRouter();
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const [drawerComponent, setDrawerComponent] = useState("account");
+    const { setOpen: setDrawerOpen, setDrawerComponent } = useFTBDrawer();
 
-    type ComponentString = "account" | "join"
-    const toggleDrawer = (component: ComponentString) => {
+    const toggleDrawer = (component: keyof typeof DrawerComponents) => {
         setDrawerComponent(component);
-        setIsDrawerOpen(!isDrawerOpen);
+        setDrawerOpen(true);
     }
 
     const DrawerComponents = {
-        join: <JoinBudget closeDrawer={() => setIsDrawerOpen(false)}/>,
-        account: <Account closeDrawer={() => setIsDrawerOpen(false)} />
+        join: <JoinBudget />,
+        account: <Account />
     }
 
     const createNewBudget = async () => {
@@ -55,10 +52,6 @@ export default function JoinOrCreateBudget() {
                     <Button className="rounded-md p-1" onClick={() => toggleDrawer("join")}>Join budget</Button>
                 </div>
             </FullSizeCard>
-            <Drawer isOpen={isDrawerOpen}
-                    closeDrawer={() => setIsDrawerOpen(false)}>
-                {DrawerComponents[drawerComponent as keyof typeof DrawerComponents]}
-            </Drawer>
         </div>
     )
 }

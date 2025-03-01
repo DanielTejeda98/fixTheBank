@@ -47,6 +47,7 @@ const getUser = async (useCache?: boolean): Promise<User|undefined> => {
 const signUserOut = () => {
     localStorage.removeItem("budgetData");
     localStorage.removeItem("userSettings");
+    localStorage.removeItem("savingsData");
     signOut();
 }
 

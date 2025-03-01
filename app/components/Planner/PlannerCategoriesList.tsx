@@ -1,14 +1,21 @@
 import { CategoryView } from "@/types/budget"
 import PlannerCategoriesCard from "./PlannerCategoryCard"
 import { Button } from "../ui/button"
+import { useFTBDrawer } from "../ui/ftbDrawer"
+import PlannerCategoriesEditor from "./PlannerCategoriesEditor"
 
 type PlannerCategoriesList = {
-    categories: CategoryView[],
-    editCategoriesClick: Function,
-    cardOnClick: Function
+    categories: CategoryView[]
 }
 
-export default function PlannerCategoriesList ({categories, editCategoriesClick, cardOnClick}: PlannerCategoriesList) {
+export default function PlannerCategoriesList ({categories}: PlannerCategoriesList) {
+    const { setOpen, setDrawerComponent } = useFTBDrawer();
+
+    function editCategoriesClick () {
+        setDrawerComponent(<PlannerCategoriesEditor categories={categories} />);
+        setOpen(true);
+    }
+
     const mapCategoriesToComponents = (categories: CategoryView[]) => {
         if (!categories.length) {
             return (
@@ -20,7 +27,7 @@ export default function PlannerCategoriesList ({categories, editCategoriesClick,
 
         return categories.map((category: CategoryView, index: number) => {
             return (
-                <PlannerCategoriesCard key={index} category={category} onClick={cardOnClick}/>
+                <PlannerCategoriesCard key={index} category={category} />
             )
         })
     }

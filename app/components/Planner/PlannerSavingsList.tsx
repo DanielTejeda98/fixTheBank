@@ -8,13 +8,20 @@ import { getSavingsPlans } from "@/app/lib/savingsApi";
 import { useAppSelector } from "@/redux/store";
 import { PlannedSaving } from "@/types/savings";
 import { currencyFormat } from "@/app/lib/renderHelper";
+import { useFTBDrawer } from "../ui/ftbDrawer";
+import PlannerSavingsEditor from "./PlannerSavingsEditor";
 
-export default function PlannerSavingsList ({openSavingsPlanner}: {openSavingsPlanner: (st?: PlannedSaving) => void}) {
+export default function PlannerSavingsList () {
     const [isOpened, setIsOpened] = useState(true)
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
     const monthSp = useAppSelector((state) => state.savingsReducer.value.plannedSavings.find(sp => sp.month === budgetMonth))?.savingsPlans as PlannedSaving[];
     const savingsAccounts = useAppSelector((state) => state.savingsReducer.value.savingsAccounts);
+    const { setOpen: setDrawerOpen, setDrawerComponent } = useFTBDrawer();
 
+    function openSavingsPlanner (sp: PlannedSaving) {
+        setDrawerComponent(<PlannerSavingsEditor savingsTransaction={sp}/>);
+        setDrawerOpen(true);
+    }
     useEffect(() => {
         if (!budgetMonth) return;
         async function fetchData () {

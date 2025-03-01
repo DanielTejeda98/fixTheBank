@@ -2,10 +2,9 @@
 import { useState } from "react";
 import { currencyFormat } from "@/app/lib/renderHelper";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGear, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { selectTransactions, useSetInitialStore } from "@/redux/features/budget-slice";
 import { useAppSelector } from "@/redux/store";
-import Drawer from "../Core/Drawer";
 import AddIncome from "./AddIncome";
 import ExpenseEditor from "./ExpenseEditor";
 import React from "react";
@@ -15,13 +14,14 @@ import Account from "../Core/Account";
 import FullSizeCard from "../Core/FullSizeCard";
 import { BudgetView, TransactionView } from "@/types/budget";
 import Link from "next/link";
-import TransactionViewer from "../Transactions/TransactionViewer";
 import { Button, buttonVariants } from "../ui/button";
+import { useFTBDrawer } from "../ui/ftbDrawer";
+import { faCalendar } from "@fortawesome/free-regular-svg-icons";
 
 export default function DashboardView({ budget }: { budget: BudgetView }) {
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const [drawerComponent, setDrawerComponent] = useState("addIncome" as keyof typeof DrawerComponents);
     const [selectedTransaction, setSelectedTransaction] = useState<TransactionView|undefined>(undefined);
+
+    const { setOpen, setDrawerComponent } = useFTBDrawer();
 
     useSetInitialStore({ budget })
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
@@ -32,21 +32,15 @@ export default function DashboardView({ budget }: { budget: BudgetView }) {
     const transactions = useAppSelector(selectTransactions).sort((a, b) => new Date(b.transactionDate || b.date).getTime() - new Date(a.transactionDate || a.date).getTime()).slice(0,10)
 
     const DrawerComponents = {
-        addIncome: <AddIncome closeDrawer={() => setIsDrawerOpen(false)} budgetId={budget._id}/>,
-        expenseEditor: <ExpenseEditor closeDrawer={() => setIsDrawerOpen(false)} budgetId={budget._id} accounts={budget.accounts} categories={budget.categories} transaction={selectedTransaction}/>,
-        selectBudget: <SelectBudget closeDrawer={() => setIsDrawerOpen(false)} />,
-        account: <Account closeDrawer={() => setIsDrawerOpen(false)} />,
-        transactionViewer: <TransactionViewer transaction={selectedTransaction} closeDrawer={() => setIsDrawerOpen(false)} openEditor={() => setDrawerComponent("expenseEditor")} />
+        addIncome: <AddIncome budgetId={budget._id}/>,
+        expenseEditor: <ExpenseEditor budgetId={budget._id} accounts={budget.accounts} categories={budget.categories} transaction={selectedTransaction}/>,
+        selectBudget: <SelectBudget />,
+        account: <Account />
     }
 
     const toggleDrawer = (component: keyof typeof DrawerComponents) => {
-        setDrawerComponent(component);
-        setIsDrawerOpen(!isDrawerOpen);
-    }
-
-    const openTransaction = (transaction: any) => {
-        setSelectedTransaction(transaction);
-        toggleDrawer("transactionViewer")
+        setDrawerComponent(DrawerComponents[component])
+        setOpen(true);
     }
 
     const openNewExpense = () => {
@@ -55,7 +49,7 @@ export default function DashboardView({ budget }: { budget: BudgetView }) {
     }
 
     const renderTransactionsList = () => {
-        return transactions.map(transaction => (<TransactionCard key={transaction._id} transaction={transaction} onClick={() => {openTransaction(transaction)}}/>))
+        return transactions.map(transaction => (<TransactionCard key={transaction._id} transaction={transaction} />))
     }
 
     return (
@@ -64,7 +58,7 @@ export default function DashboardView({ budget }: { budget: BudgetView }) {
                 <div className="flex justify-between">
                     <Button className="p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("account")}><FontAwesomeIcon icon={faUser} /></Button>
                     <p>Month: {new Date(budgetMonth).toLocaleDateString("en-us", {month: "long", year: "numeric", timeZone: "UTC"})}</p>
-                    <Button className="p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("selectBudget")}><FontAwesomeIcon icon={faGear} /></Button>
+                    <Button className="p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("selectBudget")}><FontAwesomeIcon icon={faCalendar} /></Button>
                 </div>
                 <div className="flex mt-5 pt-5 items-end">
                     <div className="flex flex-wrap grow">
@@ -142,10 +136,6 @@ export default function DashboardView({ budget }: { budget: BudgetView }) {
                     {renderTransactionsList()}
                 </div>
             </section>
-            <Drawer isOpen={isDrawerOpen}
-                    closeDrawer={() => setIsDrawerOpen(false)}>
-                {DrawerComponents[drawerComponent as keyof typeof DrawerComponents]}
-            </Drawer>
         </main>
     )
 }

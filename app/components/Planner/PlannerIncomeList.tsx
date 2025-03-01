@@ -1,11 +1,19 @@
 import { currencyFormat } from "@/app/lib/renderHelper"
 import { Button } from "../ui/button"
+import { useFTBDrawer } from "../ui/ftbDrawer";
+import PlannerIncomeEditor from "./PlannerIncomeEditor";
 
 type PlannerIncomeList = {
-    addIncomeClick: Function,
     incomeStreams: any[]
 }
-export default function PlannerIncomeList({addIncomeClick, incomeStreams}: PlannerIncomeList) {
+export default function PlannerIncomeList({incomeStreams}: PlannerIncomeList) {
+    const { setOpen, setDrawerComponent } = useFTBDrawer();
+    
+    function addIncomeClick () {
+        setDrawerComponent(<PlannerIncomeEditor />);
+        setOpen(true);
+    }
+    
     const renderIncomeStreams = () => {
         if (!incomeStreams.length) {
             return <p>No income streams added for this month</p>

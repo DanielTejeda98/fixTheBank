@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Button } from "../ui/button";
+import { DrawerBody, DrawerHeader, DrawerTitle } from "../ui/drawer";
 
 export default function PlannerCategoriesEditor ({categories}: {categories: any[]}) {
     const [addingNewCategory, setAddingNewCategory] = useState(false);
@@ -64,17 +65,21 @@ export default function PlannerCategoriesEditor ({categories}: {categories: any[
     }
 
     return (
-        <div className="flex flex-wrap">
-            <h2 className="w-full">Planner Categories Editor</h2>
-            <Button className="ml-auto rounded-md p-1" onClick={handleAddCategoryClick}>Add Category</Button>
-            <div className="border rounded-md w-full my-2 p-2">
-                {addingNewCategory ? (
-                    <div className="flex justify-between items-center w-full rounded-md p-2 mb-2 last:mb-0" data-name="newCategory">
-                        <input className="w-full" name="newCategory" onBlur={handleAddingCategoryBlur} onChange={(e) => setNewCategoryName(e.target.value)} value={newCategoryName}></input>
-                    </div>
-                ) : null}
-                {renderCategories()}
-            </div>
+        <div className="overflow-scroll">
+            <DrawerHeader>
+                <DrawerTitle>Edit Categories</DrawerTitle>
+            </DrawerHeader>
+            <DrawerBody className="flex flex-col">
+                <Button className="ml-auto rounded-md p-1" onClick={handleAddCategoryClick}>Add Category</Button>
+                <div className="border rounded-md w-full my-2 p-2">
+                    {addingNewCategory ? (
+                        <div className="flex justify-between items-center w-full rounded-md p-2 mb-2 last:mb-0" data-name="newCategory">
+                            <input className="w-full" name="newCategory" onBlur={handleAddingCategoryBlur} onChange={(e) => setNewCategoryName(e.target.value)} value={newCategoryName}></input>
+                        </div>
+                    ) : null}
+                    {renderCategories()}
+                </div>
+            </DrawerBody>
         </div>
     )
 }

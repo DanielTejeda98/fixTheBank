@@ -9,6 +9,7 @@ import { getInitialData } from "./lib/getInitialData";
 import BudgetProvider from "./providers/BudgetProvider";
 import Navigation from "./components/Core/Navigation";
 import ReduxInitializer from "./components/ReduxInitializer";
+import { FTBDrawer, FTBDrawerProvider } from "./components/ui/ftbDrawer";
 
 config.autoAddCss = false
 
@@ -33,8 +34,11 @@ export default async function RootLayout({
           <ReduxInitializer initialData={initialData}>
             <AuthProvider>
               <BudgetProvider initialData={initialData}>
-                {children}
-                <Navigation />
+                <FTBDrawerProvider>
+                  {children}
+                  <Navigation />
+                  <FTBDrawer />
+                </FTBDrawerProvider>
               </BudgetProvider>
             </AuthProvider>
           </ReduxInitializer>

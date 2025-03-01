@@ -1,12 +1,15 @@
 import { currencyFormat } from "@/app/lib/renderHelper"
 import { useAppSelector } from "@/redux/store"
 import { CategoryView } from "@/types/budget"
+import { useFTBDrawer } from "../ui/ftbDrawer"
+import PlannerCategoryView from "./PlannerCategoryView"
 
 type PlannerCategoriesCard = {
     category: CategoryView,
     onClick?: Function
 }
 export default function PlannerCategoriesCard ({category, onClick}: PlannerCategoriesCard) {
+    const { setOpen, setDrawerComponent } = useFTBDrawer();
     const currentMonth = useAppSelector(state => state.budgetReducer.value.minDate)
     const maxAmount = category.maxMonthExpectedAmount.find((c:any) => c.month === currentMonth)?.amount || 0
     const usedAmount = useAppSelector(state => state.budgetReducer.value.expenses).reduce((acc: Number, current: any) => {
@@ -18,9 +21,15 @@ export default function PlannerCategoriesCard ({category, onClick}: PlannerCateg
 
     const percentageUsage = usedAmount < maxAmount ? (usedAmount / maxAmount) * 100 : 100;
     const isOverdrafted = usedAmount > maxAmount;
+
+    function handleClick () {
+        setDrawerComponent(<PlannerCategoryView key={category?._id} category={category} />);
+        setOpen(true);
+    }
+
     return (
         <li className="flex flex-wrap items-center mb-2 p-2 gap-2 rounded-md border"
-            onClick={() => { onClick && onClick(category) } }>
+            onClick={() => handleClick() }>
             <div className="w-full">
                 {category.name}
             </div>

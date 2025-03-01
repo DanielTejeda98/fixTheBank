@@ -69,15 +69,15 @@ export default function SavingsAccountView({
     const renderDateAndUpdatePreviousRef = (date: string) => {
       previousDate = new Date(date).toLocaleDateString("en-US", {year: "numeric", month: "long", day: "numeric", timeZone: "UTC"})
       return (
-        <div className="bg-slate-200 text-sm m-1 p-1 dark:bg-slate-700">
+        <p className="bg-slate-200 text-sm m-1 p-1 dark:bg-slate-700">
           <span>{ new Date(date).toLocaleDateString("en-US", {year: "numeric", month: "long", day: "numeric", timeZone: "UTC"}) }</span>
-        </div>
+        </p>
       )
     }
     const visibleRow = (
       <>
         <div>
-          <p>{ renderDateAndUpdatePreviousRef(firstElement!.date) }</p>
+          <div>{ renderDateAndUpdatePreviousRef(firstElement!.date) }</div>
         </div>
         <div className="border m-1 p-1 text-sm" key={0}>
           <p className="text-base font-bold">{ firstElement!.name }</p>

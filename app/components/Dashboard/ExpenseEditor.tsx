@@ -16,6 +16,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { Card, CardContent } from "../ui/card";
 import { Switch } from "../ui/switch";
+import { useFTBDrawer } from "../ui/ftbDrawer";
+import { DrawerBody, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
 
 interface FormData {
     amount?: number,
@@ -54,7 +56,8 @@ const getIntitalFormData = (accounts: AccountView[], categories: CategoryView[],
     }
 }
 
-export default function ExpenseEditor({ closeDrawer, budgetId, accounts, categories, transaction }: { closeDrawer: Function, budgetId: string, accounts: AccountView[], categories: CategoryView[], transaction?: any }) {
+export default function ExpenseEditor({ budgetId, accounts, categories, transaction }: { budgetId: string, accounts: AccountView[], categories: CategoryView[], transaction?: any }) {
+    const { setOpen: setOpenDrawer } = useFTBDrawer();
     const userId = useSession().data?.user?.id;
     const validator = useReactValidator();
     const forceUpdate = useReducer(x => x + 1, 0)[1];
@@ -119,7 +122,7 @@ export default function ExpenseEditor({ closeDrawer, budgetId, accounts, categor
             // TODO: display error
             console.log(error)
         }
-        closeDrawer();
+        setOpenDrawer(false);
         clearForm();
     }
 
@@ -136,90 +139,96 @@ export default function ExpenseEditor({ closeDrawer, budgetId, accounts, categor
     const receiptLabel = isEdit && formData.receiptImage ? "Update Receipt Image" : "Add Receipt Image"
 
     return (
-        <form onSubmit={formSubmit} onReset={clearForm} className="flex flex-wrap">
-            <h2 className="text-lg font-bold w-full">{actionPrefix} Expense</h2>
-            <p className="text-sm w-full">{actionPrefix} an expense for this month</p>
-            <div className="mt-2 w-full">
-                <Label htmlFor="amount">Amount</Label>
-                <Input type="number" name="amount" value={formData.amount || ""} onChange={e => dispatch({ amount: Number(e.target.value) })} />
-                {validator.current.message("amount", formData.amount, "numeric|required")}
-            </div>
-
-            <div className="mt-2 w-full">
-                <Label htmlFor="account">Account</Label>
-                <Select value={formData.account} onValueChange={(e: string) => dispatch({ account: e})}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select an account"></SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                        {renderAccountOptions()}
-                    </SelectContent>
-                </Select>
-                {validator.current.message("account", formData.account, "required")}
-            </div>
-
-            <div className="mt-2 w-full">
-                <Label htmlFor="category">Category</Label>
-                <Select value={formData.category} onValueChange={(e: string) => dispatch({ category: e})}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select a category"></SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                        {renderCategoryOptions()}
-                    </SelectContent>
-                </Select>
-                {validator.current.message("category", formData.category, "required")}
-            </div>
-
-            <div className="mt-2 w-full">
-                <Label htmlFor="date">Date</Label>
-                <div className="flex w-full gap-2 mt-1">
-                    { dateButtonOnLeft ? <Button type="button" onClick={e => dispatch({date: formatDateInput(new Date())})}>Today</Button> : null }
-                    <Input type="date" name="date" value={formData.date} onChange={e => dispatch({date: e.target.value})}/>
-                    { !dateButtonOnLeft ? <Button type="button" onClick={e => dispatch({date: formatDateInput(new Date())})}>Today</Button> : null }
+        <form onSubmit={formSubmit} onReset={clearForm} className="flex flex-wrap overflow-scroll">
+            <DrawerHeader>
+                <DrawerTitle>{actionPrefix} Expense</DrawerTitle>
+                <DrawerDescription>{actionPrefix} an expense</DrawerDescription>
+            </DrawerHeader>
+            <DrawerBody className="flex-col w-full">
+                <div className="mt-2 w-full">
+                    <Label htmlFor="amount">Amount</Label>
+                    <Input type="number" name="amount" value={formData.amount || ""} onChange={e => dispatch({ amount: Number(e.target.value) })} />
+                    {validator.current.message("amount", formData.amount, "numeric|required")}
                 </div>
-                {validator.current.message("date", formData.date, "required")}
-            </div>
 
-            <div className="mt-2 w-full">
-                <Label htmlFor="description">Description</Label>
-                <Input type="text" name="description" value={formData.description} onChange={e => dispatch({ description: e.target.value })} />
-                {validator.current.message("description", formData.description, "required")}
-            </div>
+                <div className="mt-2 w-full">
+                    <Label htmlFor="account">Account</Label>
+                    <Select value={formData.account} onValueChange={(e: string) => dispatch({ account: e})}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select an account"></SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {renderAccountOptions()}
+                        </SelectContent>
+                    </Select>
+                    {validator.current.message("account", formData.account, "required")}
+                </div>
 
-            <div className="mt-2 w-full">
-                <Label htmlFor="receipt">{ receiptLabel }</Label>
-                <Input type="file" accept=".jpeg,.jpg,.png" name="receipt" value={formData.receiptImageSrc} onChange={e => handleReceiptImageUpload(e.target.files?.item(0))} disabled={isImageUploading} />
-            </div>
+                <div className="mt-2 w-full">
+                    <Label htmlFor="category">Category</Label>
+                    <Select value={formData.category} onValueChange={(e: string) => dispatch({ category: e})}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a category"></SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {renderCategoryOptions()}
+                        </SelectContent>
+                    </Select>
+                    {validator.current.message("category", formData.category, "required")}
+                </div>
 
-            <Collapsible asChild open={furtherOptionsOpen} onOpenChange={setFurtherOptionsOpen}>
-                <div className="w-full mb-2">
-                    <CollapsibleTrigger asChild>
-                        <div className="my-2 w-full flex justify-between items-center w-full">
-                            <h4 className="text-md font-bold">Further options</h4>
-                            <FontAwesomeIcon icon={furtherOptionsOpen ? faChevronUp : faChevronDown} />
-                        </div>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                        <Card>
-                            <CardContent>
-                            <div className="flex items-center mt-2">
-                                <div>
-                                    <p className="text-sm font-medium">Borrow from next month</p>
-                                    <p className="text-sm text-muted-foreground">Use this option to count this expense towards next months budget.</p>
-                                </div>
-                                <Switch checked={formData.borrowFromNextMonth} onCheckedChange={() => dispatch({ borrowFromNextMonth: !formData.borrowFromNextMonth })} />
+                <div className="mt-2 w-full">
+                    <Label htmlFor="date">Date</Label>
+                    <div className="flex w-full gap-2 mt-1">
+                        { dateButtonOnLeft ? <Button type="button" onClick={e => dispatch({date: formatDateInput(new Date())})}>Today</Button> : null }
+                        <Input type="date" name="date" value={formData.date} onChange={e => dispatch({date: e.target.value})}/>
+                        { !dateButtonOnLeft ? <Button type="button" onClick={e => dispatch({date: formatDateInput(new Date())})}>Today</Button> : null }
+                    </div>
+                    {validator.current.message("date", formData.date, "required")}
+                </div>
+
+                <div className="mt-2 w-full">
+                    <Label htmlFor="description">Description</Label>
+                    <Input type="text" name="description" value={formData.description} onChange={e => dispatch({ description: e.target.value })} />
+                    {validator.current.message("description", formData.description, "required")}
+                </div>
+
+                <div className="mt-2 w-full">
+                    <Label htmlFor="receipt">{ receiptLabel }</Label>
+                    <Input type="file" accept=".jpeg,.jpg,.png" name="receipt" value={formData.receiptImageSrc} onChange={e => handleReceiptImageUpload(e.target.files?.item(0))} disabled={isImageUploading} />
+                </div>
+
+                <Collapsible asChild open={furtherOptionsOpen} onOpenChange={setFurtherOptionsOpen}>
+                    <div className="w-full mb-2">
+                        <CollapsibleTrigger asChild>
+                            <div className="my-2 w-full flex justify-between items-center w-full">
+                                <h4 className="text-md font-bold">Further options</h4>
+                                <FontAwesomeIcon icon={furtherOptionsOpen ? faChevronUp : faChevronDown} />
                             </div>
-                            </CardContent>
-                        </Card>
-                    </CollapsibleContent>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                            <Card>
+                                <CardContent>
+                                <div className="flex items-center mt-2">
+                                    <div>
+                                        <p className="text-sm font-medium">Borrow from next month</p>
+                                        <p className="text-sm text-muted-foreground">Use this option to count this expense towards next months budget.</p>
+                                    </div>
+                                    <Switch checked={formData.borrowFromNextMonth} onCheckedChange={() => dispatch({ borrowFromNextMonth: !formData.borrowFromNextMonth })} />
+                                </div>
+                                </CardContent>
+                            </Card>
+                        </CollapsibleContent>
+                    </div>
+                </Collapsible>
+            </DrawerBody>
+            
+            <DrawerFooter className="w-full">
+                <div className="flex justify-end gap-3 w-full mt-5">
+                    <Button type="reset" variant="destructive" className="rounded-md p-1 min-w-32" disabled={isImageUploading}>Clear</Button>
+                    <Button type="submit" className="rounded-md p-1 min-w-32" disabled={isImageUploading}>{actionPrefix} Expense</Button>
                 </div>
-            </Collapsible>
-
-            <div className="flex justify-end gap-3 w-full mt-5">
-                <Button type="reset" variant="destructive" className="rounded-md p-1 min-w-32" disabled={isImageUploading}>Clear</Button>
-                <Button type="submit" className="rounded-md p-1 min-w-32" disabled={isImageUploading}>{actionPrefix} Expense</Button>
-            </div>
+            </DrawerFooter>
         </form>
     )
 }

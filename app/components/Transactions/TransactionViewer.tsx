@@ -5,8 +5,11 @@ import { TransactionView } from "@/types/budget";
 import { useSession } from "next-auth/react";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { useFTBDrawer } from "../ui/ftbDrawer";
+import { DrawerBody, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
 
-export default function TransactionViewer ({transaction, closeDrawer, openEditor}: {transaction?: TransactionView, closeDrawer: Function, openEditor: Function}) {
+export default function TransactionViewer ({transaction, openEditor}: {transaction?: TransactionView, openEditor: Function}) {
+    const { setOpen: setDrawerOpen } = useFTBDrawer();
     const userId = useSession().data?.user?.id;
     const categories = useAppSelector((state) => state.budgetReducer.value.categories)
     const accounts = useAppSelector((state) => state.budgetReducer.value.accounts)
@@ -24,7 +27,7 @@ export default function TransactionViewer ({transaction, closeDrawer, openEditor
         const deleteMethod = !!transaction.source ? deleteIncome : deleteExpense;
         try {
             await deleteMethod({userId}, transaction?._id)
-            closeDrawer();
+            setDrawerOpen(false);
         } catch (error) {
             console.error(error)
         }
@@ -34,22 +37,25 @@ export default function TransactionViewer ({transaction, closeDrawer, openEditor
         return;
     }
     return (
-        <div className="flex flex-col min-h-60 w-full">
-            <div>
+        <>
+            <DrawerHeader>
+                <DrawerTitle>Transaction Details</DrawerTitle>
+            </DrawerHeader>
+            <DrawerBody className="flex flex-col">
                 <h2>{transaction.description || transaction.source}</h2>
                 <p>Amount: {currencyFormat(transaction.amount)}</p>
                 {transaction.account ? <p>Account: {account}</p> : null}
                 {transaction.category ? <p>Category: {category}</p> : null}
                 {transaction.source ? <p>Income</p> : null}
-                <p>Date: {new Date(transaction.transactionDate).toLocaleDateString("en-us", {timeZone: "UTC"})}</p>
-            </div>
-            <div className="flex w-full grow justify-between gap-2 items-end">
+                <p>Date: {new Date(transaction.transactionDate || transaction.date).toLocaleDateString("en-us", {timeZone: "UTC"})}</p>
                 {transaction.receiptImage && <Link href={`/api/images/${budgetId}/${transaction.receiptImage}`} target="_blank"><Button type="button" variant={"outline"}>View receipt image</Button></Link>}
+            </DrawerBody>
+            <DrawerFooter className="w-full">
                 <div className="flex w-full justify-end gap-2">
                     <Button variant="outline" className="rounded-md p-1 self-end min-w-32" onClick={() => openEditor()}>Edit</Button>
                     <Button variant="destructive" className="rounded-md p-1 self-end min-w-32" onClick={() => handleDeleteTransaction()}>Delete Transaction</Button>
                 </div>
-            </div>
-        </div>
+            </DrawerFooter>
+        </>
     )
 }

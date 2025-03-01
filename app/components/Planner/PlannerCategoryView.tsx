@@ -9,8 +9,11 @@ import { useReducer, useState } from "react";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { useFTBDrawer } from "../ui/ftbDrawer";
+import { DrawerBody, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
 
-export default function PlannerCategoryView ({category, closeDrawer}: {category?: CategoryView, closeDrawer: Function}) {
+export default function PlannerCategoryView ({category}: {category?: CategoryView}) {
+    const { setOpen: setDrawerOpen } = useFTBDrawer();
     const userId = useSession().data?.user?.id;
     const validator = useReactValidator();
     const forceUpdate = useReducer(x => x + 1, 0)[1];
@@ -57,7 +60,7 @@ export default function PlannerCategoryView ({category, closeDrawer}: {category?
         } catch (error) {
             console.log(error)
         }
-        closeDrawer();
+        setDrawerOpen(false);
     }
 
     const handleDeleteClick = async () => {
@@ -68,33 +71,38 @@ export default function PlannerCategoryView ({category, closeDrawer}: {category?
         } catch (error) {
             console.log(error)
         }
-        closeDrawer()
+        setDrawerOpen(false)
     }
 
     if (!category) return;
 
     return (
-        <div className="flex flex-col min-h-60">
-            <h2 className="w-full">{category.name}</h2>
-            <div className="mt-2 p-2 w-full border rounded-md border-slate-500">
-                <p>Remaining unallocated planned income</p>
-                <p>{currencyFormat(unallocatedFunds)}</p>
-            </div>
-            <div className="mt-2 w-full flex items-end">
-                <div className="w-full">
-                    <Label htmlFor="amount">Allocate amount</Label>
-                    <Input type="number" name="amount" value={maxAmount != null ? getMaxAmount() : ""} onChange={e => setMaxAmount(Number(e.target.value))} />
-                    {validator.current.message("amount", maxAmount, "numeric|required")}
+        <>
+            <DrawerHeader>
+                <DrawerTitle>{category.name}</DrawerTitle>
+            </DrawerHeader>
+            <DrawerBody className="flex flex-col w-full">
+                <div className="mt-2 p-2 w-full border rounded-md border-slate-500">
+                    <p>Remaining unallocated planned income</p>
+                    <p>{currencyFormat(unallocatedFunds)}</p>
                 </div>
-                <div className="ml-2 max-w-32">
-                    <Button onClick={() => setMaxAmount(previousMonthPlannedAmount)}>Use last month <br /> {currencyFormat(previousMonthPlannedAmount)}</Button>
+                <div className="mt-2 w-full flex items-end">
+                    <div className="w-full">
+                        <Label htmlFor="amount">Allocate amount</Label>
+                        <Input type="number" name="amount" value={maxAmount != null ? getMaxAmount() : ""} onChange={e => setMaxAmount(Number(e.target.value))} />
+                        {validator.current.message("amount", maxAmount, "numeric|required")}
+                    </div>
+                    <div className="ml-2 max-w-32">
+                        <Button onClick={() => setMaxAmount(previousMonthPlannedAmount)}>Use last month <br /> {currencyFormat(previousMonthPlannedAmount)}</Button>
+                    </div>
                 </div>
-            </div>
-            
-            <div className="flex w-full grow justify-end gap-2">
-                <Button className="rounded-md p-1 self-end min-w-32" variant="destructive" onClick={handleDeleteClick}>Delete Category</Button>
-                <Button className="rounded-md p-1 self-end min-w-32" onClick={handleSubmitClick}>Save Changes</Button>
-            </div>
-        </div>
+            </DrawerBody>
+            <DrawerFooter className="w-full">
+                <div className="flex w-full grow justify-end gap-2">
+                    <Button className="rounded-md p-1 self-end min-w-32" variant="destructive" onClick={handleDeleteClick}>Delete Category</Button>
+                    <Button className="rounded-md p-1 self-end min-w-32" onClick={handleSubmitClick}>Save Changes</Button>
+                </div>
+            </DrawerFooter>
+        </>
     )
 }

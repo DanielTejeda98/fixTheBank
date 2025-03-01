@@ -9,8 +9,11 @@ import { setJoinRequestList } from "@/redux/features/budget-slice";
 import { useSession } from "next-auth/react";
 import { getUser, signUserOut } from "../../lib/userApi";
 import { Button } from ".././ui/button";
+import { useFTBDrawer } from "../ui/ftbDrawer";
+import { DrawerBody, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
 
-export default function Account({ closeDrawer }: { closeDrawer: Function }) {
+export default function Account() {
+  const { setOpen: setOpenDrawer } = useFTBDrawer(); 
   const router = useRouter();
   const reduxDispatch = useDispatch();
   const [pending, setPending] = useState(false);
@@ -22,7 +25,7 @@ export default function Account({ closeDrawer }: { closeDrawer: Function }) {
   const getUserId = useSession().data?.user?.id;
   const logout = () => {
     signUserOut();
-    closeDrawer();
+    setOpenDrawer(false);
     router.refresh();
   };
 
@@ -78,7 +81,7 @@ export default function Account({ closeDrawer }: { closeDrawer: Function }) {
   };
 
   const renderJoinRequests = () => {
-    return getRequesters?.slice(0, 3).map((requester) => {
+    return getRequesters?.slice(0, 3).map((requester: any) => {
       return (
         <NotificationCard key={requester._id}>
           <div className="flex flex-wrap border-solid border-gray-500 border-b-2 pb-2">
@@ -105,25 +108,27 @@ export default function Account({ closeDrawer }: { closeDrawer: Function }) {
   };
 
   return (
-    <div className="flex flex-col gap-5 min-h-60">
+    <>
+      <DrawerHeader>
+        <DrawerTitle>Account Infromation</DrawerTitle>
+      </DrawerHeader>
+      <DrawerBody className="flex flex-col w-full">
       <div className="flex flex-col w-full items-center gap-3">
-        <div className="font-bold text-xl">{userInformation.username}</div>
-        <div className="font-thin">{userInformation.email}</div>
-      </div>
+          <div className="font-bold text-xl">{userInformation.username}</div>
+          <div className="font-thin">{userInformation.email}</div>
+        </div>
 
-      <div className="grid gap-3 mt-3 overflow-auto border p-1 rounded-md">
-        <h2>Requests</h2>
-        {renderJoinRequests()}
-      </div>
+        <div className="grid gap-3 mt-3 overflow-auto border p-1 rounded-md">
+          <h2>Requests</h2>
+          {renderJoinRequests()}
+        </div>
+      </DrawerBody>
 
-      <div className="flex flex-wrap grow w-full items-end">
+      <DrawerFooter className="flex flex-wrap grow w-full items-end">
         <Button variant="destructive"
-          className="p-2 text-sm rounded-md ml-auto w-full"
-          onClick={logout}
-        >
-          Log out
-        </Button>
-      </div>
-    </div>
+              className="p-2 text-sm rounded-md ml-auto w-full"
+              onClick={logout}>Log out</Button>
+      </DrawerFooter>
+    </>
   );
 }
