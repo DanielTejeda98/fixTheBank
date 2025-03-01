@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changes
+
+### Fixed
+
+
+## [0.0.1]
+
+### Added
 - Changelog file
 - Added a button on planner category editor to use previous months alloted amount
 - Added an option to borrow from future budgets
@@ -15,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Caching budget
 - Settings page
 - Shadcn components
+- Added Receipt Images
 
 ### Changes
 - Transactions page: Filters now are applied to show categories that are selected
