@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded to NextJS 15
 - Upgraded to TailwindCSS v4
 ### Fixed
-
+- Invalid date on Income Transaction View
 
 ## [0.0.1]
 
