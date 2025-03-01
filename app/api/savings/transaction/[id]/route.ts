@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 
-export async function PUT (req: NextRequest, { params }: { params: { id: string }}) {
+export async function PUT (req: NextRequest, { params }: { params: Promise<{ id: string }>}) {
     const session = await getServerSession(authOptions)
     if (!session) {
         return NextResponse.json({ message: "Must be logged in"}, {status: 401})
@@ -14,7 +14,7 @@ export async function PUT (req: NextRequest, { params }: { params: { id: string 
 
     try {
         const request = await req.json();
-        const transaction = await updateSavingsTransaction(userId, new mongoose.Types.ObjectId(params.id), request);
+        const transaction = await updateSavingsTransaction(userId, new mongoose.Types.ObjectId((await params).id), request);
 
         if (!transaction) {
             return NextResponse.json({success: false, error: "Unable to update transaction!"});
@@ -27,7 +27,7 @@ export async function PUT (req: NextRequest, { params }: { params: { id: string 
     }
 }
 
-export async function DELETE (req: NextRequest, { params }: { params: { id: string }}) {
+export async function DELETE (req: NextRequest, { params }: { params: Promise<{ id: string }>}) {
     const session = await getServerSession(authOptions)
     if (!session) {
         return NextResponse.json({ message: "Must be logged in"}, {status: 401})
@@ -40,7 +40,7 @@ export async function DELETE (req: NextRequest, { params }: { params: { id: stri
         if (!request.savingsAccountId) {
             return NextResponse.json({success: false, error: `'savingsAccountId' field missing from body request`}, {status: 400});
         }
-        const transaction = await deleteSavingsTransaction(userId, new mongoose.Types.ObjectId(request.savingsAccountId), new mongoose.Types.ObjectId(params.id));
+        const transaction = await deleteSavingsTransaction(userId, new mongoose.Types.ObjectId(request.savingsAccountId), new mongoose.Types.ObjectId((await params).id));
 
         if (!transaction) {
             return NextResponse.json({success: false, error: "Unable to delete transaction!"});

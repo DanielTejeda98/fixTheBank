@@ -73,11 +73,11 @@ export default function DashboardView({ budget }: { budget: BudgetView }) {
                     </div>
                 </div>
                 <div className="grid grid-flow-col mt-3 gap-2 text-xs">
-                    <div className="text-center p-2 grow border rounded-md shadow-sm">
+                    <div className="text-center p-2 grow border rounded-md shadow-xs">
                         <p>Total income</p>
                         <p>{currencyFormat(totalIncome)}</p>
                     </div>
-                    <div className="text-center p-2 grow border rounded-md shadow-sm">
+                    <div className="text-center p-2 grow border rounded-md shadow-xs">
                         <p>Expenses</p>
                         <p>{currencyFormat(totalExpenses)}</p>
                     </div>
@@ -102,32 +102,28 @@ export default function DashboardView({ budget }: { budget: BudgetView }) {
                     <Link href="/planner" className={`${buttonVariants({variant: "outline"})} text-xs`}>Manage budget</Link>
                 </div>
                 <div className="grid grid-rows-2 grid-flow-col gap-3 mt-3">
-                    <div className="flex items-center p-2 w-45 gap-2 rounded-md border shadow-sm">
-                        <div className="rounded-full w-10 h-10"></div>
+                    <div className="flex items-center p-2 size-full gap-2 rounded-md border shadow-xs">
                         <div>
                             <p className="text-xs">Planned Income</p>
                             <p>{currencyFormat(totalPlannedIncome)}</p>
                         </div>
                     </div>
 
-                    <div className="flex items-center p-2 w-45 gap-2 rounded-md border shadow-sm">
-                        <div className="rounded-full w-10 h-10"></div>
+                    <div className="flex items-center p-2 size-full gap-2 rounded-md border shadow-xs">
                         <div>
                             <p className="text-xs">Remaining Budget</p>
                             <p>{currencyFormat(totalPlannedIncome - totalExpenses)}</p>
                         </div>
                     </div>
 
-                    <div className="flex items-center p-2 w-45 gap-2 rounded-md border shadow-sm">
-                        <div className="rounded-full w-10 h-10"></div>
+                    <div className="flex items-center p-2 size-full gap-2 rounded-md border shadow-xs">
                         <div>
                             <p className="text-xs">Budget Spent</p>
                             <p>{currencyFormat(totalExpenses)}</p>
                         </div>
                     </div>
 
-                    <div className="flex items-center p-2 w-45 gap-2 rounded-md border shadow-sm">
-                        <div className="rounded-full w-10 h-10"></div>
+                    <div className="flex items-center p-2 size-full gap-2 rounded-md border shadow-xs">
                         <div>
                             <p className="text-xs">Savings Percentage</p>
                             <p>0%</p>

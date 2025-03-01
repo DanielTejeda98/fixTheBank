@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET (
     req: NextRequest,
-    { params }: { params: { budgetId: string } }
+    { params }: { params: Promise<{ budgetId: string }> }
 ) {
     const userId = req.headers.get("userId");
     if (!userId) {
@@ -12,7 +12,7 @@ export async function GET (
     }
 
     const userIdAsObjectId = new mongoose.Types.ObjectId(userId || "");
-    const budgetIdAsObjectId = new mongoose.Types.ObjectId(params.budgetId || "");
+    const budgetIdAsObjectId = new mongoose.Types.ObjectId((await params).budgetId || "");
 
     try {
         const joinRequests = await getBudgetRequesters(userIdAsObjectId, budgetIdAsObjectId)

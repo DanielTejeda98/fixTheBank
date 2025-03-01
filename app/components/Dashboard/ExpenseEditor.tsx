@@ -190,7 +190,6 @@ export default function ExpenseEditor({ closeDrawer, budgetId, accounts, categor
             <div className="mt-2 w-full">
                 <Label htmlFor="receipt">{ receiptLabel }</Label>
                 <Input type="file" accept=".jpeg,.jpg,.png" name="receipt" value={formData.receiptImageSrc} onChange={e => handleReceiptImageUpload(e.target.files?.item(0))} disabled={isImageUploading} />
-                {validator.current.message("receipt", formData.receiptImage, "")}
             </div>
 
             <Collapsible asChild open={furtherOptionsOpen} onOpenChange={setFurtherOptionsOpen}>

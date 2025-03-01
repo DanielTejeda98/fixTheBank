@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 
-export async function PUT (req: NextRequest, { params }: { params: { id: string }}) {
+export async function PUT (req: NextRequest, { params }: { params: Promise<{ id: string }>}) {
     const session = await getServerSession(authOptions)
     if (!session) {
         return NextResponse.json({ message: "Must be logged in"}, {status: 401})
@@ -17,7 +17,7 @@ export async function PUT (req: NextRequest, { params }: { params: { id: string 
 
     try {
         const request = await req.json();
-        request._id = params.id;
+        request._id = (await params).id;
         const error = validatePUTFields(request);
         if (error) {
             return NextResponse.json({success: false, error: error.message }, {status: 412})
@@ -36,7 +36,7 @@ export async function PUT (req: NextRequest, { params }: { params: { id: string 
     }
 }
 
-export async function DELETE (req: NextRequest, { params }: { params: { id: string }}) {
+export async function DELETE (req: NextRequest, { params }: { params: Promise<{ id: string }>}) {
     const session = await getServerSession(authOptions)
     if (!session) {
         return NextResponse.json({ message: "Must be logged in"}, {status: 401})
@@ -47,7 +47,7 @@ export async function DELETE (req: NextRequest, { params }: { params: { id: stri
     let requestMonth = req.nextUrl.searchParams.get("month") || `${new Date().getMonth() + 1}/1/${new Date().getFullYear().toString().slice(2)}`
 
     try {
-        await removeSavingsPlan(userId, requestMonth, new mongoose.Types.ObjectId(params.id));
+        await removeSavingsPlan(userId, requestMonth, new mongoose.Types.ObjectId((await params).id));
 
         return NextResponse.json(null, { status: 200 });
         

@@ -1,7 +1,7 @@
 import { deleteAccount, updateAccount } from "@/controllers/accountController";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const userId = req.headers.get("userId");
     if (!userId) {
         return NextResponse.json({error: "No user ID" }, {status: 412})
@@ -12,7 +12,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         if (errors.length > 0) {
             return NextResponse.json({error: `The following fields are missing from the request body: ${errors.join(", ")}` }, {status: 400});
         }
-        const updatedAccount = await updateAccount(params.id, userId, requestBody.name);
+        const updatedAccount = await updateAccount((await params).id, userId, requestBody.name);
         if (!updatedAccount) {
             return NextResponse.json({success: false}, {status: 404});
         }
@@ -23,14 +23,14 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const userId = req.headers.get("userId");
     if (!userId) {
         return NextResponse.json({error: "No user ID" }, {status: 412})
     }
 
     try { 
-        await deleteAccount(params.id, userId)
+        await deleteAccount((await params).id, userId)
 
         return NextResponse.json({status: 200})
     } catch (error: any) {

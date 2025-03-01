@@ -70,7 +70,7 @@ export default function SavingsAccountView({
       previousDate = new Date(date).toLocaleDateString("en-US", {year: "numeric", month: "long", day: "numeric", timeZone: "UTC"})
       return (
         <div className="bg-slate-200 text-sm m-1 p-1 dark:bg-slate-700">
-          <p>{ new Date(date).toLocaleDateString("en-US", {year: "numeric", month: "long", day: "numeric", timeZone: "UTC"}) }</p>
+          <span>{ new Date(date).toLocaleDateString("en-US", {year: "numeric", month: "long", day: "numeric", timeZone: "UTC"}) }</span>
         </div>
       )
     }
@@ -88,13 +88,13 @@ export default function SavingsAccountView({
     const mappedRows = ledger.map((transaction:SavingsTransaction, index: number) => {
       const isWithdraw = transaction.transactionType === "withdraw";
       return (
-        <>
+        <div key={index}>
           {!isSameDateAsPreviousTransaction(transaction.date) ? renderDateAndUpdatePreviousRef(transaction.date) : null}
           <div className="border m-1 p-1 text-sm" key={index + 1}>
             <p className="text-base font-bold">{ transaction.name }</p>
             <p className={isWithdraw ? "text-red-500" : ""}>{isWithdraw ? "-" : null}{ currencyFormat(transaction.amount || 0) }</p>
           </div>
-        </>
+        </div>
       )
     })
 

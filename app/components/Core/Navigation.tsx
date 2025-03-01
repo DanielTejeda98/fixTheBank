@@ -33,7 +33,7 @@ export default function Navigation() {
     }
 
     return (
-        <nav className="sticky bottom-0 inset-x-0 h-20 pt-1 w-full self-end transition-all backdrop-blur-sm border-t">
+        <nav className="sticky bottom-0 inset-x-0 h-20 pt-1 w-full self-end transition-all backdrop-blur-xs border-t">
             <ul className="grid grid-row-4 grid-flow-col mt-2 mx-2">
                 <li>
                     <Link href="/dashboard" className={`flex flex-col p-1 gap-1 items-center ${pathname?.includes('/dashboard') ? 'rounded-lg border' : ''}`}>

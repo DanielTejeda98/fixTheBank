@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 
-export async function POST (req: NextRequest, { params }: { params: { id: string }}) {
+export async function POST (req: NextRequest, { params }: { params: Promise<{ id: string }>}) {
     const session = await getServerSession(authOptions)
     if (!session) {
         return NextResponse.json({ message: "Must be logged in"}, {status: 401})
@@ -14,7 +14,7 @@ export async function POST (req: NextRequest, { params }: { params: { id: string
 
     try {
         const request = await req.json();
-        request.accountId = params.id;
+        request.accountId = (await params).id;
         const validationErrors = validatePOSTFields(request);
         if (validationErrors.length > 0) {
             return NextResponse.json({success: false, error: `${validationErrors.join(", ")} field${validationErrors.length > 1 ? 's' : ''} missing from body request`}, {status: 400});

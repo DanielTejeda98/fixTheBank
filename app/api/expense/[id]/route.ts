@@ -4,7 +4,7 @@ import { updateExpense } from "@/controllers/expenseController";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT (req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT (req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions)
     if (!session) {
         return NextResponse.json({ message: "Must be logged in"}, {status: 401})
@@ -14,7 +14,7 @@ export async function PUT (req: NextRequest, { params }: { params: { id: string 
         return NextResponse.json({ message: "No user ID provided"}, {status: 412})
     }
     const userId = new mongoose.Types.ObjectId(rawUserId);
-    const expenseId = new mongoose.Types.ObjectId(params.id);
+    const expenseId = new mongoose.Types.ObjectId((await params).id);
     try {
         const requestBody = await req.json();
         const updatedExpense = await updateExpense(requestBody, expenseId, userId)

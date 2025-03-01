@@ -3,14 +3,15 @@ import { getImageFromBudget, uploadImageToBudget } from "@/controllers/imagesCon
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, { params }: { params: { budgetId: string, fileName: string }}) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ budgetId: string, fileName: string }>}) {
     const session = await getServerSession(authOptions)
     if (!session) {
         return NextResponse.json({ message: "Must be logged in"}, {status: 401})
     }
 
     try {
-        const imageResult = await getImageFromBudget(params.fileName, params.budgetId, session.user.id);
+        const paramObj = await params;
+        const imageResult = await getImageFromBudget(paramObj.fileName, paramObj.budgetId, session.user.id);
         if (imageResult) {
             return new NextResponse(imageResult.decryptedResult, {
                 headers: {

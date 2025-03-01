@@ -7,7 +7,7 @@ import { BudgetView } from "@/types/budget"
 import { cookies } from "next/headers"
 
 export async function getInitialData () {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const session = await getServerSession(authOptions)
     const cookieSelectedDate = cookieStore.get("selectedBudgetDate")?.value
     let selectedBudgetDate;

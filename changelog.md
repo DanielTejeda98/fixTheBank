@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changes
-
+- Upgraded to NextJS 15
+- Upgraded to TailwindCSS v4
 ### Fixed
 
 
