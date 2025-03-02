@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changes
 - Upgraded to NextJS 15
 - Upgraded to TailwindCSS v4
+- Updated Drawer component
 ### Fixed
 - Invalid date on Income Transaction View
 
