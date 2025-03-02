@@ -1,7 +1,11 @@
 import { useAppSelector } from "@/redux/store";
 import { Button } from "../ui/button";
+import { useFTBDrawer } from "../ui/ftbDrawer";
+import SavingsCreateAccount from "./SavingsCreateAccount";
+import { DrawerBody, DrawerHeader, DrawerTitle } from "../ui/drawer";
 
-export default function SavingsManageAccounts ({openCreateAccount}: {openCreateAccount: () => void}) {
+export default function SavingsManageAccounts () {
+    const { setDrawerComponent } = useFTBDrawer();
     const savingsAccounts = useAppSelector((state) => state.savingsReducer.value.savingsAccounts)
 
     const renderAccountsList = () => {
@@ -9,16 +13,16 @@ export default function SavingsManageAccounts ({openCreateAccount}: {openCreateA
     }
 
     return (
-        <div className="flex flex-wrap">
-            <div className="flex justify-between items-center w-full">
-                <h2 className="text-lg font-bold">
+        <div className="flex flex-wrap overflow-scroll">
+            <DrawerHeader className="flex flex-row justify-between items-center w-full">
+                <DrawerTitle>
                     Manage Accounts
-                </h2>
-                <Button onClick={() => openCreateAccount()}>Create account</Button>
-            </div>
-            <div className="mt-2">
+                </DrawerTitle>
+                <Button onClick={() => setDrawerComponent(<SavingsCreateAccount />)}>Create account</Button>
+            </DrawerHeader>
+            <DrawerBody className="w-full flex flex-col mt-2">
                 {renderAccountsList()}
-            </div>
+            </DrawerBody>
         </div>
     )
 }

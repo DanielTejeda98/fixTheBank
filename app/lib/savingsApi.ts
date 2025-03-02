@@ -79,6 +79,10 @@ export const createSavingsBucket = async (accountId: string, data: SavingsBucket
 export const getSavingsPlans = async (month?: string) => {
     try {
         const res = await fetch(`${API_BASE_URL}/planner${month ? `?month=${month}` : ""}`)
+
+        if (!res.ok) {
+            return;
+        }
     
         const parsedData = await res.json() as PlannedSavings;
 

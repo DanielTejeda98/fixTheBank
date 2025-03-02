@@ -225,8 +225,8 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
             
             <DrawerFooter className="w-full">
                 <div className="flex justify-end gap-3 w-full mt-5">
-                    <Button type="reset" variant="destructive" className="rounded-md p-1 min-w-32" disabled={isImageUploading}>Clear</Button>
-                    <Button type="submit" className="rounded-md p-1 min-w-32" disabled={isImageUploading}>{actionPrefix} Expense</Button>
+                    <Button type="reset" variant="destructive" className="rounded-md p-1 min-w-16" disabled={isImageUploading}>Clear</Button>
+                    <Button type="submit" className="rounded-md p-1 min-w-16" disabled={isImageUploading}>{actionPrefix} Expense</Button>
                 </div>
             </DrawerFooter>
         </form>

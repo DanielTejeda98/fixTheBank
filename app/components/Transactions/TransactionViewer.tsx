@@ -58,8 +58,8 @@ export default function TransactionViewer ({transaction}: {transaction?: Transac
             </DrawerBody>
             <DrawerFooter className="w-full">
                 <div className="flex w-full justify-end gap-2">
-                    <Button variant="outline" className="rounded-md p-1 self-end min-w-32" onClick={() => openEditor()}>Edit</Button>
-                    <Button variant="destructive" className="rounded-md p-1 self-end min-w-32" onClick={() => handleDeleteTransaction()}>Delete Transaction</Button>
+                    <Button variant="outline" className="rounded-md p-1 self-end min-w-16" onClick={() => openEditor()}>Edit</Button>
+                    <Button variant="destructive" className="rounded-md p-1 self-end min-w-16" onClick={() => handleDeleteTransaction()}>Delete Transaction</Button>
                 </div>
             </DrawerFooter>
         </>

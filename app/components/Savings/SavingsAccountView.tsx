@@ -7,16 +7,16 @@ import {
 } from "../ui/collapsible";
 import { SavingsAccount, SavingsBuckets, SavingsTransaction } from "@/types/savings";
 import { currencyFormat } from "@/app/lib/renderHelper";
+import { DrawerBody, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import { useFTBDrawer } from "../ui/ftbDrawer";
+import SavingsCreateAccountBucket from "./SavingsCreateAccountBucket";
 
 export default function SavingsAccountView({
-  account,
-  closeDrawer,
-  openCreateBucket
+  account
 }: {
   account: SavingsAccount;
-  closeDrawer: () => void;
-  openCreateBucket: () => void;
 }) {
+  const { setOpen: setDrawerOpen, setDrawerComponent } = useFTBDrawer();
   const [isBucketsExpanded, setBucketExpanded] = useState(false);
   const [isTransactionsExpanded, setTransactionsExpanded] = useState(false);
 
@@ -108,12 +108,20 @@ export default function SavingsAccountView({
     )
   }
 
+  const openCreateBucket = (e: React.MouseEvent | null) => {
+    e?.stopPropagation();
+    setDrawerComponent(<SavingsCreateAccountBucket savingsAccountId={account._id} />);
+    setDrawerOpen(true);
+  };
+
   return (
-    <div className="flex flex-wrap w-full">
-      <h2 className="w-full">{ account.name }</h2>
-      <div className="flex flex-wrap w-full mt-3">
+    <div className="flex flex-wrap w-full overflow-scroll">
+      <DrawerHeader>
+        <DrawerTitle>{ account.name }</DrawerTitle>
+      </DrawerHeader>
+      <DrawerBody className="flex flex-wrap w-full mt-3">
         <div className="ml-auto flex gap-2">
-          <Button onClick={() => openCreateBucket()}>Create bucket</Button>
+          <Button onClick={(e) => openCreateBucket(e)}>Create bucket</Button>
           <Button variant="secondary">Distribute</Button>
         </div>
         <Collapsible
@@ -152,7 +160,7 @@ export default function SavingsAccountView({
           </div>
           { renderLedger() }
         </Collapsible>
-      </div>
+      </DrawerBody>
     </div>
   );
 }

@@ -99,8 +99,8 @@ export default function AddIncome ({budgetId}: {budgetId: string}) {
                 
                 <DrawerFooter className="w-full">
                     <div className="flex justify-end gap-3 w-full mt-5">
-                        <Button variant="destructive" type="reset" className="rounded-md p-1 min-w-32">Clear</Button>
-                        <Button type="submit" className="rounded-md p-1 min-w-32">Add Income</Button>
+                        <Button variant="destructive" type="reset" className="rounded-md p-1 min-w-16">Clear</Button>
+                        <Button type="submit" className="rounded-md p-1 min-w-16">Add Income</Button>
                     </div>
                 </DrawerFooter>
             </form>

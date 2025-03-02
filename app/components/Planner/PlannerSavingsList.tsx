@@ -18,7 +18,7 @@ export default function PlannerSavingsList () {
     const savingsAccounts = useAppSelector((state) => state.savingsReducer.value.savingsAccounts);
     const { setOpen: setDrawerOpen, setDrawerComponent } = useFTBDrawer();
 
-    function openSavingsPlanner (sp: PlannedSaving) {
+    function openSavingsPlanner (sp?: PlannedSaving) {
         setDrawerComponent(<PlannerSavingsEditor savingsTransaction={sp}/>);
         setDrawerOpen(true);
     }

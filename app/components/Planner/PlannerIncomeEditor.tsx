@@ -75,8 +75,8 @@ export default function PlannerIncomeEditor () {
             </DrawerBody>
             <DrawerFooter className="w-full">
                 <div className="flex w-full grow justify-end gap-2">
-                    <Button variant="destructive" className="rounded-md p-1 self-end min-w-32" type="reset">Reset</Button>
-                    <Button className="rounded-md p-1 self-end min-w-32" type="submit">Save</Button>
+                    <Button variant="destructive" className="rounded-md p-1 self-end min-w-16" type="reset">Reset</Button>
+                    <Button className="rounded-md p-1 self-end min-w-16" type="submit">Save</Button>
                 </div>
             </DrawerFooter>
         </form>

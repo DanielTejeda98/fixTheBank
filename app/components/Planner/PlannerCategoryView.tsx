@@ -77,7 +77,7 @@ export default function PlannerCategoryView ({category}: {category?: CategoryVie
     if (!category) return;
 
     return (
-        <>
+        <div className="flex flex-col w-full overflow-scroll">
             <DrawerHeader>
                 <DrawerTitle>{category.name}</DrawerTitle>
             </DrawerHeader>
@@ -99,10 +99,10 @@ export default function PlannerCategoryView ({category}: {category?: CategoryVie
             </DrawerBody>
             <DrawerFooter className="w-full">
                 <div className="flex w-full grow justify-end gap-2">
-                    <Button className="rounded-md p-1 self-end min-w-32" variant="destructive" onClick={handleDeleteClick}>Delete Category</Button>
-                    <Button className="rounded-md p-1 self-end min-w-32" onClick={handleSubmitClick}>Save Changes</Button>
+                    <Button className="rounded-md p-1 self-end min-w-16" variant="destructive" onClick={handleDeleteClick}>Delete Category</Button>
+                    <Button className="rounded-md p-1 self-end min-w-16" onClick={handleSubmitClick}>Save Changes</Button>
                 </div>
             </DrawerFooter>
-        </>
+        </div>
     )
 }

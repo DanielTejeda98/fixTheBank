@@ -1,22 +1,15 @@
 import { BudgetView } from "@/types/budget";
 import FullSizeCard from "../Core/FullSizeCard";
 import { Button } from "../ui/button";
-import Drawer from "../Core/Drawer";
-import { useState } from "react";
 import SelectBudget from "../Dashboard/SelectBudget";
 import Account from "../Core/Account";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
-import SavingsAccountView from "./SavingsAccountView";
-import SavingsAddFunds from "./SavingsAddFunds";
-import SavingsWithdrawFunds from "./SavingsWithdrawFunds";
-import SavingsCreateAccount from "./SavingsCreateAccount";
 import SavingsManageAccounts from "./SavingsManageAccounts";
-import SavingsCreateAccountBucket from "./SavingsCreateAccountBucket";
 import { useAppSelector } from "@/redux/store";
-import { useRouter } from "next/navigation";
 import SavingsAccountCard from "./SavingsAccountCard";
 import { SavingsAccount } from "@/types/savings";
+import { useFTBDrawer } from "../ui/ftbDrawer";
 
 export default function SavingsView({
   mappedBudget,
@@ -24,43 +17,21 @@ export default function SavingsView({
   mappedBudget: BudgetView;
 }) {
   const savingsAccounts = useAppSelector((state) => state.savingsReducer.value.savingsAccounts);
-
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedAccount, setSelectedAccount] = useState({} as SavingsAccount);
-  const [drawerComponent, setDrawerComponent] = useState(
-    "addIncome" as keyof typeof DrawerComponents
-  );
+  const { setOpen: setDrawerOpen, setDrawerComponent } = useFTBDrawer();
 
   const DrawerComponents = {
-    selectBudget: <SelectBudget closeDrawer={() => setIsDrawerOpen(false)} />,
-    account: <Account closeDrawer={() => setIsDrawerOpen(false)} />,
-    savingsAccount: <SavingsAccountView account={selectedAccount} closeDrawer={() => setIsDrawerOpen(false)} openCreateBucket={() => openDrawer(null, "savingsCreateAccountBucket")} />,
-    savingsAddFunds: <SavingsAddFunds account={selectedAccount} closeDrawer={() => setIsDrawerOpen(false)} />,
-    savingsWithdrawFunds: <SavingsWithdrawFunds account={selectedAccount} closeDrawer={() => setIsDrawerOpen(false)} />,
-    savingsCreateAccount: <SavingsCreateAccount closeDrawer={() => setIsDrawerOpen(false)} />,
-    savingsManageAccounts: <SavingsManageAccounts openCreateAccount={() => openDrawer(null, "savingsCreateAccount")} />,
-    savingsCreateAccountBucket: <SavingsCreateAccountBucket closeDrawer={() => setIsDrawerOpen(false)} savingsAccountId={selectedAccount._id} />
+    selectBudget: <SelectBudget />,
+    account: <Account />,
+    savingsManageAccounts: <SavingsManageAccounts />
   };
 
-  const openDrawer = (e: React.MouseEvent | null, component: keyof typeof DrawerComponents) => {
-    e?.stopPropagation();
-    setDrawerComponent(component);
-    setIsDrawerOpen(true);
+  const openDrawer = (component: keyof typeof DrawerComponents) => {
+    setDrawerComponent(DrawerComponents[component]);
+    setDrawerOpen(true);
   };
-
-  const handleAccountClick = (account: SavingsAccount) => {
-    setSelectedAccount(account);
-    openDrawer(null, "savingsAccount");
-  }
-
-  const handleOpenTransactionsCreators = (e: React.MouseEvent, account: SavingsAccount, action: "savingsAddFunds" | "savingsWithdrawFunds") => {
-    e?.stopPropagation();
-    setSelectedAccount(account);
-    openDrawer(null, action);
-  }
 
   const renderSavingsAccountList = () => {
-    return savingsAccounts.map((account: SavingsAccount) => (<SavingsAccountCard key={account._id} account={account} handleAccountClick={handleAccountClick} handleOpenTransactionCreators={handleOpenTransactionsCreators}></SavingsAccountCard>))
+    return savingsAccounts.map((account: SavingsAccount) => (<SavingsAccountCard key={account._id} account={account} />))
   }
 
   return (
@@ -69,7 +40,7 @@ export default function SavingsView({
         <div className="flex justify-between">
           <Button
             className="p-2 w-10 h-10 text-center rounded-full"
-            onClick={() => openDrawer(null, "account")}
+            onClick={() => openDrawer("account")}
           >
             <FontAwesomeIcon icon={faUser} />
           </Button>
@@ -78,7 +49,7 @@ export default function SavingsView({
           </div>
           <Button
             className="p-2 w-10 h-10 text-center rounded-full"
-            onClick={() => openDrawer(null, "selectBudget")}
+            onClick={() => openDrawer("selectBudget")}
           >
             <FontAwesomeIcon icon={faGear} />
           </Button>
@@ -88,16 +59,12 @@ export default function SavingsView({
       <section className="flex flex-wrap mx-3 px-3 pb-3 border rounded-md">
         <div className="flex flex-wrap w-full mt-3 items-center">
           <h2 className="text-xl">Accounts</h2>
-          <Button className="ml-auto" variant="outline" onClick={() => openDrawer(null, "savingsManageAccounts")}>Manage account(s)</Button>
+          <Button className="ml-auto" variant="outline" onClick={() => openDrawer("savingsManageAccounts")}>Manage account(s)</Button>
         </div>
         <ul className="mt-3 w-full">
           {renderSavingsAccountList()}
         </ul>
       </section>
-
-      <Drawer isOpen={isDrawerOpen} closeDrawer={() => setIsDrawerOpen(false)}>
-        {DrawerComponents[drawerComponent]}
-      </Drawer>
     </main>
   );
 }
