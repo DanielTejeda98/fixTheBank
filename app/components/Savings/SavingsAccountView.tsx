@@ -6,11 +6,11 @@ import {
   CollapsibleTrigger,
 } from "../ui/collapsible";
 import { SavingsAccount, SavingsBuckets, SavingsTransaction } from "@/types/savings";
-import { currencyFormat } from "@/app/lib/renderHelper";
 import { DrawerBody, DrawerHeader, DrawerTitle } from "../ui/drawer";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 import SavingsCreateAccountBucket from "./SavingsCreateAccountBucket";
 import SavingsTransactionCard from "./SavingsTransactionCard";
+import SavingsBucketCard from "./SavingsBucketCard";
 
 export default function SavingsAccountView({
   account
@@ -25,21 +25,13 @@ export default function SavingsAccountView({
     // We need to make a copy of the array to help us massage it and avoid errors due to the account.buckets being immutable
     // We later on add 1 to the index to take into account the fact that we removed the first element to display it differently
     const buckets = [...account.buckets];
-    const firstElement = buckets.shift();
+    const firstElement = buckets.shift()!;
     const visibleRow = (
-      <div className="border m-1 p-1 text-sm" key={0}>
-        <p className="text-base font-bold">{ firstElement!.name }</p>
-        <p>Goal: { currencyFormat(firstElement!.goal || 0) }</p>
-        <p>Current Funds: { currencyFormat(firstElement!.currentTotal || 0) }</p>
-      </div>
+      <SavingsBucketCard bucket={firstElement} key={0}/>
     )
     const mappedRows = buckets.map((bucket:SavingsBuckets, index: number) => {
       return (
-        <div className="border m-1 p-1 text-sm" key={index + 1}>
-          <p className="text-base font-bold">{ bucket.name }</p>
-          <p>Goal: { currencyFormat(bucket.goal) }</p>
-          <p>Current Funds: { currencyFormat(bucket.currentTotal) }</p>
-        </div>
+        <SavingsBucketCard bucket={bucket} key={index + 1}/>
       )
     })
 
