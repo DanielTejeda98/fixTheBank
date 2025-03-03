@@ -18,6 +18,7 @@ import { Card, CardContent } from "../ui/card";
 import { Switch } from "../ui/switch";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 import { DrawerBody, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import Link from "next/link";
 
 interface FormData {
     amount?: number,
@@ -94,7 +95,6 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
         }
         setIsImageUploading(true);
         const res = await createReceiptImage({}, image, budgetId)
-        console.log(res.message);
         dispatch({ receiptImage: res.message });
         setIsImageUploading(false);
     }
@@ -146,6 +146,12 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
             </DrawerHeader>
             <DrawerBody className="flex-col w-full">
                 <div className="mt-2 w-full">
+                    <Label htmlFor="receipt">{ receiptLabel }</Label>
+                    {isEdit && transaction.receiptImage && <Link href={`/api/images/${budgetId}/${transaction.receiptImage}`} target="_blank"><Button type="button" variant={"outline"}>View receipt image</Button></Link>}
+                    <Input className={"mt-1"} type="file" accept=".jpeg,.jpg,.png" name="receipt" onChange={e => handleReceiptImageUpload(e.target.files?.item(0))} disabled={isImageUploading} />
+                </div>
+
+                <div className="mt-2 w-full">
                     <Label htmlFor="amount">Amount</Label>
                     <Input type="number" name="amount" value={formData.amount || ""} onChange={e => dispatch({ amount: Number(e.target.value) })} />
                     {validator.current.message("amount", formData.amount, "numeric|required")}
@@ -191,11 +197,6 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
                     <Label htmlFor="description">Description</Label>
                     <Input type="text" name="description" value={formData.description} onChange={e => dispatch({ description: e.target.value })} />
                     {validator.current.message("description", formData.description, "required")}
-                </div>
-
-                <div className="mt-2 w-full">
-                    <Label htmlFor="receipt">{ receiptLabel }</Label>
-                    <Input type="file" accept=".jpeg,.jpg,.png" name="receipt" value={formData.receiptImageSrc} onChange={e => handleReceiptImageUpload(e.target.files?.item(0))} disabled={isImageUploading} />
                 </div>
 
                 <Collapsible asChild open={furtherOptionsOpen} onOpenChange={setFurtherOptionsOpen}>
