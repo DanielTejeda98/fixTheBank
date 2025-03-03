@@ -10,6 +10,7 @@ import { currencyFormat } from "@/app/lib/renderHelper";
 import { DrawerBody, DrawerHeader, DrawerTitle } from "../ui/drawer";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 import SavingsCreateAccountBucket from "./SavingsCreateAccountBucket";
+import SavingsTransactionCard from "./SavingsTransactionCard";
 
 export default function SavingsAccountView({
   account
@@ -59,7 +60,8 @@ export default function SavingsAccountView({
       return null;
     }
     const ledger = [...account.ledger].reverse().sort((a, b) => new Date(b.date).getDate() - new Date(a.date).getDate());
-    const firstElement = ledger.shift();
+    // The ledger should not be null at this point, so we can force TS to accept the element will be there
+    const firstElement = ledger.shift()!;
 
     let previousDate = "";
     const isSameDateAsPreviousTransaction = (date: string) => {
@@ -74,26 +76,20 @@ export default function SavingsAccountView({
         </p>
       )
     }
+
+    // Render the first row, since this is always visible, we handle this case seperately
     const visibleRow = (
       <>
-        <div>
-          <div>{ renderDateAndUpdatePreviousRef(firstElement!.date) }</div>
-        </div>
-        <div className="border m-1 p-1 text-sm" key={0}>
-          <p className="text-base font-bold">{ firstElement!.name }</p>
-          <p>{firstElement!.transactionType === "withdraw" ? "-" : null}{ currencyFormat(firstElement!.amount || 0) }</p>
-        </div>
+        <div>{ renderDateAndUpdatePreviousRef(firstElement!.date) }</div>
+        <SavingsTransactionCard transaction={firstElement} key={0} />
       </>
     )
+    // Handle collapsed rows
     const mappedRows = ledger.map((transaction:SavingsTransaction, index: number) => {
-      const isWithdraw = transaction.transactionType === "withdraw";
       return (
         <div key={index}>
           {!isSameDateAsPreviousTransaction(transaction.date) ? renderDateAndUpdatePreviousRef(transaction.date) : null}
-          <div className="border m-1 p-1 text-sm" key={index + 1}>
-            <p className="text-base font-bold">{ transaction.name }</p>
-            <p className={isWithdraw ? "text-red-500" : ""}>{isWithdraw ? "-" : null}{ currencyFormat(transaction.amount || 0) }</p>
-          </div>
+          <SavingsTransactionCard transaction={transaction} key={index + 1} />
         </div>
       )
     })
@@ -122,7 +118,6 @@ export default function SavingsAccountView({
       <DrawerBody className="flex flex-wrap w-full mt-3">
         <div className="ml-auto flex gap-2">
           <Button onClick={(e) => openCreateBucket(e)}>Create bucket</Button>
-          <Button variant="secondary">Distribute</Button>
         </div>
         <Collapsible
           className="w-full mt-3"
