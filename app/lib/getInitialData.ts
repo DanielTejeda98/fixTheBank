@@ -3,10 +3,15 @@ import { getBudgetRequesters, getUserFullBudgetDocument } from "@/controllers/bu
 import mongoose from "mongoose"
 import { getServerSession } from "next-auth"
 import normalizeMongooseObjects from "./normalizeMongooseObjects"
-import { BudgetView } from "@/types/budget"
+import { BudgetView, InitialData } from "@/types/budget"
 import { cookies } from "next/headers"
 
-export async function getInitialData () {
+export const ERRORS = {
+    NO_BUDGET_FOUND: "No budget found",
+    NO_USER_ID_PROVIDED: "No userId provided"
+}
+
+export async function getInitialData (): Promise<InitialData> {
     const cookieStore = await cookies();
     const session = await getServerSession(authOptions)
     const cookieSelectedDate = cookieStore.get("selectedBudgetDate")?.value
@@ -14,7 +19,7 @@ export async function getInitialData () {
     const userId = !!session?.user?.id ? new mongoose.Types.ObjectId(session?.user?.id) : undefined;
     if (!userId)
     {
-        return { mappedBudget: null, error: "No userId provided"}
+        throw new Error(ERRORS.NO_USER_ID_PROVIDED);
     }
     try {
         selectedBudgetDate = cookieSelectedDate ? new Date(cookieSelectedDate) : new Date();
@@ -24,7 +29,7 @@ export async function getInitialData () {
     try {
         const data = await getUserFullBudgetDocument(userId, selectedBudgetDate)
         if (!data) {
-            return { mappedBudget: null, error: "No budget found" };
+            throw new Error(ERRORS.NO_BUDGET_FOUND);
         }
 
         let requesters: mongoose.Types.Array<mongoose.Types.ObjectId> | never[] = [];
@@ -53,8 +58,8 @@ export async function getInitialData () {
             lastFetched: new Date().getTime()
         } as BudgetView;
 
-        return { mappedBudget, error: null };
+        return { mappedBudget };
     } catch (error: any) {
-        return { mappedBudget: null, error };
+        throw error;
     }
 }

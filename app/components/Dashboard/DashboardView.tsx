@@ -3,7 +3,7 @@ import { useState } from "react";
 import { currencyFormat } from "@/app/lib/renderHelper";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { selectTransactions, useSetInitialStore } from "@/redux/features/budget-slice";
+import { selectTransactions } from "@/redux/features/budget-slice";
 import { useAppSelector } from "@/redux/store";
 import AddIncome from "./AddIncome";
 import ExpenseEditor from "./ExpenseEditor";
@@ -18,12 +18,14 @@ import { Button, buttonVariants } from "../ui/button";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 import { faCalendar } from "@fortawesome/free-regular-svg-icons";
 
-export default function DashboardView({ budget }: { budget: BudgetView }) {
+export default function DashboardView() {
     const [selectedTransaction, setSelectedTransaction] = useState<TransactionView|undefined>(undefined);
 
     const { setOpen, setDrawerComponent } = useFTBDrawer();
 
-    useSetInitialStore({ budget })
+    const budgetId = useAppSelector((state) => state.budgetReducer.value._id)
+    const accounts = useAppSelector((state) => state.budgetReducer.value.accounts);
+    const categories = useAppSelector((state) => state.budgetReducer.value.categories);
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
     const balance = useAppSelector((state) => state.budgetReducer.value.balance) || 0
     const totalPlannedIncome = useAppSelector((state) => state.budgetReducer.value.totalPlannedIncome) || 0
@@ -32,8 +34,8 @@ export default function DashboardView({ budget }: { budget: BudgetView }) {
     const transactions = useAppSelector(selectTransactions).sort((a, b) => new Date(b.transactionDate || b.date).getTime() - new Date(a.transactionDate || a.date).getTime()).slice(0,10)
 
     const DrawerComponents = {
-        addIncome: <AddIncome budgetId={budget._id}/>,
-        expenseEditor: <ExpenseEditor budgetId={budget._id} accounts={budget.accounts} categories={budget.categories} transaction={selectedTransaction}/>,
+        addIncome: <AddIncome budgetId={budgetId}/>,
+        expenseEditor: <ExpenseEditor budgetId={budgetId} accounts={accounts} categories={categories} transaction={selectedTransaction}/>,
         selectBudget: <SelectBudget />,
         account: <Account />
     }

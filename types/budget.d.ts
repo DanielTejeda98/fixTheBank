@@ -1,5 +1,9 @@
 // Type definitions for FixTheBank
 
+export interface InitialData {
+    mappedBudget: BudgetView | null
+}
+
 export interface BudgetView {
     _id: string,
     income: any[],

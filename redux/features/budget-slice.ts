@@ -125,10 +125,10 @@ export const selectUnallocatedFunds = (state:RootState) => {
     - ((state.budgetReducer.value.totalAllocated || 0) + getTotalPlannedSavings(state.savingsReducer.value, state.budgetReducer.value.minDate));
 }
 
-export function useSetInitialStore({budget }: {budget: BudgetView }) {
+export function useSetInitialStore({budget }: {budget: BudgetView | null }) {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setBudget(budget))
+        budget && dispatch(setBudget(budget))
     }, [budget, dispatch])
 }
 

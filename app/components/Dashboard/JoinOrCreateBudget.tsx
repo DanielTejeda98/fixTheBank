@@ -15,16 +15,17 @@ export default function JoinOrCreateBudget() {
     const userId = useSession().data?.user.id;
     const router = useRouter();
     const { setOpen: setDrawerOpen, setDrawerComponent } = useFTBDrawer();
-
-    const toggleDrawer = (component: keyof typeof DrawerComponents) => {
-        setDrawerComponent(component);
-        setDrawerOpen(true);
-    }
-
+    
     const DrawerComponents = {
         join: <JoinBudget />,
         account: <Account />
     }
+
+    const toggleDrawer = (component: keyof typeof DrawerComponents) => {
+        setDrawerComponent(DrawerComponents[component]);
+        setDrawerOpen(true);
+    }
+
 
     const createNewBudget = async () => {
         try {
@@ -39,7 +40,7 @@ export default function JoinOrCreateBudget() {
     }
 
     return (
-        <div>
+        <div className="w-full">
             <FullSizeCard>
                 <div>
                     <button className="p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("account")}><FontAwesomeIcon icon={faUser} /></button>

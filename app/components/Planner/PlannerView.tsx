@@ -5,7 +5,6 @@ import Account from "../Core/Account";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
 import { BudgetView, CategoryView } from "@/types/budget";
-import { useSetInitialStore } from "@/redux/features/budget-slice";
 import PlannerCategoriesList from "./PlannerCategoriesList";
 import { useAppSelector } from "@/redux/store";
 import PlannerIncomeList from "./PlannerIncomeList";
@@ -13,14 +12,12 @@ import { Button } from "../ui/button";
 import PlannerSavingsList from "./PlannerSavingsList";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 
-export default function PlannerView ({budget}: {budget: BudgetView}) {
+export default function PlannerView () {
     const { setDrawerComponent, setOpen: setDrawerOpen} = useFTBDrawer();
 
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
     const monthPlannedIncome = useAppSelector((state) => state.budgetReducer.value.plannedIncome.find((pi: any) => pi.month === budgetMonth)?.incomeStreams) || [];
     const categories = useAppSelector((state) => state.budgetReducer.value.categories) as CategoryView[];
-
-    useSetInitialStore({budget});
 
     const DrawerComponents = {
         selectBudget: <SelectBudget />,

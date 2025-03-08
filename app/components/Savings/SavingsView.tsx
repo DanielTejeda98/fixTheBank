@@ -11,11 +11,7 @@ import SavingsAccountCard from "./SavingsAccountCard";
 import { SavingsAccount } from "@/types/savings";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 
-export default function SavingsView({
-  mappedBudget,
-}: {
-  mappedBudget: BudgetView;
-}) {
+export default function SavingsView() {
   const savingsAccounts = useAppSelector((state) => state.savingsReducer.value.savingsAccounts);
   const { setOpen: setDrawerOpen, setDrawerComponent } = useFTBDrawer();
 

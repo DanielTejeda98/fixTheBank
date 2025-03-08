@@ -1,14 +1,12 @@
 "use client";
 import {
   selectTransactions,
-  useSetInitialStore,
 } from "@/redux/features/budget-slice";
 import { BudgetView, TransactionView } from "@/types/budget";
 import FullSizeCard from "../Core/FullSizeCard";
 import { useAppSelector } from "@/redux/store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
 import SelectBudget from "../Dashboard/SelectBudget";
 import Account from "../Core/Account";
 import TransactionCard from "../TransactionCard";
@@ -16,8 +14,7 @@ import Filter from "./Filter";
 import { Button } from "../ui/button";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 
-export default function TransactionsView({ budget }: { budget: BudgetView }) {
-  useSetInitialStore({ budget });
+export default function TransactionsView() {
   const { setDrawerComponent, setOpen: setDrawerOpen } = useFTBDrawer();
   const budgetMonth = useAppSelector(
     (state) => state.budgetReducer.value.minDate
