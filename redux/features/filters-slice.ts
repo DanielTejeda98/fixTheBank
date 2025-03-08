@@ -6,11 +6,13 @@ type InitialState = {
 
 export type FilterState = {
     categoryFilters: string[];
+    accountFilters: string[];
 }
 
 const initialState = {
     value: {
-        categoryFilters: []
+        categoryFilters: [],
+        accountFilters: []
     } as FilterState
 } as InitialState
 

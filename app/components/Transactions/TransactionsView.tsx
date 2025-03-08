@@ -2,17 +2,18 @@
 import {
   selectTransactions,
 } from "@/redux/features/budget-slice";
-import { BudgetView, TransactionView } from "@/types/budget";
+import { TransactionView } from "@/types/budget";
 import FullSizeCard from "../Core/FullSizeCard";
 import { useAppSelector } from "@/redux/store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 import SelectBudget from "../Dashboard/SelectBudget";
 import Account from "../Core/Account";
 import TransactionCard from "../TransactionCard";
 import Filter from "./Filter";
 import { Button } from "../ui/button";
 import { useFTBDrawer } from "../ui/ftbDrawer";
+import { faCalendar } from "@fortawesome/free-regular-svg-icons";
 
 export default function TransactionsView() {
   const { setDrawerComponent, setOpen: setDrawerOpen } = useFTBDrawer();
@@ -20,18 +21,15 @@ export default function TransactionsView() {
     (state) => state.budgetReducer.value.minDate
   );
   const transactions = useAppSelector(selectTransactions) as [TransactionView];
-  const categories = useAppSelector(
-    (state) => state.budgetReducer.value.categories
-  );
-  const filterBy = useAppSelector((state) => state.filtersReducer.value.categoryFilters)
+
+  const filterByCategory = useAppSelector((state) => state.filtersReducer.value.categoryFilters)
+  const filterByAccount = useAppSelector((state) => state.filtersReducer.value.accountFilters);
 
   const DrawerComponents = {
     selectBudget: <SelectBudget />,
     account: <Account />,
     filter: (
-      <Filter
-        categories={categories}
-      ></Filter>
+      <Filter />
     ),
   };
 
@@ -44,7 +42,8 @@ export default function TransactionsView() {
     return transactions
       .filter(
         (transaction) =>
-          filterBy.length > 0 ? filterBy.includes(transaction.category || '') : true
+          (filterByCategory.length > 0 ? filterByCategory.includes(transaction.category || '') : true) &&
+          (filterByAccount.length > 0 ? filterByAccount.includes(transaction.account || '') : true)
       )
       .sort((a, b) => new Date(a.transactionDate || a.date).getTime() - new Date(b.transactionDate || b.date).getTime())
       .map((transaction) => (
@@ -77,7 +76,7 @@ export default function TransactionsView() {
             className="p-2 w-10 h-10 text-center rounded-full"
             onClick={() => toggleDrawer("selectBudget")}
           >
-            <FontAwesomeIcon icon={faGear} />
+            <FontAwesomeIcon icon={faCalendar} />
           </button>
         </div>
       </FullSizeCard>
