@@ -1,3 +1,4 @@
+"use client"
 import { useReducer } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
 import { Switch } from "../ui/switch"
@@ -6,6 +7,7 @@ import { SETTINGS_STORAGE_KEY } from "@/app/hooks/useLoadSettings"
 import { useAppSelector } from "@/redux/store"
 import { useDispatch } from "react-redux"
 import { SettingsState, setSettings } from "@/redux/features/settings-slice"
+import Link from "next/link"
 
 export default function SettingsView () {
     const settings = useAppSelector((state) => state.settingsReducer.value)
@@ -23,7 +25,11 @@ export default function SettingsView () {
     }
 
     return (
-        <main className="w-full bg-background text-primary m-3">
+        <main className="w-full flex flex-col gap-2 bg-background text-primary m-3">
+            <Link href={"/settings/accounts"}>
+                <Button variant={"outline"} className="w-full py-6 justify-start">Manage Budget Accounts</Button>
+            </Link>
+            <Button variant={"outline"} className="w-full py-6 justify-start">Manage Access</Button>
             <Card>
                 <CardHeader>
                     <CardTitle>Settings</CardTitle>

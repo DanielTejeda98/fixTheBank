@@ -2,6 +2,7 @@ import dbConnect from "@/app/lib/dbConnect";
 import { findBudget } from "@/helpers/budgetHelpers";
 import accountModel, { Account } from "@/models/accountModel";
 import { Budget } from "@/models/budgetModel";
+import mongoose from "mongoose";
 
 export async function createAccount (userId: string, name: string): Promise<Account> {
     try {
@@ -50,10 +51,10 @@ export async function updateAccount (accountId: string, userId: string, name: st
 export async function deleteAccount (accountId: string, userId: string): Promise<Account> {
     try {
         await dbConnect();
-        const budget = await findBudget(accountId) as Budget;
+        const budget = await findBudget(userId) as Budget;
 
         if(!canAccessAccountCheck(accountId, budget)) {
-            throw new Error("Category not found in budget!");
+            throw new Error("User does not have access for this action!");
         }
 
         const deletedAccount = await accountModel.findByIdAndDelete(accountId) as Account;

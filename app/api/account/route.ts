@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
         }
         const createdAccount = await createAccount(userId, requestBody.name);
 
-        return NextResponse.json({data: createdAccount}, {status: 204});
+        return NextResponse.json({data: createdAccount}, {status: 201});
     } catch (error) {
         return NextResponse.json({error}, {status: 500});
     }
