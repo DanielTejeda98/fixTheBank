@@ -11,6 +11,7 @@ import Link from "next/link"
 
 export default function SettingsView () {
     const settings = useAppSelector((state) => state.settingsReducer.value)
+    const isBudgetOwner = useAppSelector((state) => state.budgetReducer.value.isOwner);
     const [settingsData, settingsDataDispatch] = useReducer((state: SettingsState, action: SettingsState):SettingsState => {
         return {...state, ...action}
     }, {
@@ -29,7 +30,11 @@ export default function SettingsView () {
             <Link href={"/settings/accounts"}>
                 <Button variant={"outline"} className="w-full py-6 justify-start">Manage Budget Accounts</Button>
             </Link>
-            <Button variant={"outline"} className="w-full py-6 justify-start">Manage Access</Button>
+            {isBudgetOwner && (
+                <Link href={"/settings/access"}>
+                    <Button variant={"outline"} className="w-full py-6 justify-start">Manage Access</Button>
+                </Link>
+            )}
             <Card>
                 <CardHeader>
                     <CardTitle>Settings</CardTitle>

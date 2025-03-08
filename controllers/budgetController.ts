@@ -224,6 +224,25 @@ export async function removePlannedIncome(userId: mongoose.Types.ObjectId, month
     }
 }
 
+export async function getBudgetUsers (userId: mongoose.Types.ObjectId) {
+    const budgetUsers = await budgetModel.findOne({ owner: userId }, "owner allowed")
+    .populate({
+        path: "owner",
+        model: userModel,
+        select: "username email"
+    }).populate({
+        path: "allowed",
+        model: userModel,
+        select: "username email"
+    }).exec()
+
+    if (!budgetUsers) {
+        throw new Error("No budget found for specified user");
+    }
+
+    return budgetUsers;
+}
+
 function getBudgetMinMaxDates(budgetMonth: Date) {
     if (process.env.DEBUG === "debug") {
         console.log(`[getBudgetMinMaxDates]: Received call with budgetMonth ${budgetMonth}`);
