@@ -28,7 +28,7 @@ export default function AccessList({ owner, members }: { owner: User, members: U
                     </Card>
 
                     {members.map(member => (
-                        <Card>
+                        <Card key={member._id}>
                             <CardHeader>
                                 <CardTitle>Owner</CardTitle>
                             </CardHeader>

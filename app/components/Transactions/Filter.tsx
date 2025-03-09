@@ -40,7 +40,7 @@ export default function Filter() {
     }
   };
 
-  const renderFiltersList = ({
+  const RenderFiltersList = ({
     title,
     setFilters,
     toggleFilter,
@@ -94,8 +94,8 @@ export default function Filter() {
         <Button variant="outline" className="text-xs" disabled={setFiltersCount === 0} onClick={() => reduxDispatch(setFilters({ categoryFilters: [], accountFilters: []}))}>Deselect All</Button>
       </DrawerHeader>
       <DrawerBody className="flex flex-col w-full">
-        {renderFiltersList({title: "Categories", setFilters: filteredByCategories, toggleFilter: toggleCategory, filters: categories})}
-        {renderFiltersList({title: "Accounts", setFilters: filteredByAccounts, toggleFilter: toggleAccount, filters: accounts})}
+        {RenderFiltersList({title: "Categories", setFilters: filteredByCategories, toggleFilter: toggleCategory, filters: categories})}
+        {RenderFiltersList({title: "Accounts", setFilters: filteredByAccounts, toggleFilter: toggleAccount, filters: accounts})}
       </DrawerBody>
     </div>
   );

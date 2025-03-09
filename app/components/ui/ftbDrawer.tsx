@@ -74,7 +74,7 @@ function FTBDrawerProvider({
         setDrawerComponent,
         setOpen,
         toggleDrawer
-    }), [state, open, component,setOpen, toggleDrawer])
+    }), [state, open, component,setOpen, toggleDrawer, setDrawerComponent])
 
     return (
         <FTBDrawerContext.Provider value={contextValue}>
