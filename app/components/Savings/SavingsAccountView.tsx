@@ -51,7 +51,7 @@ export default function SavingsAccountView({
     if (!account.ledger || account.ledger.length === 0) {
       return null;
     }
-    const ledger = [...account.ledger].reverse().sort((a, b) => new Date(b.date).getDate() - new Date(a.date).getDate());
+    const ledger = [...account.ledger].reverse().sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     // The ledger should not be null at this point, so we can force TS to accept the element will be there
     const firstElement = ledger.shift()!;
 
