@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated Drawer component
 ### Fixed
 - Invalid date on Income Transaction View
+- Login not allowing special characters for password
+- Income viewer showing "Edit" button when there is currently no edit functions
+- Categories not correctly sync when entering edit mode for an expense
+- Savings sorting based on month rather than actual time
 
 ## [0.0.1]
 
