@@ -36,7 +36,7 @@ const getIntitalFormData = (accounts: AccountView[], categories: CategoryView[],
         return {
             amount: transaction.amount,
             account: accounts.find(acc => acc._id === transaction.account)?._id || accounts[0]?._id || "",
-            category: categories.find(cat => cat._id === transaction.account)?._id || categories[0]?._id || "",
+            category: categories.find(cat => cat._id === transaction.category)?._id || categories[0]?._id || "",
             date: formatDateInput(new Date(transaction.transactionDate.split("T")[0].replaceAll("-", "/") || transaction.date.split("T")[0].replaceAll("-", "/"))),
             description: transaction.description,
             borrowFromNextMonth: !transaction.transactionDate ? false : new Date(transaction.transactionDate) < new Date(transaction.date),
@@ -159,7 +159,7 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
 
                 <div className="mt-2 w-full">
                     <Label htmlFor="account">Account</Label>
-                    <Select value={formData.account} onValueChange={(e: string) => dispatch({ account: e})}>
+                    <Select value={formData.account} onValueChange={(e: string) => dispatch({ account: e})} name="account">
                         <SelectTrigger>
                             <SelectValue placeholder="Select an account"></SelectValue>
                         </SelectTrigger>
@@ -172,7 +172,7 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
 
                 <div className="mt-2 w-full">
                     <Label htmlFor="category">Category</Label>
-                    <Select value={formData.category} onValueChange={(e: string) => dispatch({ category: e})}>
+                    <Select value={formData.category} onValueChange={(e: string) => dispatch({ category: e})} name="category">
                         <SelectTrigger>
                             <SelectValue placeholder="Select a category"></SelectValue>
                         </SelectTrigger>
