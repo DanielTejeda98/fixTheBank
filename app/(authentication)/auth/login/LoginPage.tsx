@@ -124,7 +124,7 @@ export default function LoginPage() {
                 validation={{
                     validator: validator,
                     data: formData.password,
-                    validation: "alpha_num_dash_space|required"
+                    validation: "required"
                 }}
                 value={formData.password}
                 onChange={(value: any) => formDispatch({ password: value })} />
