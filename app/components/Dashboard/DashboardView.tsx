@@ -134,7 +134,7 @@ export default function DashboardView() {
                     <Link href="/transactions" className={`${buttonVariants({variant: "outline"})} text-xs`}>View all</Link>
                 </div>
 
-                <div className="grid gap-3 mt-3">
+                <div className="grid gap-3 mt-3" data-qa="recent-transactions-list">
                     {renderTransactionsList()}
                 </div>
             </section>
