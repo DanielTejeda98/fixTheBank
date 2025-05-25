@@ -93,7 +93,7 @@ function FTBDrawer ({
     const { open, setOpen, component } = useFTBDrawer();
 
     return (
-        <Drawer open={open} onOpenChange={setOpen} modal={true} {...props} handleOnly={true}>
+        <Drawer open={open} onOpenChange={setOpen} modal={true} {...props} handleOnly={true} repositionInputs={false}>
             <DrawerContent>
                 {component}
             </DrawerContent>
