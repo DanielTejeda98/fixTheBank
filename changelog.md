@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Account management UI
 - Filter by transaction Account
+- Notes on Categories for Planner
 ### Changes
 - Upgraded to NextJS 15
 - Upgraded to TailwindCSS v4

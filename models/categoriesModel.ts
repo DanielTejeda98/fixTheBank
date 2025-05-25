@@ -5,11 +5,17 @@ type CategoryMonthlyMax = {
     amount: Number
 }
 
+type Note = {
+    month: String,
+    note: String
+}
+
 export interface Category extends mongoose.Document {
     budgetId: mongoose.Types.ObjectId,
     name: String,
     sortRank: Number,
     maxMonthExpectedAmount: mongoose.Types.Array<CategoryMonthlyMax>,
+    notes: mongoose.Types.Array<Note>
 }
 
 const CategoriesSchema = new mongoose.Schema<Category>({
@@ -31,6 +37,12 @@ const CategoriesSchema = new mongoose.Schema<Category>({
             amount: Number
         }]
     },
+    notes: {
+        type: [{
+            month: String,
+            note: String,
+        }]
+    }
 })
 
 export default mongoose.models.Categories || mongoose.model<Category>("Categories", CategoriesSchema);

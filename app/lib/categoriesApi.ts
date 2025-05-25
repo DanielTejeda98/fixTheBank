@@ -19,26 +19,10 @@ const updateCategory = async (headers: any, categoryUpdate: any) => {
         method: "PUT",
         body: JSON.stringify({
             name: categoryUpdate.name,
-            sortRank: categoryUpdate.sortRank || 0
-        })
-    })
-    const parsedRes = await res.json();
-    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
-    const budgetRes = await getBudget({ userId: headers.userId }, budgetDate)
-    store.dispatch(setBudget(budgetRes.data));
-
-    return parsedRes;
-}
-
-const updateCategoryWithMaxAmount = async (headers: any, categoryUpdate: any) => {
-    const res = await fetch(`${API_BASE_URL}/categories/${categoryUpdate._id}`, {
-        headers,
-        method: "PUT",
-        body: JSON.stringify({
-            name: categoryUpdate.name,
             sortRank: categoryUpdate.sortRank || 0,
             date: categoryUpdate.date,
-            amount: categoryUpdate.amount
+            amount: categoryUpdate.amount,
+            note: categoryUpdate.note
         })
     })
     const parsedRes = await res.json();
@@ -73,6 +57,5 @@ const deleteCategory = async (headers: any, categoryId: string) => {
 export {
     createCategory,
     updateCategory,
-    updateCategoryWithMaxAmount,
     deleteCategory
 }

@@ -1,5 +1,5 @@
 import useReactValidator from "@/app/hooks/useReactValidator";
-import { deleteCategory, updateCategoryWithMaxAmount } from "@/app/lib/categoriesApi";
+import { deleteCategory, updateCategory } from "@/app/lib/categoriesApi";
 import { currencyFormat } from "@/app/lib/renderHelper";
 import { selectUnallocatedFunds } from "@/redux/features/budget-slice";
 import { useAppSelector } from "@/redux/store";
@@ -11,6 +11,7 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 import { DrawerBody, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import { Textarea } from "../ui/textarea";
 
 export default function PlannerCategoryView ({category}: {category?: CategoryView}) {
     const { setOpen: setDrawerOpen } = useFTBDrawer();
@@ -30,7 +31,8 @@ export default function PlannerCategoryView ({category}: {category?: CategoryVie
         }
     })?.amount || 0;
 
-    const [maxAmount, setMaxAmount] = useState(category?.maxMonthExpectedAmount.find((c:any) => c.month === currentMonth)?.amount as Number)
+    const [maxAmount, setMaxAmount] = useState(category?.maxMonthExpectedAmount.find((c) => c.month === currentMonth)?.amount as Number)
+    const [note, setNote] = useState(category?.notes.find(n => n.month === currentMonth)?.note || "");
 
     const getMaxAmount = () => {
         const amount = maxAmount.toString();
@@ -50,12 +52,13 @@ export default function PlannerCategoryView ({category}: {category?: CategoryVie
             return;
         }
         try {
-            await updateCategoryWithMaxAmount({userId}, {
+            await updateCategory({userId}, {
                 _id: category?._id,
                 name: category?.name,
                 sortRank: 0,
                 date: currentMonth,
-                amount: maxAmount
+                amount: maxAmount,
+                note: note
             })
         } catch (error) {
             console.log(error)
@@ -95,6 +98,11 @@ export default function PlannerCategoryView ({category}: {category?: CategoryVie
                     <div className="ml-2 max-w-32">
                         <Button onClick={() => setMaxAmount(previousMonthPlannedAmount)}>Use last month <br /> {currencyFormat(previousMonthPlannedAmount)}</Button>
                     </div>
+                </div>
+
+                <div className="w-full">
+                    <Label htmlFor="amount">Notes</Label>
+                    <Textarea name="notes" value={note} onChange={e => setNote(e.target.value)} />
                 </div>
             </DrawerBody>
             <DrawerFooter className="w-full">

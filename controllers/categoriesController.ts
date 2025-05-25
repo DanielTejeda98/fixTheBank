@@ -28,7 +28,7 @@ export async function createCategory (budgetId: string, userId: string, name: st
     }
 }
 
-export async function updateCategory (categoryId: string, userId: string, name: string, sortRank: Number, date?: string, amount?: Number): Promise<Category|null> {
+export async function updateCategory (categoryId: string, userId: string, name: string, sortRank: Number, date?: string, amount?: Number, note?: string): Promise<Category|null> {
     try {
         await dbConnect();
         const budget = await findBudget(userId) as Budget;
@@ -45,17 +45,31 @@ export async function updateCategory (categoryId: string, userId: string, name: 
 
         category.name = name;
         category.sortRank = sortRank;
-        const hasAmount = isNotNullOrUndefined(amount); 
-        if (date && hasAmount) {
-            const existingMax = category.maxMonthExpectedAmount.find(cat => cat.month === date)
-            if (!existingMax) {
-                category.maxMonthExpectedAmount.push({
-                    month: date,
-                    amount
-                })
-            } else {
-                // Using non null operator, as isNotNullOrUndefined will check null and undefined for us
-                existingMax.amount = amount!;
+        if (date) {
+            if (isNotNullOrUndefined(amount) && !Number.isNaN(amount)) {
+                const existingMax = category.maxMonthExpectedAmount.find(cat => cat.month === date)
+                if (!existingMax) {
+                    category.maxMonthExpectedAmount.push({
+                        month: date,
+                        amount
+                    })
+                } else {
+                    // Using non null operator, as isNotNullOrUndefined will check null and undefined for us
+                    existingMax.amount = amount!;
+                }
+            }
+
+            if (isNotNullOrUndefined(note)) {
+                const existingNote = category.notes.find(cat => cat.month === date)
+                if (!existingNote) {
+                    category.notes.push({
+                        month: date,
+                        note
+                    })
+                } else {
+                    // Using non null operator, as isNotNullOrUndefined will check null and undefined for us
+                    existingNote.note = note!;
+                }
             }
         }
 

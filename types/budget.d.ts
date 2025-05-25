@@ -23,7 +23,14 @@ export interface BudgetView {
 export interface CategoryView {
     _id: string,
     name: string,
-    maxMonthExpectedAmount: any
+    maxMonthExpectedAmount: [{
+        month: string,
+        amount: number
+    }]
+    notes: [{
+        month: string,
+        note: string
+    }]
 }
 
 export interface AccountView {

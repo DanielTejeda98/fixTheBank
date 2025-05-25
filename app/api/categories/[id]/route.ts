@@ -12,7 +12,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         if (errors.length > 0) {
             return NextResponse.json({success: false, error: `The following fields are missing from the request body: ${errors.join(", ")}` }, {status: 400});
         }
-        const updatedCategory = await updateCategory((await params).id, userId, requestBody.name, requestBody.sortRank, requestBody.date, requestBody.amount);
+        const updatedCategory = await updateCategory((await params).id, userId, requestBody.name, requestBody.sortRank, requestBody.date, requestBody.amount, requestBody.note);
         if (!updatedCategory) {
             return NextResponse.json({success: false}, {status: 404});
         }
