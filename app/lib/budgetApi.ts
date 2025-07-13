@@ -12,17 +12,25 @@ const createExpense = async (headers: any, expense: any) => {
     return await res.json();
 }
 
-export const createReceiptImage = async (headers: any, receiptImage: File, budgetId: string) => {    
-    const res = await fetch(`${API_BASE_URL}/images/${budgetId}`, {
-        headers: {
-            ...headers,
-            "Content-Type": receiptImage.type
-        },
-        method: 'POST',
-        body: receiptImage
-    })
+export const createReceiptImage = async (headers: any, receiptImage: File, budgetId: string) => {
+    try {
+        const res = await fetch(`${API_BASE_URL}/imagess/${budgetId}`, {
+            headers: {
+                ...headers,
+                "Content-Type": receiptImage.type
+            },
+            method: 'POST',
+            body: receiptImage
+        })
 
-    return await res.json();;
+        if (!res.ok) {
+            throw new Error(`Error uploading image: ${res.statusText}`);
+        }
+    
+        return await res.json();;
+    } catch (error) {
+        throw error;
+    }
 }
 
 const updateExpense = async (headers: any, expense: any) => {

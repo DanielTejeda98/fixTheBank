@@ -64,6 +64,7 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
     const forceUpdate = useReducer(x => x + 1, 0)[1];
     const reduxDispatch = useDispatch();
     const dateButtonOnLeft = useAppSelector((state) => state.settingsReducer.value.dateTodayButtonOnLeft);
+    const [formRootError, setFormRootError] = useState<string | null>(null); // For errors not tied to a specific field
     const [furtherOptionsOpen, setFurtherOptionsOpen] = useState(false);
     const [isImageUploading, setIsImageUploading] = useState(false);
     const [formData, dispatch] = useReducer((state: FormData, action: FormData): FormData => {
@@ -93,10 +94,16 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
         if (!image) {
             return;
         }
-        setIsImageUploading(true);
-        const res = await createReceiptImage({}, image, budgetId)
-        dispatch({ receiptImage: res.message });
-        setIsImageUploading(false);
+        try {
+            setIsImageUploading(true);
+            const res = await createReceiptImage({}, image, budgetId)
+            dispatch({ receiptImage: res.message });
+        } catch (error: unknown) {
+            console.error("Error uploading image:", error);
+            setFormRootError(`Failed to upload image. ${(error as Error).message}. Please try again or try later.`);
+        } finally {
+            setIsImageUploading(false);
+        }
     }
 
     const formSubmit = async (form: FormEvent) => {
@@ -145,6 +152,12 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
                 <DrawerDescription>{actionPrefix} an expense</DrawerDescription>
             </DrawerHeader>
             <DrawerBody className="flex-col w-full">
+                {formRootError ? 
+                    <Card className="w-full mb-2 bg-red-100 border-red-300 text-red-900">
+                        <CardContent>
+                            <p className="text-sm">{formRootError}</p>
+                        </CardContent>
+                    </Card> : null}
                 <div className="mt-2 w-full">
                     <Label htmlFor="receipt">{ receiptLabel }</Label>
                     {isEdit && transaction.receiptImage && <Link href={`/api/images/${budgetId}/${transaction.receiptImage}`} target="_blank"><Button type="button" variant={"outline"}>View receipt image</Button></Link>}
