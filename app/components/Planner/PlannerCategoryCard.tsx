@@ -16,6 +16,10 @@ export default function PlannerCategoriesCard ({category, onClick}: PlannerCateg
         if(current.category !== category._id) {
             return acc;
         }
+
+        if (current.borrowFromNextMonth && new Date(current.date).getMonth() != new Date(currentMonth).getMonth()) {
+            return acc;
+        }
         return acc + current.amount;
     }, 0)
 

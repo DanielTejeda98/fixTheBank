@@ -77,6 +77,9 @@ const getTotalIncome = (budget:any): number => {
 
 const getTotalExpenses = (budget:any): number => {
     return budget.expenses.reduce((total:number, current: Expense) => {
+        if (current.borrowFromNextMonth && new Date(current.date).getMonth() != new Date(budget.minDate).getMonth()) {
+            return total; // Ignore expenses borrowed from next month that are in the future
+        }
         return total + current.amount;
     }, 0)
 }

@@ -1,6 +1,6 @@
 // Defines budget logic
 import dbConnect from "@/app/lib/dbConnect";
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 import budgetModel, { Budget } from "@/models/budgetModel";
 import shareableBudgetModel, { ShareableBudget } from "@/models/shareableBudgets";
 import incomeModel from "@/models/incomeModel";
@@ -29,7 +29,7 @@ export async function getUserFullBudgetDocument(userId: mongoose.Types.ObjectId,
             .populate({
                 path: "expenses",
                 model: expenseModel,
-                match: { date: { $gte: minDate, $lte: maxDate } },
+                match: { $or: [{date: { $gte: minDate, $lte: maxDate }}, {transactionDate: { $gte: minDate, $lte: maxDate }}] },
             })
             .populate({
                 path: "income",
