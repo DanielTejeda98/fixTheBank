@@ -21,6 +21,25 @@ const createExpense = async (headers: any, expense: any) => {
     }
 }
 
+const createSplitExpense = async (headers: any, expense: any) => {
+    try {
+        const res = await fetch(`${API_BASE_URL}/expense/split`, {
+            headers,
+            method: "POST",
+            body: JSON.stringify(expense)
+        })
+
+        if (!res.ok) {
+            throw Error (`Error creating split expense: ${res.statusText}`);
+        }
+
+        return await res.json();
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
 export const createReceiptImage = async (headers: any, receiptImage: File, budgetId: string) => {
     try {
         const res = await fetch(`${API_BASE_URL}/images/${budgetId}`, {
@@ -201,6 +220,7 @@ const deletePlannedIncome = async (headers: any, monthIndex: String, incomeSourc
 
 export {
     createExpense,
+    createSplitExpense,
     updateExpense,
     createIncome,
     getBudget,

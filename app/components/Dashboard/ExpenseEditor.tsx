@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useReducer, useState } from "react";
-import { createExpense, createReceiptImage, getBudget, updateExpense } from "@/app/lib/budgetApi";
+import { createExpense, createReceiptImage, createSplitExpense, getBudget, updateExpense } from "@/app/lib/budgetApi";
 import { setBudget } from "@/redux/features/budget-slice";
 import { useDispatch } from "react-redux";
 import { useSession } from "next-auth/react";
@@ -30,7 +30,7 @@ interface FormData {
     giftTransaction?: boolean
     revealGiftDate?: string
     splitPayments?: boolean
-    splitPaymentsMonths?: number
+    numberOfPayments?: number
     receiptImage?: string
     receiptImageSrc?: string
 }
@@ -46,8 +46,8 @@ const getIntitalFormData = (accounts: AccountView[], categories: CategoryView[],
             borrowFromNextMonth: !transaction.transactionDate ? false : new Date(transaction.transactionDate) < new Date(transaction.date),
             giftTransaction: transaction.giftTransaction || false,
             revealGiftDate: transaction.revealGiftDate ? formatDateInput(new Date(transaction.revealGiftDate.split("T")[0].replaceAll("-", "/"))) : "",
-            splitPayments: transaction.splitPayments || false,
-            splitPaymentsMonths: transaction.splitPaymentsMonths || 0,
+            splitPayments: !!transaction.splitPaymentMasterId || false,
+            numberOfPayments: transaction.splitPaymentsMonths || 0,
             receiptImage: transaction.receiptImage,
             receiptImageSrc: ""
         }
@@ -63,7 +63,7 @@ const getIntitalFormData = (accounts: AccountView[], categories: CategoryView[],
         giftTransaction: false,
         revealGiftDate: "",
         splitPayments: false,
-        splitPaymentsMonths: 0,
+        numberOfPayments: 0,
         receiptImage: "",
         receiptImageSrc: ""
     }
@@ -129,7 +129,11 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
 
         try {
             if (!isEdit) {
-                await createExpense({ userId }, { ...formData, budgetId });
+                if (formData.splitPayments) {
+                    await createSplitExpense({ userId }, {...formData, budgetId });
+                } else {
+                    await createExpense({ userId }, { ...formData, budgetId });
+                }
             } else {
                 await updateExpense({ userId }, { ...formData, id: transaction._id});
             }
@@ -239,9 +243,9 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
 
                 {formData.splitPayments ?
                     <div className="mt-2 w-full">
-                        <Label htmlFor="splitPaymentsMonths">Split for how many months?</Label>
-                        <Input type="number" name="splitPaymentsMonths" value={formData.splitPaymentsMonths || ""} onChange={e => dispatch({ splitPaymentsMonths: Number(e.target.value) })} />
-                        {validator.current.message("splitPaymentsMonths", formData.splitPaymentsMonths, "numeric|required")}
+                        <Label htmlFor="numberOfPayments">Split for how many months?</Label>
+                        <Input type="number" name="numberOfPayments" value={formData.numberOfPayments || ""} onChange={e => dispatch({ numberOfPayments: Number(e.target.value) })} />
+                        {validator.current.message("numberOfPayments", formData.numberOfPayments, "numeric|required")}
                     </div>
                 : null}
                 

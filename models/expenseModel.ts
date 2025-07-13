@@ -14,7 +14,7 @@ export interface Expense extends mongoose.Document {
     borrowFromNextMonth: boolean,
     giftTransaction: boolean,
     revealGiftDate?: Date,
-    splitPayments: boolean,
+    splitPaymentMasterId?: mongoose.Types.ObjectId | null
 }
 
 const ExpenseSchema = new mongoose.Schema<Expense>({
@@ -70,9 +70,10 @@ const ExpenseSchema = new mongoose.Schema<Expense>({
         type: Date,
         default: null
     },
-    splitPayments: {
-        type: Boolean,
-        default: false
+    splitPaymentMasterId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SplitPaymentMaster",
+        default: null
     }
 })
 

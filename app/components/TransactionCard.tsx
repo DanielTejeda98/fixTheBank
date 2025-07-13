@@ -28,7 +28,7 @@ export default function TransactionCard({
 
         if (transaction.borrowFromNextMonth) badges.push("Borrowed");
         if (transaction.giftTransaction) badges.push("Gift");
-        if (transaction.splitPayments) badges.push("Split");
+        if (transaction.splitPaymentMasterId) badges.push("Split");
     }
     const category = categories.find(cat => cat._id === transaction.category)?.name || ""
 

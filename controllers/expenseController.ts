@@ -1,6 +1,7 @@
 import dbConnect from "@/app/lib/dbConnect";
 import budgetModel, { Budget } from "@/models/budgetModel";
 import expenseModel, { Expense } from "@/models/expenseModel";
+import splitPaymentMasterModel, { SplitPaymentMaster } from "@/models/splitPaymentMasterModel";
 import mongoose from "mongoose";
 
 async function createExpense (request: any, userId: mongoose.Types.ObjectId) {
@@ -34,8 +35,7 @@ async function createExpense (request: any, userId: mongoose.Types.ObjectId) {
             receiptImage: request.receiptImage,
             borrowFromNextMonth: request.borrowFromNextMonth || false,
             giftTransaction: request.giftTransaction || false,
-            revealGiftDate: request.giftTransaction ? request.revealGiftDate : null,
-            splitPayments: request.splitPayments || false
+            revealGiftDate: request.giftTransaction ? request.revealGiftDate : null
         })
 
         await budget.updateOne({
@@ -81,8 +81,7 @@ async function updateExpense (request: any, expenseId: mongoose.Types.ObjectId, 
             receiptImage: request.receiptImage,
             borrowFromNextMonth: request.borrowFromNextMonth || false,
             giftTransaction: request.giftTransaction || false,
-            revealGiftDate: request.revealGiftDate,
-            splitPayments: request.splitPayments || false,
+            revealGiftDate: request.revealGiftDate
         } as Expense;
     
         for (const key of Object.keys(updateRequest)) {
@@ -136,8 +135,81 @@ async function findBudget (userId: mongoose.Types.ObjectId): Promise<Budget> {
     return budget;
 }
 
+async function createSplitExpense (request: any, userId: mongoose.Types.ObjectId) {
+    try {
+        await dbConnect();
+
+        const budget = await findBudget(userId) as Budget;
+
+        const splitPaymentMaster = await splitPaymentMasterModel.create({
+            budgetId: budget._id,
+            totalAmount: request.amount,
+            numberOfPayments: request.numberOfPayments,
+            createdBy: userId,
+            updatedBy: userId
+        } as SplitPaymentMaster);
+
+        let totalAmountCheck = 0;
+        let individualAmount = Math.round((request.amount / request.numberOfPayments) * 100) / 100;
+        const expenses = [];
+
+        for (let i = 0; i < request.numberOfPayments; i++) {
+            totalAmountCheck += individualAmount;
+            // Handle rounding errors on last payment
+            if (i === request.numberOfPayments - 1 && totalAmountCheck !== request.amount) {
+                const difference = Math.round((request.amount - totalAmountCheck) * 100) / 100;
+                if (Math.abs(difference) >= 0.01) {
+                    // Only adjust if difference is significant
+                    individualAmount = individualAmount + difference;
+                }
+            }
+
+            if(request.borrowFromNextMonth) {
+                request.transactionDate = request.date;
+                const expenseNextMonth = new Date(request.date);
+                expenseNextMonth.setMonth(expenseNextMonth.getMonth() + 1, 1);
+                request.date = expenseNextMonth;
+            }
+
+            const expenseDate = new Date(request.date);
+            expenseDate.setMonth(expenseDate.getMonth() + i);
+            const expense = await expenseModel.create({
+                createdBy: userId,
+                updatedBy: userId,
+                amount: individualAmount,
+                category: new mongoose.Types.ObjectId(request.category),
+                date: expenseDate,
+                transactionDate: request.transactionDate || expenseDate,
+                description: request.description ? `${request.description} (Part ${i + 1} of ${request.numberOfPayments})` : undefined,
+                account: request.account,
+                budgetId: budget._id,
+                receiptImage: request.receiptImage,
+                borrowFromNextMonth: request.borrowFromNextMonth || false,
+                giftTransaction: request.giftTransaction || false,
+                revealGiftDate: request.giftTransaction ? request.revealGiftDate : null,
+                splitPaymentMasterId: splitPaymentMaster._id
+            });
+            expenses.push(expense);
+            splitPaymentMaster.payments.push(expense._id);
+        }
+
+        await budget.updateOne({
+         $push: {
+            expenses: expenses.map(e => e._id)
+         }
+        });
+
+        await budget.save();
+        await splitPaymentMaster.save();
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
 export {
     createExpense,
     updateExpense,
-    deleteExpense
+    deleteExpense,
+    createSplitExpense
 }

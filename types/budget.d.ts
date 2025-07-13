@@ -63,7 +63,7 @@ export interface TransactionView {
     giftTransaction?: boolean,
     revealGiftDate?: Date,
     borrowFromNextMonth?: boolean,
-    splitPayments?: boolean,
     createdBy: MiniUser,
     updatedBy: MiniUser,
+    splitPaymentMasterId?: string | null
 }
