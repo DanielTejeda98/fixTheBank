@@ -47,7 +47,7 @@ export default function TransactionViewer ({transaction}: {transaction?: Transac
     const isHiddenGiftTransaction = transaction.giftTransaction 
     && transaction.revealGiftDate 
     && new Date(transaction.revealGiftDate) > new Date() 
-    && userId !== transaction.createdBy.toString();
+    && userId !== transaction.createdBy._id.toString();
 
     return (
         <>
@@ -60,6 +60,8 @@ export default function TransactionViewer ({transaction}: {transaction?: Transac
                 {transaction.account ? <p>Account: {account}</p> : null}
                 {transaction.category ? <p>Category: {category}</p> : null}
                 {transaction.source ? <p>Income</p> : null}
+                {transaction.createdBy ? <p>Created by: {transaction.createdBy.username || transaction.createdBy._id}</p> : null}
+                {transaction.updatedBy ? <p>Last updated by: {transaction.updatedBy.username || transaction.updatedBy._id}</p> : null}
                 <p>Date: {new Date(transaction.transactionDate || transaction.date).toLocaleDateString("en-us", {timeZone: "UTC"})}</p>
                 {transaction.receiptImage && <Link href={`/api/images/${budgetId}/${transaction.receiptImage}`} target="_blank"><Button type="button" variant={"outline"}>View receipt image</Button></Link>}
             </DrawerBody>

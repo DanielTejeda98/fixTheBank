@@ -30,11 +30,25 @@ export async function getUserFullBudgetDocument(userId: mongoose.Types.ObjectId,
                 path: "expenses",
                 model: expenseModel,
                 match: { $or: [{date: { $gte: minDate, $lte: maxDate }}, {transactionDate: { $gte: minDate, $lte: maxDate }}] },
+                populate: [
+                    {
+                        path: "createdBy updatedBy",
+                        model: userModel,
+                        select: "username"
+                    }
+                ],
             })
             .populate({
                 path: "income",
                 model: incomeModel,
-                match: { date: { $gte: minDate, $lte: maxDate } }
+                match: { date: { $gte: minDate, $lte: maxDate } },
+                populate: [
+                    {
+                        path: "createdBy updatedBy",
+                        model: userModel,
+                        select: "username"
+                    }
+                ],
             })
             .exec();
 

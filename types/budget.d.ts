@@ -44,6 +44,11 @@ export interface PlannedIncomeView {
     incomeStreams: any[]
 }
 
+export interface MiniUser {
+    _id: string,
+    username: string
+}
+
 export interface TransactionView {
     _id: string,
     type: string,
@@ -59,6 +64,6 @@ export interface TransactionView {
     revealGiftDate?: Date,
     borrowFromNextMonth?: boolean,
     splitPayments?: boolean,
-    createdBy: string,
-    updatedBy: string,
+    createdBy: MiniUser,
+    updatedBy: MiniUser,
 }

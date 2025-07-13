@@ -39,7 +39,7 @@ export default function TransactionCard({
     const isHiddenGiftTransaction = transaction.giftTransaction 
     && transaction.revealGiftDate 
     && new Date(transaction.revealGiftDate) > new Date() 
-    && userId !== transaction.createdBy.toString();
+    && userId !== transaction.createdBy._id.toString();
 
     return (
         <div className="flex items-center p-2 gap-2 rounded-md border max-w-[calc(100vw-3rem)]" onClick={() => openTransactionDrawer()} data-qa="transaction-card">
