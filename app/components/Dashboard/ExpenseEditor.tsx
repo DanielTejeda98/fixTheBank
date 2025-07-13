@@ -21,13 +21,17 @@ import { DrawerBody, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle 
 import Link from "next/link";
 
 interface FormData {
-    amount?: number,
+    amount?: number
     account?: string
-    category?: string,
+    category?: string
     date?: string
     description?: string
-    borrowFromNextMonth?: boolean,
-    receiptImage?: string,
+    borrowFromNextMonth?: boolean
+    giftTransaction?: boolean
+    revealGiftDate?: string
+    splitPayments?: boolean
+    splitPaymentsMonths?: number
+    receiptImage?: string
     receiptImageSrc?: string
 }
 
@@ -40,6 +44,10 @@ const getIntitalFormData = (accounts: AccountView[], categories: CategoryView[],
             date: formatDateInput(new Date(transaction.transactionDate.split("T")[0].replaceAll("-", "/") || transaction.date.split("T")[0].replaceAll("-", "/"))),
             description: transaction.description,
             borrowFromNextMonth: !transaction.transactionDate ? false : new Date(transaction.transactionDate) < new Date(transaction.date),
+            giftTransaction: transaction.giftTransaction || false,
+            revealGiftDate: transaction.revealGiftDate ? formatDateInput(new Date(transaction.revealGiftDate.split("T")[0].replaceAll("-", "/"))) : "",
+            splitPayments: transaction.splitPayments || false,
+            splitPaymentsMonths: transaction.splitPaymentsMonths || 0,
             receiptImage: transaction.receiptImage,
             receiptImageSrc: ""
         }
@@ -52,6 +60,10 @@ const getIntitalFormData = (accounts: AccountView[], categories: CategoryView[],
         date: "",
         description: "",
         borrowFromNextMonth: false,
+        giftTransaction: false,
+        revealGiftDate: "",
+        splitPayments: false,
+        splitPaymentsMonths: 0,
         receiptImage: "",
         receiptImageSrc: ""
     }
@@ -121,16 +133,21 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
             } else {
                 await updateExpense({ userId }, { ...formData, id: transaction._id});
             }
+        } catch (error) {
+            setFormRootError(`Failed to create expense. ${(error as Error).message}. Please try again or try later.`);
+            return;
+        }
+
+        try {
             const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
             const res = await getBudget({ userId }, budgetDate)
             // Set store values
             reduxDispatch(setBudget(res.data));
+            setOpenDrawer(false);
+            clearForm();
         } catch (error) {
-            // TODO: display error
-            console.log(error)
+            setFormRootError(`Failed to refresh budget data. ${(error as Error).message}. Please refresh the page manually.`);
         }
-        setOpenDrawer(false);
-        clearForm();
     }
 
     const renderAccountOptions = () => {
@@ -212,10 +229,26 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
                     {validator.current.message("description", formData.description, "required")}
                 </div>
 
+                {formData.giftTransaction ?
+                    <div className="mt-2 w-full">
+                        <Label htmlFor="revealGiftDate">Hide transaction until</Label>
+                        <Input type="date" name="revealGiftDate" value={formData.revealGiftDate} onChange={e => dispatch({revealGiftDate: e.target.value})}/>
+                        {validator.current.message("revealGiftDate", formData.revealGiftDate, "required")}
+                    </div>
+                : null}
+
+                {formData.splitPayments ?
+                    <div className="mt-2 w-full">
+                        <Label htmlFor="splitPaymentsMonths">Split for how many months?</Label>
+                        <Input type="number" name="splitPaymentsMonths" value={formData.splitPaymentsMonths || ""} onChange={e => dispatch({ splitPaymentsMonths: Number(e.target.value) })} />
+                        {validator.current.message("splitPaymentsMonths", formData.splitPaymentsMonths, "numeric|required")}
+                    </div>
+                : null}
+                
                 <Collapsible asChild open={furtherOptionsOpen} onOpenChange={setFurtherOptionsOpen}>
                     <div className="w-full mb-2">
                         <CollapsibleTrigger asChild>
-                            <div className="my-2 w-full flex justify-between items-center w-full">
+                            <div className="my-2 w-full flex justify-between items-center">
                                 <h4 className="text-md font-bold">Further options</h4>
                                 <FontAwesomeIcon icon={furtherOptionsOpen ? faChevronUp : faChevronDown} />
                             </div>
@@ -229,6 +262,22 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
                                         <p className="text-sm text-muted-foreground">Use this option to count this expense towards next months budget.</p>
                                     </div>
                                     <Switch checked={formData.borrowFromNextMonth} onCheckedChange={() => dispatch({ borrowFromNextMonth: !formData.borrowFromNextMonth })} />
+                                </div>
+
+                                <div className="flex items-center mt-2">
+                                    <div>
+                                        <p className="text-sm font-medium">Gift Transaction?</p>
+                                        <p className="text-sm text-muted-foreground">Use this option to make this a gift transaction.</p>
+                                    </div>
+                                    <Switch checked={formData.giftTransaction} onCheckedChange={() => dispatch({ giftTransaction: !formData.giftTransaction })} />
+                                </div>
+
+                                <div className="flex items-center mt-2">
+                                    <div>
+                                        <p className="text-sm font-medium">Split Payments</p>
+                                        <p className="text-sm text-muted-foreground">Use this option to automatically split payments to upcoming months.</p>
+                                    </div>
+                                    <Switch checked={formData.splitPayments} onCheckedChange={() => dispatch({ splitPayments: !formData.splitPayments })} />
                                 </div>
                                 </CardContent>
                             </Card>

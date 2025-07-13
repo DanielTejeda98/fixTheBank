@@ -4,17 +4,26 @@ import { store } from "@/redux/store";
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_FTB_HOST}/api`
 
 const createExpense = async (headers: any, expense: any) => {
-    const res = await fetch(`${API_BASE_URL}/expense`, {
-        headers,
-        method: "POST",
-        body: JSON.stringify(expense)
-    })
-    return await res.json();
+    try {
+        const res = await fetch(`${API_BASE_URL}/expense`, {
+            headers,
+            method: "POST",
+            body: JSON.stringify(expense)
+        })
+
+        if (!res.ok) {
+            throw Error (`Error creating expense: ${res.statusText}`);
+        }
+
+        return await res.json();
+    } catch (error) {
+        throw error;
+    }
 }
 
 export const createReceiptImage = async (headers: any, receiptImage: File, budgetId: string) => {
     try {
-        const res = await fetch(`${API_BASE_URL}/imagess/${budgetId}`, {
+        const res = await fetch(`${API_BASE_URL}/images/${budgetId}`, {
             headers: {
                 ...headers,
                 "Content-Type": receiptImage.type

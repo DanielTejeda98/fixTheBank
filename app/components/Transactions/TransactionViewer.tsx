@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 import { DrawerBody, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
 import ExpenseEditor from "../Dashboard/ExpenseEditor";
+import { cn } from "@/lib/utils";
 
 export default function TransactionViewer ({transaction}: {transaction?: TransactionView}) {
     const { setOpen: setDrawerOpen, setDrawerComponent } = useFTBDrawer();
@@ -42,12 +43,18 @@ export default function TransactionViewer ({transaction}: {transaction?: Transac
     if (!transaction) {
         return;
     }
+
+    const isHiddenGiftTransaction = transaction.giftTransaction 
+    && transaction.revealGiftDate 
+    && new Date(transaction.revealGiftDate) > new Date() 
+    && userId !== transaction.createdBy.toString();
+
     return (
         <>
             <DrawerHeader>
                 <DrawerTitle>Transaction Details</DrawerTitle>
             </DrawerHeader>
-            <DrawerBody className="flex flex-col">
+            <DrawerBody className={cn({"blur-sm": isHiddenGiftTransaction}, "flex flex-col")}>
                 <h2>{transaction.description || transaction.source}</h2>
                 <p>Amount: {currencyFormat(transaction.amount)}</p>
                 {transaction.account ? <p>Account: {account}</p> : null}

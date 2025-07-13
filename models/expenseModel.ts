@@ -10,7 +10,11 @@ export interface Expense extends mongoose.Document {
     transactionDate: Date,
     description: string,
     budgetId: mongoose.Schema.Types.ObjectId,
-    receiptImage: string
+    receiptImage: string,
+    borrowFromNextMonth: boolean,
+    giftTransaction: boolean,
+    revealGiftDate?: Date,
+    splitPayments: boolean,
 }
 
 const ExpenseSchema = new mongoose.Schema<Expense>({
@@ -53,6 +57,22 @@ const ExpenseSchema = new mongoose.Schema<Expense>({
     receiptImage: {
         type: String,
         default: ""
+    },
+    borrowFromNextMonth: {
+        type: Boolean,
+        default: false
+    },
+    giftTransaction: {
+        type: Boolean,
+        default: false
+    },
+    revealGiftDate: {
+        type: Date,
+        default: null
+    },
+    splitPayments: {
+        type: Boolean,
+        default: false
     }
 })
 

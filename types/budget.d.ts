@@ -55,4 +55,10 @@ export interface TransactionView {
     date: Date,
     transactionDate: Date,
     receiptImage?: string
+    giftTransaction?: boolean,
+    revealGiftDate?: Date,
+    borrowFromNextMonth?: boolean,
+    splitPayments?: boolean,
+    createdBy: string,
+    updatedBy: string,
 }

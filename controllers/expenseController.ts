@@ -16,6 +16,11 @@ async function createExpense (request: any, userId: mongoose.Types.ObjectId) {
             request.date = expenseNextMonth;
         }
 
+        if (request.giftTransaction && !request.revealGiftDate) {
+            request.revealGiftDate = new Date(request.date);
+            request.revealGiftDate.setMonth(request.revealGiftDate.getMonth() + 1, 1);
+        }
+
         const expense = await expenseModel.create({
             createdBy: userId,
             updatedBy: userId,
@@ -26,7 +31,11 @@ async function createExpense (request: any, userId: mongoose.Types.ObjectId) {
             description: request.description,
             account: request.account,
             budgetId: new mongoose.Types.ObjectId(request.budgetId),
-            receiptImage: request.receiptImage
+            receiptImage: request.receiptImage,
+            borrowFromNextMonth: request.borrowFromNextMonth || false,
+            giftTransaction: request.giftTransaction || false,
+            revealGiftDate: request.giftTransaction ? request.revealGiftDate : null,
+            splitPayments: request.splitPayments || false
         })
 
         await budget.updateOne({
@@ -55,6 +64,13 @@ async function updateExpense (request: any, expenseId: mongoose.Types.ObjectId, 
             request.date = expenseNextMonth;
         }
 
+        if (request.giftTransaction && !request.revealGiftDate) {
+            request.revealGiftDate = new Date(request.date);
+            request.revealGiftDate.setMonth(request.revealGiftDate.getMonth() + 1, 1);
+        } else if (!request.giftTransaction) {
+            request.revealGiftDate = null;
+        }
+
         const updateRequest = {
             amount: request.amount,
             account: request.account ? new mongoose.Types.ObjectId(request.account) : null,
@@ -62,7 +78,11 @@ async function updateExpense (request: any, expenseId: mongoose.Types.ObjectId, 
             transactionDate: request.transactionDate || request.date || null,
             date: request.date || null,
             description: request.description,
-            receiptImage: request.receiptImage
+            receiptImage: request.receiptImage,
+            borrowFromNextMonth: request.borrowFromNextMonth || false,
+            giftTransaction: request.giftTransaction || false,
+            revealGiftDate: request.revealGiftDate,
+            splitPayments: request.splitPayments || false,
         } as Expense;
     
         for (const key of Object.keys(updateRequest)) {
