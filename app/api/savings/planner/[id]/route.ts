@@ -1,17 +1,14 @@
-import { authOptions } from "@/config/authOptions";
 import { removeSavingsPlan, updateSavingsPlan } from "@/controllers/savingsController";
 import { PlannedSaving } from "@/types/savings";
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 
 export async function PUT (req: NextRequest, { params }: { params: Promise<{ id: string }>}) {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-        return NextResponse.json({ message: "Must be logged in"}, {status: 401})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
-
-    const userId = new mongoose.Types.ObjectId(session.user.id);
 
     let requestMonth = req.nextUrl.searchParams.get("month") || `${new Date().getMonth() + 1}/1/${new Date().getFullYear().toString().slice(2)}`
 
@@ -37,13 +34,11 @@ export async function PUT (req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function DELETE (req: NextRequest, { params }: { params: Promise<{ id: string }>}) {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-        return NextResponse.json({ message: "Must be logged in"}, {status: 401})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
-
-    const userId = new mongoose.Types.ObjectId(session.user.id);
-
+    
     let requestMonth = req.nextUrl.searchParams.get("month") || `${new Date().getMonth() + 1}/1/${new Date().getFullYear().toString().slice(2)}`
 
     try {

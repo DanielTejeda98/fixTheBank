@@ -1,25 +1,24 @@
-import mongoose from "mongoose";
 import { joinSharedBudget } from "@/controllers/budgetController";
 import { NextRequest, NextResponse } from "next/server";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 
 type JoinRequest = {
     joinCode: string,
 }
 
 export async function POST (req: NextRequest) {
-    const userId = req.headers.get("userId");
-    if (!userId) {
-        return NextResponse.json({success: false, error: "No user ID" }, {status: 412})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
-    const userIdAsObjectId = new mongoose.Types.ObjectId(userId || "");
-
+    
     const body = await req.json() as JoinRequest;
     const error = validatePOSTFields(body);
     if (error) {
         return NextResponse.json({success: false, error: error.message }, {status: 412})
     }
     try {
-        await joinSharedBudget(userIdAsObjectId, body.joinCode)
+        await joinSharedBudget(userId, body.joinCode)
     
         return NextResponse.json({success: true, data: "Join request sent"});
     } catch (error: any) {

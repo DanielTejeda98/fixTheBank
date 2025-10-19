@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { createIncome, deleteIncome } from "@/controllers/incomeController";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 
 export async function POST(req: NextRequest) {
-    const headerUserId = req.headers.get("userId");
-    if (!headerUserId) {
-        return NextResponse.json({success: false, error: "User ID missing from header." }, {status: 412})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
     const request = await req.json();
     const error = validatePOSTFields(request);
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({success: false, error: error.message }, {status: 412})
     }
     try {
-        const newIncome = await createIncome(request, new mongoose.Types.ObjectId(headerUserId));
+        const newIncome = await createIncome(request, userId);
 
         return NextResponse.json({success: true, data: newIncome}, {status: 200});
     } catch (error) {
@@ -23,7 +24,11 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-    const userId = req.headers.get("userId");
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
+    }
+    
     const request = await req.json();
 
     if(!request.incomeId) {
@@ -33,10 +38,9 @@ export async function DELETE(req: NextRequest) {
     if(!userId) {
         return NextResponse.json({error: "No user ID provided"}, {status: 412})
     }
-    const userIdAsObjectId = new mongoose.Types.ObjectId(userId);
     const incomeIdAsObjectId = new mongoose.Types.ObjectId(request.incomeId)
     try {
-        const deletedIncome = await deleteIncome(incomeIdAsObjectId, userIdAsObjectId)
+        const deletedIncome = await deleteIncome(incomeIdAsObjectId, userId)
 
         return NextResponse.json({success: true, data: deletedIncome}, {status: 200});
     } catch (error) {

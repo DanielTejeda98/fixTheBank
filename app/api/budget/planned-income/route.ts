@@ -1,12 +1,14 @@
 import { addPlannedIncome, removePlannedIncome } from "@/controllers/budgetController";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 
 export async function POST (req: NextRequest) {
-    const userId = req.headers.get("userId");
-    if (!userId) {
-        return NextResponse.json({success: false, error: "No user ID" }, {status: 412})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
+
     const requestBody = await req.json();
     const errors = validatePOSTFields(requestBody)
     if (errors.length) {
@@ -18,10 +20,11 @@ export async function POST (req: NextRequest) {
 }
 
 export async function DELETE (req: NextRequest) {
-    const userId = req.headers.get("userId");
-    if (!userId) {
-        return NextResponse.json({success: false, error: "No user ID" }, {status: 412})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
+    
     const requestBody = await req.json();
     const errors = validateDELETEFields(requestBody)
     if (errors.length) {

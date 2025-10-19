@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/config/authOptions";
 import { createExpense, deleteExpense } from "@/controllers/expenseController";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 
 export async function POST(req: NextRequest) {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-        return NextResponse.json({ message: "Must be logged in"}, {status: 401})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
-    const headerUserId = req.headers.get("userId");
-    if (!headerUserId) {
-        return NextResponse.json({ message: "No user ID provided"}, {status: 412})
-    }
-    const userId = new mongoose.Types.ObjectId(headerUserId);
     
     const request = await req.json();
     const error = validatePOSTFields(request);
@@ -32,22 +26,18 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-        return NextResponse.json({ message: "Must be logged in"}, {status: 401})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
-    const userId = req.headers.get("userId");
-    if (!userId) {
-        return NextResponse.json({ message: "No user ID provided"}, {status: 412})
-    }
+    
     const request = await req.json();
     if(!request.expenseId) {
         return NextResponse.json({success: false, error: "No expense ID provided for delete"})
     }
-    const userIdAsObjectId = new mongoose.Types.ObjectId(userId);
     const expenseIdasObjectId = new mongoose.Types.ObjectId(request.expenseId);
     try {
-        const deletedExpense = await deleteExpense(expenseIdasObjectId, userIdAsObjectId)
+        const deletedExpense = await deleteExpense(expenseIdasObjectId, userId)
 
         return NextResponse.json({success: true, message: deletedExpense}, {status: 200});
     } catch (error) {

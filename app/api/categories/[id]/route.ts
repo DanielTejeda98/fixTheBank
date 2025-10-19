@@ -1,11 +1,13 @@
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 import { deleteCategory, updateCategory } from "@/controllers/categoriesController";
 import { NextRequest, NextResponse } from "next/server"
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const userId = req.headers.get("userId");
-    if (!userId) {
-        return NextResponse.json({success: false, error: "No user ID" }, {status: 412})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
+
     try {
         const requestBody = await req.json();
         const errors = validateFields(requestBody);
@@ -24,9 +26,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const userId = req.headers.get("userId");
-    if (!userId) {
-        return NextResponse.json({success: false, error: "No user ID" }, {status: 412})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
 
     try { 

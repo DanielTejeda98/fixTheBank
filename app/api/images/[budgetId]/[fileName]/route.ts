@@ -1,19 +1,18 @@
-import { authOptions } from "@/config/authOptions";
-import { getImageFromBudget, uploadImageToBudget } from "@/controllers/imagesController";
-import { getServerSession } from "next-auth";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
+import { getImageFromBudget } from "@/controllers/imagesController";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ budgetId: string, fileName: string }>}) {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-        return NextResponse.json({ message: "Must be logged in"}, {status: 401})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
 
     try {
         const paramObj = await params;
-        const imageResult = await getImageFromBudget(paramObj.fileName, paramObj.budgetId, session.user.id);
+        const imageResult = await getImageFromBudget(paramObj.fileName, paramObj.budgetId, userId);
         if (imageResult) {
-            return new NextResponse(imageResult.decryptedResult, {
+            return new NextResponse(imageResult.decryptedResult as BodyInit, {
                 headers: {
                     "Content-Type": imageResult.fileType
                 }

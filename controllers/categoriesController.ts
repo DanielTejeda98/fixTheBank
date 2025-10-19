@@ -5,7 +5,7 @@ import { Budget } from "@/models/budgetModel";
 import { findBudget } from "@/helpers/budgetHelpers";
 import { isNotNullOrUndefined } from "@/lib/utils";
 
-export async function createCategory (budgetId: string, userId: string, name: string): Promise<Category> {
+export async function createCategory (budgetId: string, userId: mongoose.Types.ObjectId, name: string): Promise<Category> {
     try {
         await dbConnect();
         const budget = await findBudget(userId) as Budget;
@@ -28,7 +28,7 @@ export async function createCategory (budgetId: string, userId: string, name: st
     }
 }
 
-export async function updateCategory (categoryId: string, userId: string, name: string, sortRank: Number, date?: string, amount?: Number, note?: string): Promise<Category|null> {
+export async function updateCategory (categoryId: string, userId: mongoose.Types.ObjectId, name: string, sortRank: Number, date?: string, amount?: Number, note?: string): Promise<Category|null> {
     try {
         await dbConnect();
         const budget = await findBudget(userId) as Budget;
@@ -81,7 +81,7 @@ export async function updateCategory (categoryId: string, userId: string, name: 
     }
 }
 
-export async function deleteCategory (categoryId: string, userId: string): Promise<Category> {
+export async function deleteCategory (categoryId: string, userId: mongoose.Types.ObjectId): Promise<Category> {
     try {
         await dbConnect();
         const budget = await findBudget(userId) as Budget;

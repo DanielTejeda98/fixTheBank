@@ -1,11 +1,13 @@
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 import { deleteAccount, updateAccount } from "@/controllers/accountController";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const userId = req.headers.get("userId");
-    if (!userId) {
-        return NextResponse.json({error: "No user ID" }, {status: 412})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
+
     try {
         const requestBody = await req.json();
         const errors = validateFields(requestBody);
@@ -24,11 +26,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const userId = req.headers.get("userId");
-    if (!userId) {
-        return NextResponse.json({error: "No user ID" }, {status: 412})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
-
+    
     try { 
         await deleteAccount((await params).id, userId)
 

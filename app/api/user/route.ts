@@ -2,20 +2,16 @@ import dbConnect from "@/app/lib/dbConnect";
 import userModel, { User } from "@/models/userModel";
 import { hash } from "@/app/lib/passwordHasher";
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/config/authOptions";
-import mongoose from "mongoose";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 
 export async function GET (req: NextRequest) {
     await dbConnect();
 
-    const session = await getServerSession(authOptions)
-    if (!session) {
-        return NextResponse.json({ message: "Must be logged in"}, {status: 401})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
-
-    const userId = new mongoose.Types.ObjectId(session.user.id);
-
+    
     try {
         const user = await userModel.findById(userId, "username email");
 

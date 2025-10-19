@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { approveRequesterToJoinBudget } from "@/controllers/budgetController";
 import { NextRequest, NextResponse } from "next/server";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 
 type ApproveJoinRequest = {
     budgetId: string,
@@ -8,12 +9,10 @@ type ApproveJoinRequest = {
 }
 
 export async function POST (req: NextRequest) {
-    const userId = req.headers.get("userId");
-    if (!userId) {
-        return NextResponse.json({success: false, error: "No user ID" }, {status: 412})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
-    const userIdAsObjectId = new mongoose.Types.ObjectId(userId || "");
-    
     const body = await req.json() as ApproveJoinRequest;
     const error = validatePOSTFields(body);
     if (error) {
@@ -23,7 +22,7 @@ export async function POST (req: NextRequest) {
     const budgetIdAsObjectId = new mongoose.Types.ObjectId(body.budgetId || "");
     const requesterIdAsObjectId = new mongoose.Types.ObjectId(body.requesterId || "");
     try {
-        await approveRequesterToJoinBudget(userIdAsObjectId, budgetIdAsObjectId, requesterIdAsObjectId)
+        await approveRequesterToJoinBudget(userId, budgetIdAsObjectId, requesterIdAsObjectId)
     
         return NextResponse.json({success: true, data: "User approved"});
     } catch (error) {

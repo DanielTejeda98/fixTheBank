@@ -4,15 +4,14 @@ import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { PlannedSaving } from "@/types/savings";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 
 export async function GET (req: NextRequest) {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-        return NextResponse.json({ message: "Must be logged in"}, {status: 401})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
-
-    const userId = new mongoose.Types.ObjectId(session.user.id);
-
+    
     const requestMonth = req.nextUrl.searchParams.get("month") || `${new Date().getMonth() + 1}/1/${new Date().getFullYear().toString().slice(2)}`
 
     try {

@@ -1,19 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import mongoose from "mongoose";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/config/authOptions";
 import { createSplitExpense, deleteExpense } from "@/controllers/expenseController";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 
 export async function POST(req: NextRequest) {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-        return NextResponse.json({ message: "Must be logged in"}, {status: 401})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
-    const headerUserId = req.headers.get("userId");
-    if (!headerUserId) {
-        return NextResponse.json({ message: "No user ID provided"}, {status: 412})
-    }
-    const userId = new mongoose.Types.ObjectId(headerUserId);
     
     const request = await req.json();
     const error = validatePOSTFields(request);

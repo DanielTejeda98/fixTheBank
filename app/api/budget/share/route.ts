@@ -1,17 +1,15 @@
-import mongoose from "mongoose";
 import { toggleShareableBudget } from "@/controllers/budgetController";
 import { NextRequest, NextResponse } from "next/server";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 
 export async function POST(req: NextRequest) {
-    const userId = req.headers.get("userId");
-    if (!userId) {
-        return NextResponse.json({success: false, error: "No user ID" }, {status: 412})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
-
-    const userIdAsObjectId = new mongoose.Types.ObjectId(userId || "");
-
+    
     try {
-        const shareableBudget = await toggleShareableBudget(userIdAsObjectId);
+        const shareableBudget = await toggleShareableBudget(userId);
         if (shareableBudget) {
             return NextResponse.json({success: true, data: shareableBudget});
         }

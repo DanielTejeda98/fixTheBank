@@ -4,7 +4,7 @@ import accountModel, { Account } from "@/models/accountModel";
 import { Budget } from "@/models/budgetModel";
 import mongoose from "mongoose";
 
-export async function createAccount (userId: string, name: string): Promise<Account> {
+export async function createAccount (userId: mongoose.Types.ObjectId, name: string): Promise<Account> {
     try {
         await dbConnect();
         const budget = await findBudget(userId) as Budget;
@@ -27,7 +27,7 @@ export async function createAccount (userId: string, name: string): Promise<Acco
     }
 }
 
-export async function updateAccount (accountId: string, userId: string, name: string) {
+export async function updateAccount (accountId: string, userId: mongoose.Types.ObjectId, name: string) {
     try {
         await dbConnect()
         const budget = await findBudget(userId) as Budget;
@@ -48,7 +48,7 @@ export async function updateAccount (accountId: string, userId: string, name: st
     }
 }
 
-export async function deleteAccount (accountId: string, userId: string): Promise<Account> {
+export async function deleteAccount (accountId: string, userId: mongoose.Types.ObjectId): Promise<Account> {
     try {
         await dbConnect();
         const budget = await findBudget(userId) as Budget;

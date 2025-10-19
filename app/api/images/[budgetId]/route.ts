@@ -1,12 +1,11 @@
-import { authOptions } from "@/config/authOptions";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 import { uploadImageToBudget } from "@/controllers/imagesController";
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ budgetId: string }>}) {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-        return NextResponse.json({ message: "Must be logged in"}, {status: 401})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
 
     const contentType = req.headers.get("Content-Type");
@@ -15,7 +14,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ bud
     }
     const buffer = Buffer.from(await req.arrayBuffer());
     try {
-        const { filename, result } = await uploadImageToBudget(buffer, contentType, (await params).budgetId, session.user.id);
+        const { filename, result } = await uploadImageToBudget(buffer, contentType, (await params).budgetId, userId);
         if (result) {
             return NextResponse.json({message: filename}, { status: 201 });
         } else {

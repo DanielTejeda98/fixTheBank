@@ -1,19 +1,14 @@
 import mongoose from "mongoose";
-import { authOptions } from "@/config/authOptions";
 import { updateExpense } from "@/controllers/expenseController";
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 
 export async function PUT (req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-        return NextResponse.json({ message: "Must be logged in"}, {status: 401})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
-    const rawUserId = session.user.id;
-    if (!rawUserId) {
-        return NextResponse.json({ message: "No user ID provided"}, {status: 412})
-    }
-    const userId = new mongoose.Types.ObjectId(rawUserId);
+    
     const expenseId = new mongoose.Types.ObjectId((await params).id);
     try {
         const requestBody = await req.json();

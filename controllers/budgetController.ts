@@ -1,6 +1,6 @@
 // Defines budget logic
 import dbConnect from "@/app/lib/dbConnect";
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 import budgetModel, { Budget } from "@/models/budgetModel";
 import shareableBudgetModel, { ShareableBudget } from "@/models/shareableBudgets";
 import incomeModel from "@/models/incomeModel";
@@ -82,12 +82,12 @@ export async function getUserFullBudgetDocument(userId: mongoose.Types.ObjectId,
     }
 }
 
-export async function createUserBudget(userId: string) {
+export async function createUserBudget(userId: mongoose.Types.ObjectId) {
     try {
         await dbConnect();
 
         const budget = await budgetModel.create({
-            owner: new mongoose.Types.ObjectId(userId)
+            owner: userId
         })
 
         if (!budget) {

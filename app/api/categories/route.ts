@@ -1,11 +1,13 @@
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 import { createCategory } from "@/controllers/categoriesController";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-    const userId = req.headers.get("userId");
-    if (!userId) {
-        return NextResponse.json({success: false, error: "No userId found in header" }, {status: 400}); 
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
+    
     try {
         const requestBody = await req.json();
         const errors = validateFields(requestBody);

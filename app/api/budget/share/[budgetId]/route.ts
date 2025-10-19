@@ -1,21 +1,21 @@
 import mongoose from "mongoose";
 import { getBudgetRequesters } from "@/controllers/budgetController";
 import { NextRequest, NextResponse } from "next/server";
+import { getUserSessionId } from "@/app/lib/sessionHelpers";
 
 export async function GET (
     req: NextRequest,
     { params }: { params: Promise<{ budgetId: string }> }
 ) {
-    const userId = req.headers.get("userId");
-    if (!userId) {
-        return NextResponse.json({success: false, error: "No user ID" }, {status: 412})
+    const userId = await getUserSessionId(req);
+    if (userId instanceof NextResponse) {
+        return userId;
     }
-
-    const userIdAsObjectId = new mongoose.Types.ObjectId(userId || "");
+    
     const budgetIdAsObjectId = new mongoose.Types.ObjectId((await params).budgetId || "");
 
     try {
-        const joinRequests = await getBudgetRequesters(userIdAsObjectId, budgetIdAsObjectId)
+        const joinRequests = await getBudgetRequesters(userId, budgetIdAsObjectId)
 
         return NextResponse.json({success: true, data: joinRequests})
     } catch (error: any) {
