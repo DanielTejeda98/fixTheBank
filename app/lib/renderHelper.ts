@@ -14,4 +14,13 @@ const formatDateInput = (date: Date): string => {
     return `${date.getFullYear()}-${formattedMonth}-${formattedDay}`
 }
 
-export { currencyFormat, formatDateInput }
+const formatDateDisplay = (date: string | Date): string => {
+    const toLocaleDateStringSettings = {month: "long", year: "numeric", timeZone: "UTC"} as const;
+    if (date instanceof Date) {
+        return date.toLocaleDateString("en-US", toLocaleDateStringSettings)
+    }
+
+    return new Date(date).toLocaleDateString("en-US", toLocaleDateStringSettings)
+}
+
+export { currencyFormat, formatDateInput, formatDateDisplay }

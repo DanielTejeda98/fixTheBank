@@ -10,6 +10,7 @@ import { useAppSelector } from "@/redux/store";
 import SavingsAccountCard from "./SavingsAccountCard";
 import { SavingsAccount } from "@/types/savings";
 import { useFTBDrawer } from "../ui/ftbDrawer";
+import TopOptions from "../Core/TopOptions";
 
 export default function SavingsView() {
   const savingsAccounts = useAppSelector((state) => state.savingsReducer.value.savingsAccounts);
@@ -33,23 +34,11 @@ export default function SavingsView() {
   return (
     <main className="w-full">
       <FullSizeCard>
-        <div className="flex justify-between">
-          <Button
-            className="p-2 w-10 h-10 text-center rounded-full"
-            onClick={() => openDrawer("account")}
-          >
-            <FontAwesomeIcon icon={faUser} />
-          </Button>
+        <TopOptions>
           <div className="text-center">
             <h1>Savings</h1>
           </div>
-          <Button
-            className="p-2 w-10 h-10 text-center rounded-full"
-            onClick={() => openDrawer("selectBudget")}
-          >
-            <FontAwesomeIcon icon={faGear} />
-          </Button>
-        </div>
+        </TopOptions>
       </FullSizeCard>
 
       <section className="flex flex-wrap mx-3 px-3 pb-3 border rounded-md">

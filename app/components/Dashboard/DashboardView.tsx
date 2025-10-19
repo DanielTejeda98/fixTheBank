@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react";
-import { currencyFormat } from "@/app/lib/renderHelper";
+import { currencyFormat, formatDateDisplay } from "@/app/lib/renderHelper";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { selectTransactions } from "@/redux/features/budget-slice";
@@ -12,16 +12,17 @@ import TransactionCard from "../TransactionCard";
 import SelectBudget from "./SelectBudget";
 import Account from "../Core/Account";
 import FullSizeCard from "../Core/FullSizeCard";
-import { BudgetView, TransactionView } from "@/types/budget";
+import { TransactionView } from "@/types/budget";
 import Link from "next/link";
 import { Button, buttonVariants } from "../ui/button";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 import { faCalendar } from "@fortawesome/free-regular-svg-icons";
+import TopOptions from "../Core/TopOptions";
 
 export default function DashboardView() {
     const [selectedTransaction, setSelectedTransaction] = useState<TransactionView|undefined>(undefined);
 
-    const { setOpen, setDrawerComponent } = useFTBDrawer();
+    const { openWithComponent } = useFTBDrawer();
 
     const budgetId = useAppSelector((state) => state.budgetReducer.value._id)
     const accounts = useAppSelector((state) => state.budgetReducer.value.accounts);
@@ -35,19 +36,16 @@ export default function DashboardView() {
 
     const DrawerComponents = {
         addIncome: <AddIncome budgetId={budgetId}/>,
-        expenseEditor: <ExpenseEditor budgetId={budgetId} accounts={accounts} categories={categories} transaction={selectedTransaction}/>,
-        selectBudget: <SelectBudget />,
-        account: <Account />
+        expenseEditor: <ExpenseEditor budgetId={budgetId} accounts={accounts} categories={categories} transaction={selectedTransaction}/>
     }
 
-    const toggleDrawer = (component: keyof typeof DrawerComponents) => {
-        setDrawerComponent(DrawerComponents[component])
-        setOpen(true);
+    const openDrawer = (component: keyof typeof DrawerComponents) => {
+        openWithComponent(DrawerComponents[component]);
     }
 
     const openNewExpense = () => {
         setSelectedTransaction(undefined)
-        toggleDrawer("expenseEditor");
+        openDrawer("expenseEditor");
     }
 
     const renderTransactionsList = () => {
@@ -57,11 +55,9 @@ export default function DashboardView() {
     return (
         <main className="w-full bg-background text-primary">
             <FullSizeCard>
-                <div className="flex justify-between">
-                    <Button className="p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("account")}><FontAwesomeIcon icon={faUser} /></Button>
-                    <p>Month: {new Date(budgetMonth).toLocaleDateString("en-us", {month: "long", year: "numeric", timeZone: "UTC"})}</p>
-                    <Button className="p-2 w-10 h-10 text-center rounded-full" onClick={() => toggleDrawer("selectBudget")}><FontAwesomeIcon icon={faCalendar} /></Button>
-                </div>
+                <TopOptions>
+                    <p>Month: {formatDateDisplay(budgetMonth)}</p>
+                </TopOptions>
                 <div className="flex mt-5 pt-5 items-end">
                     <div className="flex flex-wrap grow">
                         <p className="w-full text-sm text-center">Account Balance</p>
@@ -87,7 +83,7 @@ export default function DashboardView() {
                     </div> */}
                 </div>
                 <div className="flex justify-center gap-2 mt-5">
-                    <Button variant="secondary" onClick={() => toggleDrawer("addIncome")}>(+) Add funds</Button>
+                    <Button variant="secondary" onClick={() => openDrawer("addIncome")}>(+) Add funds</Button>
                     <Button onClick={() => openNewExpense()}>(-) Add Expense</Button>
                 </div>
             </FullSizeCard>

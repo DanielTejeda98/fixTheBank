@@ -10,6 +10,7 @@ type FTBDrawerContext = {
     setDrawerComponent: (component: ReactNode) => void,
     setOpen: (open: boolean) => void,
     toggleDrawer: () => void
+    openWithComponent: (component: ReactNode) => void
 }
 
 const FTBDrawerContext = React.createContext<FTBDrawerContext | null>(null);
@@ -65,6 +66,11 @@ function FTBDrawerProvider({
         return setOpen((open) => !open);
     }, [setOpen])
 
+    const openWithComponent = React.useCallback((value: ReactNode | ((value: ReactNode) => ReactNode)) => {
+        setDrawerComponent(value)
+        setOpen(true);
+    }, [setDrawerComponent, setOpen])
+
     const state = open ? "open" : "closed";
 
     const contextValue = React.useMemo<FTBDrawerContext>(() => ({
@@ -73,8 +79,9 @@ function FTBDrawerProvider({
         component,
         setDrawerComponent,
         setOpen,
-        toggleDrawer
-    }), [state, open, component,setOpen, toggleDrawer, setDrawerComponent])
+        toggleDrawer,
+        openWithComponent
+    }), [state, open, component,setOpen, toggleDrawer, setDrawerComponent, openWithComponent])
 
     return (
         <FTBDrawerContext.Provider value={contextValue}>
