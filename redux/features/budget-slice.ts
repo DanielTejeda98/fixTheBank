@@ -112,6 +112,15 @@ export const budget = createSlice({
                     joinRequests: action.payload.joinRequests
                 }
             }
+        },
+        setBudgetShareSettings: (state, action: PayloadAction<{isShared: boolean; shareCode: string | null}>) => {
+            return {
+                value: {
+                    ...state.value,
+                    isShared: action.payload.isShared,
+                    shareCode: action.payload.shareCode
+                }
+            }
         }
     }
 })
@@ -135,5 +144,5 @@ export function useSetInitialStore({budget }: {budget: BudgetView | null }) {
     }, [budget, dispatch])
 }
 
-export const { setBudget, setJoinRequestList } = budget.actions;
+export const { setBudget, setJoinRequestList, setBudgetShareSettings } = budget.actions;
 export default budget.reducer;

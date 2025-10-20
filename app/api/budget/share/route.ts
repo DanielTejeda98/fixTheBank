@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     if (userId instanceof NextResponse) {
         return userId;
     }
-    
+
     try {
         const shareableBudget = await toggleShareableBudget(userId);
         if (shareableBudget) {
@@ -16,6 +16,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({success: true, data: "Budget successfuly unshared."})
     } catch (error) {
         console.log(error)
-        return NextResponse.json({success: false, error})
+        return NextResponse.json({success: false, error}, {status: 400})
     }
 }

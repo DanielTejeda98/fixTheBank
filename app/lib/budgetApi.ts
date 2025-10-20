@@ -1,5 +1,6 @@
 import { setBudget } from "@/redux/features/budget-slice";
 import { store } from "@/redux/store";
+import { BudgetShareResponse } from "@/types/BudgetShareResponse";
 
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_FTB_HOST}/api`
 
@@ -135,9 +136,8 @@ const deleteIncome = async (headers: any, incomeId: string) => {
     return parsedRes;
 }
 
-const toggleBudgetShareSettings = async (headers: any) => {
+const toggleBudgetShareSettings = async (): Promise<BudgetShareResponse> => {
     const res = await fetch(`${API_BASE_URL}/budget/share`, {
-        headers,
         method: "POST",
     })
     return await res.json();
