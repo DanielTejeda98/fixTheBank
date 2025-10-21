@@ -42,11 +42,13 @@ export default function TransactionCard({
     && userId !== transaction.createdBy._id.toString();
 
     return (
-        <div className="flex items-center p-2 gap-2 rounded-md border max-w-[calc(100vw-3rem)]" onClick={() => openTransactionDrawer()} data-qa="transaction-card">
+        <button className="flex items-center p-2 gap-2 rounded-md border max-w-[calc(100vw-3rem)]" 
+                onClick={() => openTransactionDrawer()}
+                data-qa="transaction-card">
             <div className="flex rounded-full min-w-10 h-10 justify-center items-center outline-1 outline-slate-700 dark:outline-hidden dark:bg-slate-700 dark:text-white">
                 { type === "expense" ? category.substring(0,2).toUpperCase() : "I" }
             </div>
-            <div className={cn({'blur-sm': isHiddenGiftTransaction})}>
+            <div className={cn({'blur-sm': isHiddenGiftTransaction}, "flex flex-col items-start")}>
                 { badges.length > 0 ? 
                     <div className="flex gap-1">
                         { badges.map((badge, i) => (
@@ -61,6 +63,6 @@ export default function TransactionCard({
                 <p className={`text-right ${type === "income" ? "text-green-500" : "text-red-500"}`}>{ currencyFormat(transaction.amount) }</p>
                 <p className="text-xs text-end text-neutral-400">{new Date(transaction.transactionDate || transaction.date).toLocaleString("en-us", {dateStyle: "full", timeZone: "UTC"})}</p>
             </div>
-        </div>
+        </button>
     )
 }
