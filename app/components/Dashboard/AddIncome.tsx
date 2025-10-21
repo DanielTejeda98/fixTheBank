@@ -7,14 +7,14 @@ import useReactValidator from "@/app/hooks/useReactValidator";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import { formatDateInput } from "@/app/lib/renderHelper";
+import { formatCurrencyInput, formatDateInput } from "@/app/lib/renderHelper";
 import { useAppSelector } from "@/redux/store";
 import { DrawerBody, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 
 interface FormData {
     budgetId?: string,
-    amount?: number,
+    amount?: string,
     source?: string,
     date?: string
 }
@@ -29,14 +29,14 @@ export default function AddIncome ({budgetId}: {budgetId: string}) {
     const [formData, formDispatch] = useReducer((state: FormData, action: FormData):FormData => {
         return {...state, ...action}
     }, {
-        amount: undefined,
+        amount: "",
         source: "",
         date: ""
     })
 
     const clearForm = () => {
         formDispatch({
-            amount: undefined,
+            amount: "",
             source: "",
             date: ""
         })
@@ -53,7 +53,7 @@ export default function AddIncome ({budgetId}: {budgetId: string}) {
         }
         
         try {
-            await createIncome({userId}, {...formData, budgetId});
+            await createIncome({userId}, {...formData, amount: Number(formData.amount), budgetId});
             const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
             const res = await getBudget({ userId }, budgetDate)
             // Set store values
@@ -76,7 +76,7 @@ export default function AddIncome ({budgetId}: {budgetId: string}) {
                 <DrawerBody className="flex-col w-full">
                     <div className="mt-2 w-full">
                         <Label htmlFor="income">Income</Label>
-                        <Input type="number" id="income" name="income" value={formData.amount || ""} onChange={e => formDispatch({amount: Number(e.target.value)})}/>
+                        <Input type="number" id="income" name="income" value={formData.amount || ""} onChange={e => formDispatch({amount: formatCurrencyInput(e.target.value)})}/>
                         {validator.current.message("income", formData.amount, "numeric|required")}
                     </div>
 

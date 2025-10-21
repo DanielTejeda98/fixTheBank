@@ -4,7 +4,7 @@ import { Label } from "../ui/label";
 import useReactValidator from "@/app/hooks/useReactValidator";
 import { useAppSelector } from "@/redux/store";
 import { Button } from "../ui/button";
-import { formatDateInput } from "@/app/lib/renderHelper";
+import { formatCurrencyInput, formatDateInput } from "@/app/lib/renderHelper";
 import { createTransaction } from "@/app/lib/savingsApi";
 import { SavingsAccount } from "@/types/savings";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
@@ -13,7 +13,7 @@ import { DrawerBody, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawe
 
 interface FormData {
     name?: string,
-    amount?: number,
+    amount?: string,
     date?: string,
     bucket?: string
 }
@@ -27,7 +27,7 @@ export default function SavingsAddFunds ({account}: {account: SavingsAccount}) {
         return {...state, ...action}
     }, {
         name: "",
-        amount: undefined,
+        amount: "",
         date: "",
         bucket: ""
     })
@@ -35,7 +35,7 @@ export default function SavingsAddFunds ({account}: {account: SavingsAccount}) {
     const clearForm = () => {
         formDispatch({
             name: "",
-            amount: undefined,
+            amount: "",
             date: "",
             bucket: ""
         })
@@ -53,7 +53,7 @@ export default function SavingsAddFunds ({account}: {account: SavingsAccount}) {
         
         await createTransaction({
             transactionType: "deposit",
-            amount: formData.amount!,
+            amount: Number(formData.amount!),
             date: formData.date!,
             accountId: account._id,
             name: formData.name!.trim(),
@@ -93,7 +93,7 @@ export default function SavingsAddFunds ({account}: {account: SavingsAccount}) {
 
                 <div className="mt-2 w-full">
                     <Label htmlFor="income">Income</Label>
-                    <Input type="number" id="income" name="income" value={formData.amount} onChange={e => formDispatch({amount: Number(e.target.value)})}/>
+                    <Input type="number" id="income" name="income" value={formData.amount} onChange={e => formDispatch({amount: formatCurrencyInput(e.target.value)})}/>
                     {validator.current.message("income", formData.amount, "numeric|required")}
                 </div>
 

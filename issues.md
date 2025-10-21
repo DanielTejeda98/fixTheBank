@@ -3,3 +3,4 @@
 
 - Planner
 -- When entering 0 in a category, it fails to update.
+-- [FIXED] Entering 21.0 in the allocate amount field is not possible right now

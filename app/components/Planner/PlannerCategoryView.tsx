@@ -1,6 +1,6 @@
 import useReactValidator from "@/app/hooks/useReactValidator";
 import { deleteCategory, updateCategory } from "@/app/lib/categoriesApi";
-import { currencyFormat } from "@/app/lib/renderHelper";
+import { currencyFormat, formatCurrencyInput } from "@/app/lib/renderHelper";
 import { selectUnallocatedFunds } from "@/redux/features/budget-slice";
 import { useAppSelector } from "@/redux/store";
 import { CategoryView } from "@/types/budget"
@@ -31,18 +31,11 @@ export default function PlannerCategoryView ({category}: {category?: CategoryVie
         }
     })?.amount || 0;
 
-    const [maxAmount, setMaxAmount] = useState(category?.maxMonthExpectedAmount.find((c) => c.month === currentMonth)?.amount as Number)
+    const [maxAmount, setMaxAmount] = useState(category?.maxMonthExpectedAmount.find((c) => c.month === currentMonth)?.amount.toFixed(2) || "");
     const [note, setNote] = useState(category?.notes.find(n => n.month === currentMonth)?.note || "");
 
-    const getMaxAmount = () => {
-        const amount = maxAmount.toString();
-        if (amount.includes('.') && amount.split('.')[1].length > 2) {
-            const splitString = amount.split('.');
-            const correctedString = `${splitString[0]}.${splitString[1].substring(0,2)}`;
-            setMaxAmount(Number(correctedString));
-            return correctedString;
-        } 
-        return amount;
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setMaxAmount(formatCurrencyInput(e.target.value));
     }
 
     const handleSubmitClick = async () => {
@@ -57,7 +50,7 @@ export default function PlannerCategoryView ({category}: {category?: CategoryVie
                 name: category?.name,
                 sortRank: 0,
                 date: currentMonth,
-                amount: maxAmount,
+                amount: Number(maxAmount),
                 note: note
             })
         } catch (error) {
@@ -92,11 +85,11 @@ export default function PlannerCategoryView ({category}: {category?: CategoryVie
                 <div className="mt-2 w-full flex items-end">
                     <div className="w-full">
                         <Label htmlFor="amount">Allocate amount</Label>
-                        <Input type="number" name="amount" value={maxAmount != null ? getMaxAmount() : ""} onChange={e => setMaxAmount(Number(e.target.value))} />
+                        <Input type="number" name="amount" value={maxAmount || ""} onChange={handleInputChange} />
                         {validator.current.message("amount", maxAmount, "numeric|required")}
                     </div>
                     <div className="ml-2 max-w-32">
-                        <Button onClick={() => setMaxAmount(previousMonthPlannedAmount)}>Use last month <br /> {currencyFormat(previousMonthPlannedAmount)}</Button>
+                        <Button onClick={() => setMaxAmount(previousMonthPlannedAmount.toString())}>Use last month <br /> {currencyFormat(previousMonthPlannedAmount)}</Button>
                     </div>
                 </div>
 

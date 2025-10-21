@@ -1,5 +1,5 @@
 import useReactValidator from "@/app/hooks/useReactValidator";
-import { currencyFormat } from "@/app/lib/renderHelper";
+import { currencyFormat, formatCurrencyInput } from "@/app/lib/renderHelper";
 import { selectUnallocatedFunds } from "@/redux/features/budget-slice";
 import { useAppSelector } from "@/redux/store";
 import { FormEvent, ReactNode, useEffect, useReducer } from "react";
@@ -13,7 +13,7 @@ import { useFTBDrawer } from "../ui/ftbDrawer";
 import { DrawerBody, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
 
 interface FormData {
-    amount: number,
+    amount: string,
     account: string,
     bucket: string,
     description: string,
@@ -22,7 +22,7 @@ interface FormData {
 const getIntitalFormData = (savings?: PlannedSaving) => {
     if (savings) {
         return {
-            amount: savings.amount,
+            amount: savings.amount.toString(),
             account: savings.account.toString(),
             bucket: savings.bucket.toString(),
             description: savings.description || ""
@@ -30,7 +30,7 @@ const getIntitalFormData = (savings?: PlannedSaving) => {
     }
 
     return {
-        amount: 0,
+        amount: "",
         account: "",
         bucket: "",
         description: ""
@@ -58,7 +58,7 @@ export default function PlannerSavingsEditor ({savingsTransaction}: {savingsTran
 
     const clearForm = () => {
         formDispatch({
-            amount: 0,
+            amount: "",
             account: "",
             bucket: "",
             description: ""
@@ -76,8 +76,8 @@ export default function PlannerSavingsEditor ({savingsTransaction}: {savingsTran
         }
         try {
             !savingsTransaction
-                ? await addSavingsPlan(formData, budgetMonth) 
-                : await editSavingsPlan(savingsTransaction._id, formData, budgetMonth)
+                ? await addSavingsPlan({...formData, amount: Number(formData.amount)}, budgetMonth) 
+                : await editSavingsPlan(savingsTransaction._id, {...formData, amount: Number(formData.amount)}, budgetMonth)
 
         } catch (error) {
             console.log(error)
@@ -113,7 +113,7 @@ export default function PlannerSavingsEditor ({savingsTransaction}: {savingsTran
     }
 
     const handleAmountUpdate = (amount: string) => {
-        formDispatch({...formData, amount: Number(amount)});
+        formDispatch({...formData, amount: formatCurrencyInput(amount)});
     }
 
     const handleAccountUpdate = (account: string) => {

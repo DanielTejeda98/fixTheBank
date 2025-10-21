@@ -8,7 +8,7 @@ import useReactValidator from "@/app/hooks/useReactValidator";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { formatDateInput } from "@/app/lib/renderHelper";
+import { formatCurrencyInput, formatDateInput } from "@/app/lib/renderHelper";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { useAppSelector } from "@/redux/store";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
@@ -21,7 +21,7 @@ import { DrawerBody, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle 
 import Link from "next/link";
 
 interface FormData {
-    amount?: number
+    amount?: string
     account?: string
     category?: string
     date?: string
@@ -38,7 +38,7 @@ interface FormData {
 const getIntitalFormData = (accounts: AccountView[], categories: CategoryView[], transaction?: any): FormData => {
     if (transaction) {
         return {
-            amount: transaction.amount,
+            amount: transaction.amount.toString(),
             account: accounts.find(acc => acc._id === transaction.account)?._id || accounts[0]?._id || "",
             category: categories.find(cat => cat._id === transaction.category)?._id || categories[0]?._id || "",
             date: formatDateInput(new Date(transaction.transactionDate.split("T")[0].replaceAll("-", "/") || transaction.date.split("T")[0].replaceAll("-", "/"))),
@@ -54,7 +54,7 @@ const getIntitalFormData = (accounts: AccountView[], categories: CategoryView[],
     }
 
     return {
-        amount: undefined,
+        amount: "",
         account: accounts?.length > 0 ? accounts[0]._id : "",
         category: categories?.length > 0 ? categories[0]._id : "",
         date: "",
@@ -90,7 +90,7 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
     
     const clearForm = () => {
         dispatch({
-            amount: undefined,
+            amount: "",
             account: accounts?.length > 0 ? accounts[0]._id : "",
             category: categories?.length > 0 ? categories[0]._id : "",
             date: "",
@@ -130,9 +130,9 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
         try {
             if (!isEdit) {
                 if (formData.splitPayments) {
-                    await createSplitExpense({ userId }, {...formData, budgetId });
+                    await createSplitExpense({ userId }, {...formData, amount: Number(formData.amount), budgetId });
                 } else {
-                    await createExpense({ userId }, { ...formData, budgetId });
+                    await createExpense({ userId }, { ...formData, amount: Number(formData.amount), budgetId });
                 }
             } else {
                 await updateExpense({ userId }, { ...formData, id: transaction._id});
@@ -187,7 +187,7 @@ export default function ExpenseEditor({ budgetId, accounts, categories, transact
 
                 <div className="mt-2 w-full">
                     <Label htmlFor="amount">Amount</Label>
-                    <Input type="number" name="amount" value={formData.amount || ""} onChange={e => dispatch({ amount: Number(e.target.value) })} />
+                    <Input type="number" name="amount" value={formData.amount || ""} onChange={e => dispatch({ amount: formatCurrencyInput(e.target.value) })} />
                     {validator.current.message("amount", formData.amount, "numeric|required")}
                 </div>
 

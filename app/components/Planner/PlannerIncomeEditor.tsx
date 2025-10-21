@@ -8,10 +8,11 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 import { DrawerBody, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import { formatCurrencyInput } from "@/app/lib/renderHelper";
 
 type FormData = {
     source?: string,
-    amount?: number
+    amount?: string
 }
 
 export default function PlannerIncomeEditor () {
@@ -24,13 +25,13 @@ export default function PlannerIncomeEditor () {
     const [formData, formDispatch] = useReducer((state: FormData, action: FormData):FormData => {
         return {...state, ...action}
     }, {
-        amount: undefined,
+        amount: "",
         source: ""
     })
 
     const clearForm = () => {
         formDispatch({
-            amount: undefined,
+            amount: "",
             source: ""
         })
         validator.current.hideMessages();
@@ -46,7 +47,7 @@ export default function PlannerIncomeEditor () {
         }
         
         try {
-            await createPlannedIncome({userId}, currentMonth, {...formData});
+            await createPlannedIncome({userId}, currentMonth, {...formData, amount: Number(formData.amount)});
         } catch (error) {
             // TODO: display error
             console.log(error)
@@ -69,7 +70,7 @@ export default function PlannerIncomeEditor () {
                 </div>
                 <div className="mt-2 w-full">
                     <Label htmlFor="amount">Amount</Label>
-                    <Input type="number" name="amount" value={formData.amount || ""} onChange={e => formDispatch({ amount: Number(e.target.value) })} />
+                    <Input type="number" name="amount" value={formData.amount || ""} onChange={e => formDispatch({ amount: formatCurrencyInput(e.target.value) })} />
                     {validator.current.message("amount", formData.amount, "numeric|required")}
                 </div>
             </DrawerBody>
