@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Entering 21.0 on planner fields not being possible due to validation (would reset to 21.)
 - All number inputs now sanitize to allow for up to two digit decimals
+- Transaction cards are now wrapped with a button element to make them interactable
 
 ## [0.4.0]
 ### Changes
