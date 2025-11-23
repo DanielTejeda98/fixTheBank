@@ -12,7 +12,7 @@ export default function PlannerCategoriesCard ({category, onClick}: PlannerCateg
     const { setOpen, setDrawerComponent } = useFTBDrawer();
     const currentMonth = useAppSelector(state => state.budgetReducer.value.minDate)
     const maxAmount = category.maxMonthExpectedAmount.find((c:any) => c.month === currentMonth)?.amount || 0
-    const usedAmount = useAppSelector(state => state.budgetReducer.value.expenses).reduce((acc: Number, current: any) => {
+    const usedAmount = useAppSelector(state => state.budgetReducer.value.expenses).reduce((acc: number, current: any) => {
         if(current.category !== category._id) {
             return acc;
         }
