@@ -1,23 +1,18 @@
 "use client"
 import { useState } from "react";
 import { currencyFormat, formatDateDisplay } from "@/app/lib/renderHelper";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { selectTransactions } from "@/redux/features/budget-slice";
 import { useAppSelector } from "@/redux/store";
 import AddIncome from "./AddIncome";
 import ExpenseEditor from "./ExpenseEditor";
 import React from "react";
-import TransactionCard from "../TransactionCard";
-import SelectBudget from "./SelectBudget";
-import Account from "../Core/Account";
 import FullSizeCard from "../Core/FullSizeCard";
 import { TransactionView } from "@/types/budget";
 import Link from "next/link";
 import { Button, buttonVariants } from "../ui/button";
 import { useFTBDrawer } from "../ui/ftbDrawer";
-import { faCalendar } from "@fortawesome/free-regular-svg-icons";
 import TopOptions from "../Core/TopOptions";
+import { useGetMergedTransactionsList } from "../Transactions/useGetMergedTransactionsList";
 
 export default function DashboardView() {
     const [selectedTransaction, setSelectedTransaction] = useState<TransactionView|undefined>(undefined);
@@ -25,18 +20,16 @@ export default function DashboardView() {
     const { openWithComponent } = useFTBDrawer();
 
     const budgetId = useAppSelector((state) => state.budgetReducer.value._id)
-    const accounts = useAppSelector((state) => state.budgetReducer.value.accounts);
-    const categories = useAppSelector((state) => state.budgetReducer.value.categories);
     const budgetMonth = useAppSelector((state) => state.budgetReducer.value.minDate)
     const balance = useAppSelector((state) => state.budgetReducer.value.balance) || 0
     const totalPlannedIncome = useAppSelector((state) => state.budgetReducer.value.totalPlannedIncome) || 0
     const totalIncome = useAppSelector((state) => state.budgetReducer.value.totalIncome) || 0
     const totalExpenses = useAppSelector((state) => state.budgetReducer.value.totalExpenses) || 0
-    const transactions = useAppSelector(selectTransactions).sort((a, b) => new Date(b.transactionDate || b.date).getTime() - new Date(a.transactionDate || a.date).getTime()).slice(0,10)
+    const transactions = useGetMergedTransactionsList().sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0,10)
 
     const DrawerComponents = {
         addIncome: <AddIncome budgetId={budgetId}/>,
-        expenseEditor: <ExpenseEditor budgetId={budgetId} accounts={accounts} categories={categories} transaction={selectedTransaction}/>
+        expenseEditor: <ExpenseEditor budgetId={budgetId} transaction={selectedTransaction}/>
     }
 
     const openDrawer = (component: keyof typeof DrawerComponents) => {
@@ -49,7 +42,7 @@ export default function DashboardView() {
     }
 
     const renderTransactionsList = () => {
-        return transactions.map(transaction => (<TransactionCard key={transaction._id} transaction={transaction} />))
+        return transactions.map(transaction => transaction.transactionCard)
     }
 
     return (

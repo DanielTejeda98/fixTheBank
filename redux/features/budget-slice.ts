@@ -4,7 +4,7 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { AccountView, BudgetView, CategoryView } from "@/types/budget";
+import { AccountView, BudgetView, CategoryView, ExpenseTransaction, IncomeTransaction } from "@/types/budget";
 import { getTotalPlannedSavings } from "./savings-slice";
 
 type InitialState = {
@@ -15,9 +15,9 @@ type BudgetState = {
     _id: string;
     categories: CategoryView[];
     accounts: AccountView[];
-    income: any[];
+    income: IncomeTransaction[];
     plannedIncome: any[],
-    expenses: any[];
+    expenses: ExpenseTransaction[];
     minDate: string;
     maxDate: string;
     isOwner: boolean,
@@ -125,8 +125,10 @@ export const budget = createSlice({
     }
 })
 
-const selectIncome = (state:RootState) => state.budgetReducer.value.income;
-const selectExpense = (state:RootState) => state.budgetReducer.value.expenses;
+export const selectIncome = (state:RootState) => state.budgetReducer.value.income;
+export const selectExpense = (state:RootState) => state.budgetReducer.value.expenses;
+export const selectCategories = (state: RootState) => state.budgetReducer.value.categories;
+export const selectAccounts = (state: RootState) => state.budgetReducer.value.accounts;
 
 export const selectTransactions = createSelector([selectIncome, selectExpense], (income, expenses) => {
     return [...income, ...expenses]

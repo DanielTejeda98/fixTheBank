@@ -1,14 +1,16 @@
 // Type definitions for FixTheBank
 
+import { User } from "./user"
+
 export interface InitialData {
     mappedBudget: BudgetView | null
 }
 
 export interface BudgetView {
     _id: string,
-    income: any[],
+    income: IncomeTransaction[],
     plannedIncome: PlannedIncomeView[],
-    expenses: any[],
+    expenses: ExpenseTransaction[],
     categories: CategoryView[],
     accounts: AccountView[],
     minDate: string,
@@ -47,6 +49,34 @@ export interface PlannedIncomeView {
 export interface MiniUser {
     _id: string,
     username: string
+}
+
+export interface IncomeTransaction {
+    _id: string;
+    createdBy: User;
+    updatedBy: User;
+    amount: number;
+    source: string;
+    date: Date;
+    budgetId: string;
+}
+
+export interface ExpenseTransaction {
+    _id: string;
+    createdBy: User;
+    updatedBy: User;
+    amount: number;
+    account: string;
+    category: string;
+    date: Date;
+    transactionDate: Date;
+    description: string;
+    budgetId: string;
+    receiptImage: string;
+    borrowFromNextMonth: boolean;
+    giftTransaction: boolean;
+    revealGiftDate?: Date;
+    splitPaymentMasterId?: string | null;
 }
 
 export interface TransactionView {

@@ -1,26 +1,21 @@
 "use client";
-import {
-  selectTransactions,
-} from "@/redux/features/budget-slice";
-import { TransactionView } from "@/types/budget";
 import FullSizeCard from "../Core/FullSizeCard";
 import { useAppSelector } from "@/redux/store";
 import SelectBudget from "../Dashboard/SelectBudget";
 import Account from "../Core/Account";
-import TransactionCard from "../TransactionCard";
 import Filter from "./Filter";
 import { Button } from "../ui/button";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 import TopOptions from "../Core/TopOptions";
 import { formatDateDisplay } from "@/app/lib/renderHelper";
+import { useGetMergedTransactionsList } from "./useGetMergedTransactionsList";
 
 export default function TransactionsView() {
   const { setDrawerComponent, setOpen: setDrawerOpen } = useFTBDrawer();
   const budgetMonth = useAppSelector(
     (state) => state.budgetReducer.value.minDate
   );
-  const transactions = useAppSelector(selectTransactions) as TransactionView[];
-
+  const transactions = useGetMergedTransactionsList();
   const filterByCategory = useAppSelector((state) => state.filtersReducer.value.categoryFilters)
   const filterByAccount = useAppSelector((state) => state.filtersReducer.value.accountFilters);
 
@@ -41,16 +36,11 @@ export default function TransactionsView() {
     return transactions
       .filter(
         (transaction) =>
-          (filterByCategory.length > 0 ? filterByCategory.includes(transaction.category || '') : true) &&
-          (filterByAccount.length > 0 ? filterByAccount.includes(transaction.account || '') : true)
+          (filterByCategory.length > 0 ? filterByCategory.includes(transaction.categoryId || '') : true) &&
+          (filterByAccount.length > 0 ? filterByAccount.includes(transaction.accountId || '') : true)
       )
-      .sort((a, b) => new Date(a.transactionDate || a.date).getTime() - new Date(b.transactionDate || b.date).getTime())
-      .map((transaction) => (
-        <TransactionCard
-          key={transaction._id}
-          transaction={transaction}
-        />
-      ));
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .map((transaction) => transaction.transactionCard);
   };
 
   return (

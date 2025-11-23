@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useReducer, useState } from "react";
 import { createExpense, createReceiptImage, createSplitExpense, getBudget, updateExpense } from "@/app/lib/budgetApi";
-import { setBudget } from "@/redux/features/budget-slice";
+import { selectAccounts, selectCategories, setBudget } from "@/redux/features/budget-slice";
 import { useDispatch } from "react-redux";
 import { useSession } from "next-auth/react";
 import { AccountView, CategoryView } from "@/types/budget";
@@ -69,9 +69,11 @@ const getIntitalFormData = (accounts: AccountView[], categories: CategoryView[],
     }
 }
 
-export default function ExpenseEditor({ budgetId, accounts, categories, transaction }: { budgetId: string, accounts: AccountView[], categories: CategoryView[], transaction?: any }) {
+export default function ExpenseEditor({ budgetId, transaction }: { budgetId: string, transaction?: any }) {
     const { setOpen: setOpenDrawer } = useFTBDrawer();
     const userId = useSession().data?.user?.id;
+    const accounts = useAppSelector(selectAccounts);
+    const categories = useAppSelector(selectCategories);
     const validator = useReactValidator();
     const forceUpdate = useReducer(x => x + 1, 0)[1];
     const reduxDispatch = useDispatch();

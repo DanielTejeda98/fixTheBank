@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changes
 - Now uses Alpine node docker image
+- Updated UI for transactions viewer
+- Rewrote Transaction Cards to use composable component pattern
 
 ### Fixed
 - Entering 21.0 on planner fields not being possible due to validation (would reset to 21.)

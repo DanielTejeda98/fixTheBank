@@ -97,9 +97,8 @@ const createBudget = async (headers: any) => {
     return await res.json()
 }
 
-const deleteExpense = async (headers: any, expenseId: string) => {
+const deleteExpense = async (expenseId: string) => {
     const res = await fetch(`${API_BASE_URL}/expense`, {
-        headers,
         method: "DELETE",
         body: JSON.stringify({
             expenseId
@@ -110,15 +109,14 @@ const deleteExpense = async (headers: any, expenseId: string) => {
         throw Error(parsedRes.error);
     }
     const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
-    const budgetRes = await getBudget({ userId: headers.userId }, budgetDate)
+    const budgetRes = await getBudget({ userId: "" }, budgetDate)
     store.dispatch(setBudget(budgetRes.data));
 
     return parsedRes;
 }
 
-const deleteIncome = async (headers: any, incomeId: string) => {
+const deleteIncome = async (incomeId: string) => {
     const res = await fetch(`${API_BASE_URL}/income`, {
-        headers,
         method: "DELETE",
         body: JSON.stringify({
             incomeId
@@ -130,7 +128,7 @@ const deleteIncome = async (headers: any, incomeId: string) => {
     }
 
     const budgetDate = sessionStorage.getItem("selectedBudgetDate") || '';
-    const budgetRes = await getBudget({ userId: headers.userId }, budgetDate)
+    const budgetRes = await getBudget({ userId: "" }, budgetDate)
     store.dispatch(setBudget(budgetRes.data));
 
     return parsedRes;
