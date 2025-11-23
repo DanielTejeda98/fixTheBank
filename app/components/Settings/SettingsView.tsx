@@ -124,7 +124,7 @@ export default function SettingsView () {
                     <Button variant="outline" className="w-full" onClick={() => saveSettings()}>Save Settings</Button>
                 </CardFooter>
             </Card>
-            <p className="text-sm text-muted-foreground mt-1">Version: 0.4.0</p>
+            <p className="text-sm text-muted-foreground mt-1">Version: 0.4.1</p>
         </main>
     )
 }
