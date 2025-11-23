@@ -4,6 +4,8 @@
 
 FixTheBank was born from the need to keep track of one's budget in a private and free (as long as you have the equipment to run it) way. It was built with the idea of sharing a budget with a household/partner.
 
+<img width="368" height="831" alt="image" src="https://github.com/user-attachments/assets/205afa60-a94e-4c02-bda1-3360fb415172" />
+
 ## What makes FixTheBank awesome?
 * **Private access to your data** No one owns your data except you. No third party is getting to see how you spend your money, or what you are saving for.
 * **Sharing Budgets** You can share a budget that you own with a partner, household, or a group.
