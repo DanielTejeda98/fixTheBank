@@ -2,341 +2,443 @@
 import dbConnect from "@/app/lib/dbConnect";
 import mongoose, { mongo } from "mongoose";
 import budgetModel, { Budget } from "@/models/budgetModel";
-import shareableBudgetModel, { ShareableBudget } from "@/models/shareableBudgets";
+import shareableBudgetModel, {
+  ShareableBudget,
+} from "@/models/shareableBudgets";
 import incomeModel from "@/models/incomeModel";
 import expenseModel from "@/models/expenseModel";
 import userModel from "@/models/userModel";
 import categoriesModel from "@/models/categoriesModel";
 import accountModel, { Account } from "@/models/accountModel";
 
-export async function getUserFullBudgetDocument(userId: mongoose.Types.ObjectId, budgetMonth: Date) {
-    if (process.env.DEBUG === 'debug') {
-        console.log(`[getUserFullBudgetDocument] Getting full budget document started`)
+export async function getUserFullBudgetDocument(
+  userId: mongoose.Types.ObjectId,
+  budgetMonth: Date
+) {
+  if (process.env.DEBUG === "debug") {
+    console.log(
+      `[getUserFullBudgetDocument] Getting full budget document started`
+    );
+  }
+  try {
+    await dbConnect();
+    const { minDate, maxDate } = getBudgetMinMaxDates(budgetMonth);
+
+    const budget = await budgetModel
+      .findOne()
+      .or([{ owner: userId }, { allowed: userId }])
+      .populate({
+        path: "categories",
+        model: categoriesModel,
+      })
+      .populate({
+        path: "accounts",
+        model: accountModel,
+      })
+      .populate({
+        path: "expenses",
+        model: expenseModel,
+        match: {
+          $or: [
+            { date: { $gte: minDate, $lte: maxDate } },
+            { transactionDate: { $gte: minDate, $lte: maxDate } },
+          ],
+        },
+        populate: [
+          {
+            path: "createdBy updatedBy reconciledBy",
+            model: userModel,
+            select: "username",
+          },
+        ],
+      })
+      .populate({
+        path: "income",
+        model: incomeModel,
+        match: { date: { $gte: minDate, $lte: maxDate } },
+        populate: [
+          {
+            path: "createdBy updatedBy reconciledBy",
+            model: userModel,
+            select: "username",
+          },
+        ],
+      })
+      .exec();
+
+    if (!budget) {
+      return null;
     }
-    try {
-        await dbConnect()
-        const { minDate, maxDate } = getBudgetMinMaxDates(budgetMonth);
-
-        const budget = await budgetModel.findOne().or([{ owner: userId }, { allowed: userId }])
-            .populate({
-                path: "categories",
-                model: categoriesModel
-            })
-            .populate({
-                path: "accounts",
-                model: accountModel
-            })
-            .populate({
-                path: "expenses",
-                model: expenseModel,
-                match: { $or: [{date: { $gte: minDate, $lte: maxDate }}, {transactionDate: { $gte: minDate, $lte: maxDate }}] },
-                populate: [
-                    {
-                        path: "createdBy updatedBy",
-                        model: userModel,
-                        select: "username"
-                    }
-                ],
-            })
-            .populate({
-                path: "income",
-                model: incomeModel,
-                match: { date: { $gte: minDate, $lte: maxDate } },
-                populate: [
-                    {
-                        path: "createdBy updatedBy",
-                        model: userModel,
-                        select: "username"
-                    }
-                ],
-            })
-            .exec();
-
-        if (!budget) {
-            return null;
-        }
-        // Create default account if no accounts exist
-        if (!budget.accounts) {
-            budget.accounts = new mongoose.Types.Array<Account>();
-        }
-        if (!budget.accounts.length) {
-            const account = await accountModel.create({
-                budgetId: budget._id,
-                name: "default"
-            })
-
-            if (account) {
-                budget.accounts.push(account._id);
-                budget.save();
-            }
-        }
-
-        return {
-            ...budget._doc,
-            minDate: minDate.toLocaleString("en-us", { dateStyle: "short", timeZone: "UTC" }),
-            maxDate: maxDate.toLocaleString("en-us", { dateStyle: "short", timeZone: "UTC" }),
-            isOwner: budget._doc.owner.toString() === userId.toString()
-        };
-    } catch (error) {
-        throw error
+    // Create default account if no accounts exist
+    if (!budget.accounts) {
+      budget.accounts = new mongoose.Types.Array<Account>();
     }
+    if (!budget.accounts.length) {
+      const account = await accountModel.create({
+        budgetId: budget._id,
+        name: "default",
+      });
+
+      if (account) {
+        budget.accounts.push(account._id);
+        budget.save();
+      }
+    }
+
+    return {
+      ...budget._doc,
+      minDate: minDate.toLocaleString("en-us", {
+        dateStyle: "short",
+        timeZone: "UTC",
+      }),
+      maxDate: maxDate.toLocaleString("en-us", {
+        dateStyle: "short",
+        timeZone: "UTC",
+      }),
+      isOwner: budget._doc.owner.toString() === userId.toString(),
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 export async function createUserBudget(userId: mongoose.Types.ObjectId) {
-    try {
-        await dbConnect();
+  try {
+    await dbConnect();
 
-        const budget = await budgetModel.create({
-            owner: userId
-        })
+    const budget = await budgetModel.create({
+      owner: userId,
+    });
 
-        if (!budget) {
-            return null;
-        }
-
-        const account = await accountModel.create({
-            budgetId: budget._id,
-            name: "default"
-        })
-
-        if (account) {
-            budget.accounts.push(account._id);
-            budget.save();
-        }
-
-        return budget;
-    } catch (error) {
-        throw error
+    if (!budget) {
+      return null;
     }
+
+    const account = await accountModel.create({
+      budgetId: budget._id,
+      name: "default",
+    });
+
+    if (account) {
+      budget.accounts.push(account._id);
+      budget.save();
+    }
+
+    return budget;
+  } catch (error) {
+    throw error;
+  }
 }
 
 export async function toggleShareableBudget(userId: mongoose.Types.ObjectId) {
-    try {
-        await dbConnect();
-        // Is the budget being shared?
-        const sharedBudgetInfo = await shareableBudgetModel.findOne({ owner: userId });
-        // if budget is not being shared, add it to the sharable budget table and sync budget
-        if (!sharedBudgetInfo) {
-            return await createSharedBudgetInformation(userId);
-        }
-        // if budget is being shared, disable share by removing from sharableBudget table and sync budget
-        await deleteSharedBudgetInformation(userId, sharedBudgetInfo);
-        return false;
-    } catch (error) {
-        throw error
+  try {
+    await dbConnect();
+    // Is the budget being shared?
+    const sharedBudgetInfo = await shareableBudgetModel.findOne({
+      owner: userId,
+    });
+    // if budget is not being shared, add it to the sharable budget table and sync budget
+    if (!sharedBudgetInfo) {
+      return await createSharedBudgetInformation(userId);
     }
+    // if budget is being shared, disable share by removing from sharableBudget table and sync budget
+    await deleteSharedBudgetInformation(userId, sharedBudgetInfo);
+    return false;
+  } catch (error) {
+    throw error;
+  }
 }
 
-export async function joinSharedBudget(userId: mongoose.Types.ObjectId, joinCode: string) {
-    try {
-        await dbConnect();
+export async function joinSharedBudget(
+  userId: mongoose.Types.ObjectId,
+  joinCode: string
+) {
+  try {
+    await dbConnect();
 
-        const sharedBudget = await shareableBudgetModel.findOne({ joinCode }) as ShareableBudget;
-        if (!sharedBudget) {
-            throw new Error("No shared budget with the provided join code: " + joinCode);
-        }
-
-        if (sharedBudget.requestedAccounts.includes(userId)) {
-            throw new Error("Already requested to join budget!")
-        }
-
-        sharedBudget.requestedAccounts.push(userId)
-        await sharedBudget.save();
-    } catch (error) {
-        throw error;
+    const sharedBudget = (await shareableBudgetModel.findOne({
+      joinCode,
+    })) as ShareableBudget;
+    if (!sharedBudget) {
+      throw new Error(
+        "No shared budget with the provided join code: " + joinCode
+      );
     }
+
+    if (sharedBudget.requestedAccounts.includes(userId)) {
+      throw new Error("Already requested to join budget!");
+    }
+
+    sharedBudget.requestedAccounts.push(userId);
+    await sharedBudget.save();
+  } catch (error) {
+    throw error;
+  }
 }
 
-export async function getBudgetRequesters(userId: mongoose.Types.ObjectId, budgetId: mongoose.Types.ObjectId) {
-    try {
-        await dbConnect();
-        const sharedBudget = await shareableBudgetModel.findOne({ owner: userId, budgetId }).populate("requestedAccounts", "_id username", userModel).exec() as ShareableBudget;
-        if (!sharedBudget) {
-            throw new Error(`No shared budget found for budget ID ${budgetId}`);
-        }
-
-        return sharedBudget.requestedAccounts || [];
-
-    } catch (error) {
-        throw error;
+export async function getBudgetRequesters(
+  userId: mongoose.Types.ObjectId,
+  budgetId: mongoose.Types.ObjectId
+) {
+  try {
+    await dbConnect();
+    const sharedBudget = (await shareableBudgetModel
+      .findOne({ owner: userId, budgetId })
+      .populate("requestedAccounts", "_id username", userModel)
+      .exec()) as ShareableBudget;
+    if (!sharedBudget) {
+      throw new Error(`No shared budget found for budget ID ${budgetId}`);
     }
+
+    return sharedBudget.requestedAccounts || [];
+  } catch (error) {
+    throw error;
+  }
 }
 
-export async function approveRequesterToJoinBudget(userId: mongoose.Types.ObjectId, budgetId: mongoose.Types.ObjectId, requesterId: mongoose.Types.ObjectId) {
-    if (userId === requesterId) {
-        throw new Error(`Requester ID ${requesterId} is the same as budget owner ID ${userId}`);
+export async function approveRequesterToJoinBudget(
+  userId: mongoose.Types.ObjectId,
+  budgetId: mongoose.Types.ObjectId,
+  requesterId: mongoose.Types.ObjectId
+) {
+  if (userId === requesterId) {
+    throw new Error(
+      `Requester ID ${requesterId} is the same as budget owner ID ${userId}`
+    );
+  }
+
+  try {
+    await dbConnect();
+
+    const budget = (await budgetModel.findOne({
+      _id: budgetId,
+      owner: userId,
+    })) as Budget;
+    if (!budget) {
+      throw new Error(
+        `No budget found for user ${userId} with the provided budget Id ${budgetId}`
+      );
     }
 
-    try {
-        await dbConnect();
-
-        const budget = await budgetModel.findOne({ _id: budgetId, owner: userId }) as Budget
-        if (!budget) {
-            throw new Error(`No budget found for user ${userId} with the provided budget Id ${budgetId}`)
-        }
-
-        const sharedBudget = await shareableBudgetModel.findOne({ budgetId }) as ShareableBudget;
-        if (!sharedBudget) {
-            throw new Error(`No shared budget found for budget ID ${budgetId}`);
-        }
-
-        sharedBudget.requestedAccounts.pull(requesterId);
-        budget.allowed.push(requesterId);
-
-        await sharedBudget.save();
-        await budget.save();
-
-    } catch (error) {
-        throw error;
+    const sharedBudget = (await shareableBudgetModel.findOne({
+      budgetId,
+    })) as ShareableBudget;
+    if (!sharedBudget) {
+      throw new Error(`No shared budget found for budget ID ${budgetId}`);
     }
+
+    sharedBudget.requestedAccounts.pull(requesterId);
+    budget.allowed.push(requesterId);
+
+    await sharedBudget.save();
+    await budget.save();
+  } catch (error) {
+    throw error;
+  }
 }
 
-export async function addPlannedIncome(userId: mongoose.Types.ObjectId, monthIndex: string, newIncomeStream: { source: string, amount: Number }) {
-    try {
-        await dbConnect();
-        const budget = await budgetModel.findOne().or([{ owner: userId }, { allowed: userId }])
+export async function addPlannedIncome(
+  userId: mongoose.Types.ObjectId,
+  monthIndex: string,
+  newIncomeStream: { source: string; amount: Number }
+) {
+  try {
+    await dbConnect();
+    const budget = await budgetModel
+      .findOne()
+      .or([{ owner: userId }, { allowed: userId }]);
 
-        if (!budget) {
-            throw new Error(`No budget found for user ID: ${userId}`)
-        }
-
-        const plannedIncomeMonthList = budget._doc.plannedIncome.find((doc: any) => doc.month === monthIndex);
-        // If the month index does not exist, create one and push our new source
-        if (!plannedIncomeMonthList) {
-            budget.plannedIncome.push({ month: monthIndex, incomeStreams: [{ source: newIncomeStream.source, amount: newIncomeStream.amount }] });
-        } else {
-            plannedIncomeMonthList.incomeStreams.push({ source: newIncomeStream.source, amount: newIncomeStream.amount });
-        }
-
-        await budget.save();
-    } catch (error) {
-        throw error
+    if (!budget) {
+      throw new Error(`No budget found for user ID: ${userId}`);
     }
+
+    const plannedIncomeMonthList = budget._doc.plannedIncome.find(
+      (doc: any) => doc.month === monthIndex
+    );
+    // If the month index does not exist, create one and push our new source
+    if (!plannedIncomeMonthList) {
+      budget.plannedIncome.push({
+        month: monthIndex,
+        incomeStreams: [
+          { source: newIncomeStream.source, amount: newIncomeStream.amount },
+        ],
+      });
+    } else {
+      plannedIncomeMonthList.incomeStreams.push({
+        source: newIncomeStream.source,
+        amount: newIncomeStream.amount,
+      });
+    }
+
+    await budget.save();
+  } catch (error) {
+    throw error;
+  }
 }
 
-export async function removePlannedIncome(userId: mongoose.Types.ObjectId, monthIndex: string, incomeSourceId: mongoose.Types.ObjectId) {
-    try {
-        await dbConnect();
-        const budget = await budgetModel.findOne().or([{ owner: userId }, { allowed: userId }])
+export async function removePlannedIncome(
+  userId: mongoose.Types.ObjectId,
+  monthIndex: string,
+  incomeSourceId: mongoose.Types.ObjectId
+) {
+  try {
+    await dbConnect();
+    const budget = await budgetModel
+      .findOne()
+      .or([{ owner: userId }, { allowed: userId }]);
 
-        if (!budget) {
-            throw new Error(`No budget found for user ID: ${userId}`)
-        }
-
-        const plannedIncomeMonthList = budget._doc.plannedIncome.find((doc: any) => doc.month === monthIndex);
-
-        // If the month index does not exist, create one and push our new source
-        if (!plannedIncomeMonthList) {
-            throw new Error("Month index does not exist!");
-        }
-
-        plannedIncomeMonthList.pull(incomeSourceId);
-
-        budget.save();
-    } catch (error) {
-        throw error
+    if (!budget) {
+      throw new Error(`No budget found for user ID: ${userId}`);
     }
+
+    const plannedIncomeMonthList = budget._doc.plannedIncome.find(
+      (doc: any) => doc.month === monthIndex
+    );
+
+    // If the month index does not exist, create one and push our new source
+    if (!plannedIncomeMonthList) {
+      throw new Error("Month index does not exist!");
+    }
+
+    plannedIncomeMonthList.pull(incomeSourceId);
+
+    budget.save();
+  } catch (error) {
+    throw error;
+  }
 }
 
-export async function getBudgetUsers (userId: mongoose.Types.ObjectId) {
-    const budgetUsers = await budgetModel.findOne({ owner: userId }, "owner allowed")
+export async function getBudgetUsers(userId: mongoose.Types.ObjectId) {
+  const budgetUsers = await budgetModel
+    .findOne({ owner: userId }, "owner allowed")
     .populate({
-        path: "owner",
-        model: userModel,
-        select: "username email"
-    }).populate({
-        path: "allowed",
-        model: userModel,
-        select: "username email"
-    }).exec()
+      path: "owner",
+      model: userModel,
+      select: "username email",
+    })
+    .populate({
+      path: "allowed",
+      model: userModel,
+      select: "username email",
+    })
+    .exec();
 
-    if (!budgetUsers) {
-        throw new Error("No budget found for specified user");
-    }
+  if (!budgetUsers) {
+    throw new Error("No budget found for specified user");
+  }
 
-    return budgetUsers;
+  return budgetUsers;
 }
 
 function getBudgetMinMaxDates(budgetMonth: Date) {
-    if (process.env.DEBUG === "debug") {
-        console.log(`[getBudgetMinMaxDates]: Received call with budgetMonth ${budgetMonth}`);
-    }
-    return {
-        minDate: new Date(Date.UTC(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1, 0, 0, 0, 0)),
-        maxDate: new Date(Date.UTC(budgetMonth.getFullYear(), budgetMonth.getMonth() + 1, 0, 23, 59, 59, 999))
-    }
+  if (process.env.DEBUG === "debug") {
+    console.log(
+      `[getBudgetMinMaxDates]: Received call with budgetMonth ${budgetMonth}`
+    );
+  }
+  return {
+    minDate: new Date(
+      Date.UTC(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1, 0, 0, 0, 0)
+    ),
+    maxDate: new Date(
+      Date.UTC(
+        budgetMonth.getFullYear(),
+        budgetMonth.getMonth() + 1,
+        0,
+        23,
+        59,
+        59,
+        999
+      )
+    ),
+  };
 }
 
 async function createSharedBudgetInformation(userId: mongoose.Types.ObjectId) {
-    // get budget model assigned to user
-    try {
-        const budget = await budgetModel.findOne({ owner: userId }, "owner isShared shareId")
-        if (!budget) {
-            throw new Error("No budget found for specified user");
-        }
-
-        const joinCode = generateJoinCode();
-
-        const possibleSharedBudget = await shareableBudgetModel.findOne({ joinCode: joinCode })
-        if (possibleSharedBudget) {
-            throw new Error("Unable to process, joinCode was in use.")
-        }
-
-        // create sharablebudget document
-        const sharableBudgetInfo = await shareableBudgetModel.create({
-            owner: userId,
-            budgetId: budget._id,
-            joinCode: joinCode
-        })
-
-        // sync budget model
-        await syncBudgetWithShareableBudgetInfo(budget, sharableBudgetInfo);
-
-        return sharableBudgetInfo
-    } catch (error) {
-        throw error
+  // get budget model assigned to user
+  try {
+    const budget = await budgetModel.findOne(
+      { owner: userId },
+      "owner isShared shareId"
+    );
+    if (!budget) {
+      throw new Error("No budget found for specified user");
     }
+
+    const joinCode = generateJoinCode();
+
+    const possibleSharedBudget = await shareableBudgetModel.findOne({
+      joinCode: joinCode,
+    });
+    if (possibleSharedBudget) {
+      throw new Error("Unable to process, joinCode was in use.");
+    }
+
+    // create sharablebudget document
+    const sharableBudgetInfo = await shareableBudgetModel.create({
+      owner: userId,
+      budgetId: budget._id,
+      joinCode: joinCode,
+    });
+
+    // sync budget model
+    await syncBudgetWithShareableBudgetInfo(budget, sharableBudgetInfo);
+
+    return sharableBudgetInfo;
+  } catch (error) {
+    throw error;
+  }
 }
 
-async function deleteSharedBudgetInformation(userId: mongoose.Types.ObjectId, sharedBudgetInfo: ShareableBudget) {
-    try {
-        const budget = await budgetModel.findOne({ owner: userId }, "owner isShared shareId")
-        if (!budget) {
-            throw new Error("No budget found for specified user");
-        }
-
-        await sharedBudgetInfo.deleteOne();
-        await syncBudgetWithShareableBudgetInfo(budget, null);
-    } catch (error) {
-        throw error
+async function deleteSharedBudgetInformation(
+  userId: mongoose.Types.ObjectId,
+  sharedBudgetInfo: ShareableBudget
+) {
+  try {
+    const budget = await budgetModel.findOne(
+      { owner: userId },
+      "owner isShared shareId"
+    );
+    if (!budget) {
+      throw new Error("No budget found for specified user");
     }
+
+    await sharedBudgetInfo.deleteOne();
+    await syncBudgetWithShareableBudgetInfo(budget, null);
+  } catch (error) {
+    throw error;
+  }
 }
 
-async function syncBudgetWithShareableBudgetInfo(budgetDocument: Budget, sharedBudgetInfo: ShareableBudget | null) {
-    try {
-        if (sharedBudgetInfo) {
-            budgetDocument.shareCode = sharedBudgetInfo.joinCode;
-            budgetDocument.isShared = true;
-            budgetDocument.shareId = sharedBudgetInfo._id as mongoose.Types.ObjectId;
-        } else {
-            budgetDocument.shareCode = null;
-            budgetDocument.isShared = false;
-            budgetDocument.set("shareId", null)
-        }
-        return await budgetDocument.save()
-    } catch (error) {
-        throw error
+async function syncBudgetWithShareableBudgetInfo(
+  budgetDocument: Budget,
+  sharedBudgetInfo: ShareableBudget | null
+) {
+  try {
+    if (sharedBudgetInfo) {
+      budgetDocument.shareCode = sharedBudgetInfo.joinCode;
+      budgetDocument.isShared = true;
+      budgetDocument.shareId = sharedBudgetInfo._id as mongoose.Types.ObjectId;
+    } else {
+      budgetDocument.shareCode = null;
+      budgetDocument.isShared = false;
+      budgetDocument.set("shareId", null);
     }
+    return await budgetDocument.save();
+  } catch (error) {
+    throw error;
+  }
 }
 
 function generateJoinCode() {
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    const characterLength = characters.length;
-    const CODE_CHARACTER_LENGTH = 4;
-    let result = ""
-    for (let i = 0; i < CODE_CHARACTER_LENGTH; i++) {
-        result += characters.charAt(Math.floor(Math.random() * characterLength));
-    }
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const characterLength = characters.length;
+  const CODE_CHARACTER_LENGTH = 4;
+  let result = "";
+  for (let i = 0; i < CODE_CHARACTER_LENGTH; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characterLength));
+  }
 
-    return result;
+  return result;
 }
