@@ -1,6 +1,6 @@
 cd ..
 
-$gitCommitId = (& "git" log --format=`"%H`" -n 1).Substring(0, 7)
+$gitCommitId = (& git log --format="%H" -n 1).Substring(0, 7)
 
 Write-Host "Creating image for commit ID:" $gitCommitId
 
