@@ -5,11 +5,12 @@ import budgetModel, { Budget } from "@/models/budgetModel";
 import shareableBudgetModel, {
   ShareableBudget,
 } from "@/models/shareableBudgets";
-import incomeModel from "@/models/incomeModel";
-import expenseModel from "@/models/expenseModel";
+import incomeModel, { Income } from "@/models/incomeModel";
+import expenseModel, { Expense } from "@/models/expenseModel";
 import userModel from "@/models/userModel";
-import categoriesModel from "@/models/categoriesModel";
+import categoriesModel, { Category } from "@/models/categoriesModel";
 import accountModel, { Account } from "@/models/accountModel";
+import normalizeMongooseObjects from "@/app/lib/normalizeMongooseObjects";
 
 export async function getUserFullBudgetDocument(
   userId: mongoose.Types.ObjectId,
@@ -96,6 +97,181 @@ export async function getUserFullBudgetDocument(
         timeZone: "UTC",
       }),
       isOwner: budget._doc.owner.toString() === userId.toString(),
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+export type YearBudgetReviewData = ReturnType<typeof getBudgetForYear>;
+export async function getBudgetForYear(
+  userId: mongoose.Types.ObjectId,
+  year: string
+) {
+  try {
+    await dbConnect();
+    const budgetMinDate = new Date(`1/1/${year}`);
+    const budgetMaxDate = new Date(`12/31/${year}`);
+
+    const budget = await budgetModel
+      .findOne()
+      .or([{ owner: userId }, { allowed: userId }])
+      .populate({
+        path: "categories",
+        model: categoriesModel,
+      })
+      .populate({
+        path: "accounts",
+        model: accountModel,
+      })
+      .populate({
+        path: "expenses",
+        model: expenseModel,
+        match: {
+          $or: [
+            { date: { $gte: budgetMinDate, $lte: budgetMaxDate } },
+            { transactionDate: { $gte: budgetMinDate, $lte: budgetMaxDate } },
+          ],
+        },
+        populate: [
+          {
+            path: "createdBy updatedBy reconciledBy",
+            model: userModel,
+            select: "username",
+          },
+        ],
+      })
+      .populate({
+        path: "income",
+        model: incomeModel,
+        match: { date: { $gte: budgetMinDate, $lte: budgetMaxDate } },
+        populate: [
+          {
+            path: "createdBy updatedBy reconciledBy",
+            model: userModel,
+            select: "username",
+          },
+        ],
+      })
+      .exec();
+
+    if (!budget) {
+      return null;
+    }
+
+    const oldestBudgetExpense = (await expenseModel
+      .findOne({ budgetId: budget._id, date: { $gte: 0 } })
+      .sort({ transactionDate: 1, date: 1 })) as Expense;
+    const oldestBudgetIncome = (await incomeModel
+      .findOne({ budgetId: budget._id, date: { $gte: 0 } })
+      .sort({ date: 1 })) as Income;
+
+    const startYear = () => {
+      console.log(oldestBudgetExpense, oldestBudgetIncome);
+      const oldestExpenseTransaction =
+        oldestBudgetExpense.transactionDate || oldestBudgetExpense.date;
+
+      if (oldestBudgetIncome.date > oldestExpenseTransaction) {
+        return new Date(oldestExpenseTransaction).getFullYear();
+      }
+
+      return new Date(oldestBudgetIncome.date).getFullYear();
+    };
+
+    const budgetDoc: Budget = normalizeMongooseObjects(budget._doc);
+    const totalExpenses = (budgetDoc.expenses as unknown as Expense[]).reduce(
+      (acc: number, curr: Expense) => acc + curr.amount,
+      0
+    );
+    const totalIncome = (budgetDoc.income as unknown as Income[]).reduce(
+      (acc: number, curr: Income) => acc + curr.amount,
+      0
+    );
+
+    const categoryTotalsExpenseBreakdown = (
+      budgetDoc.categories as unknown as Category[]
+    )
+      .map((category) => {
+        return {
+          id: category._id,
+          name: category.name,
+          totalExpenses: parseFloat(
+            (budgetDoc.expenses as unknown as Expense[])
+              .filter((ex) => ex.category === category._id)
+              .reduce((acc: number, curr: Expense) => acc + curr.amount, 0)
+              .toFixed(2)
+          ),
+          totalPlanned: parseFloat(
+            category.maxMonthExpectedAmount
+              .filter(
+                (mmea) =>
+                  new Date(mmea.month as string).getFullYear() ===
+                  parseInt(year)
+              )
+              .reduce((acc, curr) => (acc += curr.amount as number), 0)
+              .toFixed(2)
+          ),
+        };
+      })
+      .sort((a, b) => b.totalExpenses - a.totalExpenses);
+
+    const accountTotalsExpenseBreakdown = (
+      budgetDoc.accounts as unknown as Account[]
+    )
+      .map((account) => {
+        return {
+          id: account._id,
+          name: account.name,
+          totalExpenses: parseFloat(
+            (budgetDoc.expenses as unknown as Expense[])
+              .filter((ex) => ex.account === account._id)
+              .reduce((acc: number, curr: Expense) => acc + curr.amount, 0)
+              .toFixed(2)
+          ),
+        };
+      })
+      .sort((a, b) => b.totalExpenses - a.totalExpenses);
+
+    const monthlyExpenseTotalBreakdown = Array.from({ length: 12 }).map(
+      (_, index) => {
+        console.log(index);
+        return parseFloat(
+          (budgetDoc.expenses as unknown as Expense[])
+            .filter(
+              (ex) =>
+                (ex.transactionDate
+                  ? new Date(ex.transactionDate)
+                  : new Date(ex.date)
+                ).getMonth() === index
+            )
+            .reduce((acc: number, curr: Expense) => acc + curr.amount, 0)
+            .toFixed(2)
+        );
+      }
+    );
+
+    const monthlyIncomeTotalBreakdown = Array.from({ length: 12 }).map(
+      (_, index) => {
+        return parseFloat(
+          (budgetDoc.income as unknown as Income[])
+            .filter((ex) => new Date(ex.date).getMonth() === index)
+            .reduce((acc: number, curr: Income) => acc + curr.amount, 0)
+            .toFixed(2)
+        );
+      }
+    );
+
+    return {
+      ...budgetDoc,
+      year,
+      startYear: startYear(),
+      totalExpenses: parseFloat(totalExpenses.toFixed(2)),
+      totalIncome: parseFloat(totalIncome.toFixed(2)),
+      balance: parseFloat((totalIncome - totalExpenses).toFixed(2)),
+      categoryTotalsExpenseBreakdown,
+      accountTotalsExpenseBreakdown,
+      monthlyExpenseTotalBreakdown,
+      monthlyIncomeTotalBreakdown,
     };
   } catch (error) {
     console.error(error);

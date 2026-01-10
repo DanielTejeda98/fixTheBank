@@ -1,13 +1,10 @@
 "use client";
-import { useState } from "react";
 import { currencyFormat, formatDateDisplay } from "@/app/lib/renderHelper";
-import { selectTransactions } from "@/redux/features/budget-slice";
 import { useAppSelector } from "@/redux/store";
 import AddIncome from "./AddIncome";
 import ExpenseEditor from "./ExpenseEditor";
 import React from "react";
 import FullSizeCard from "../Core/FullSizeCard";
-import { TransactionView } from "@/types/budget";
 import Link from "next/link";
 import { Button, buttonVariants } from "../ui/button";
 import { useFTBDrawer } from "../ui/ftbDrawer";
@@ -144,6 +141,19 @@ export default function DashboardView() {
         <div className="grid gap-3 mt-3" data-qa="recent-transactions-list">
           {renderTransactionsList()}
         </div>
+      </section>
+
+      <section className="m-3 p-3 border">
+        <div className="flex justify-between items-center">
+          <h2>Links</h2>
+        </div>
+
+        <Link
+          href="/year-in-review"
+          className={`${buttonVariants({ variant: "outline" })} w-full`}
+        >
+          View your Year in Review
+        </Link>
       </section>
     </main>
   );
