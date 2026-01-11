@@ -85,7 +85,7 @@ export default function ReceiptCapturer({
       >
         <LucideCamera /> Auto Detect Receipt (Beta)
       </Button>
-      <Script src="https://docs.opencv.org/4.5.0/opencv.js" async></Script>
+      <Script src="https://docs.opencv.org/4.7.0/opencv.js" async></Script>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
