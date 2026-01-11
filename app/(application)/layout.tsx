@@ -19,7 +19,7 @@ export default async function RootLayout({
   } catch (e: any) {
     switch (e.message) {
       case ERRORS.NO_BUDGET_FOUND: {
-        return (        
+        return (
           <ReduxProvider>
             <AuthProvider>
               <FTBDrawerProvider>
@@ -28,29 +28,30 @@ export default async function RootLayout({
               </FTBDrawerProvider>
             </AuthProvider>
           </ReduxProvider>
-        )
+        );
       }
       default: {
         return (
-          <p>An error has occured when pulling initial data. Please try again or file a bug report.</p>
-        )
+          <p>
+            An error has occured when pulling initial data. Please try again or
+            file a bug report.
+          </p>
+        );
       }
     }
   }
 
   return (
-        <ReduxProvider>
-          <ReduxInitializer initialData={initialData}>
-            <AuthProvider>
-              <BudgetProvider initialData={initialData}>
-                <FTBDrawerProvider>
-                  {children}
-                  <Navigation />
-                  <FTBDrawer />
-                </FTBDrawerProvider>
-              </BudgetProvider>
-            </AuthProvider>
-          </ReduxInitializer>
-        </ReduxProvider>
+    <ReduxProvider>
+      <ReduxInitializer initialData={initialData}>
+        <AuthProvider>
+          <FTBDrawerProvider>
+            {children}
+            <Navigation />
+            <FTBDrawer />
+          </FTBDrawerProvider>
+        </AuthProvider>
+      </ReduxInitializer>
+    </ReduxProvider>
   );
 }
