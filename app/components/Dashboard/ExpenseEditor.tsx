@@ -54,6 +54,7 @@ import {
   ItemSeparator,
   ItemTitle,
 } from "../ui/item";
+import ReceiptCapturer from "../Core/RecieptCapturer/ReceiptCapturer";
 
 interface FormData {
   amount?: string;
@@ -296,14 +297,24 @@ export default function ExpenseEditor({
               </Button>
             </Link>
           )}
-          <Input
-            className={"mt-1"}
-            type="file"
-            accept=".jpeg,.jpg,.png"
-            name="receipt"
-            onChange={(e) => handleReceiptImageUpload(e.target.files?.item(0))}
-            disabled={isImageUploading}
-          />
+          <div className="flex flex-col gap-2">
+            <Input
+              className={"mt-1"}
+              type="file"
+              accept=".jpeg,.jpg,.png"
+              name="receipt"
+              onChange={(e) =>
+                handleReceiptImageUpload(e.target.files?.item(0))
+              }
+              disabled={isImageUploading}
+            />
+            <ReceiptCapturer
+              isImageUploading={isImageUploading}
+              handleReceiptImageUpload={(file) =>
+                handleReceiptImageUpload(file)
+              }
+            />
+          </div>
         </div>
 
         <div className="mt-2 w-full">
