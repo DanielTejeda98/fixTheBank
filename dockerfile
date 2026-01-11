@@ -1,5 +1,17 @@
 FROM node:alpine3.22
 
+RUN apk update && apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    pkgconfig \
+    cairo-dev \
+    pango-dev \
+    jpeg-dev \
+    giflib-dev \
+    libpng-dev \
+    build-base
+
 WORKDIR /app
 
 COPY package*.json ./
