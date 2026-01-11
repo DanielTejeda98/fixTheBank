@@ -45,6 +45,15 @@ import {
   DrawerTitle,
 } from "../ui/drawer";
 import Link from "next/link";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemSeparator,
+  ItemTitle,
+} from "../ui/item";
 
 interface FormData {
   amount?: string;
@@ -431,66 +440,79 @@ export default function ExpenseEditor({
         >
           <div className="w-full mb-2">
             <CollapsibleTrigger asChild>
-              <div className="my-2 w-full flex justify-between items-center">
+              <button className="my-2 w-full flex justify-between items-center">
                 <h4 className="text-md font-bold">Further options</h4>
                 <FontAwesomeIcon
                   icon={furtherOptionsOpen ? faChevronUp : faChevronDown}
                 />
-              </div>
+              </button>
             </CollapsibleTrigger>
             <CollapsibleContent>
               <Card>
                 <CardContent>
-                  <div className="flex items-center mt-2">
-                    <div>
-                      <p className="text-sm font-medium">
-                        Borrow from next month
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Use this option to count this expense towards next
-                        months budget.
-                      </p>
-                    </div>
-                    <Switch
-                      checked={formData.borrowFromNextMonth}
-                      onCheckedChange={() =>
-                        dispatch({
-                          borrowFromNextMonth: !formData.borrowFromNextMonth,
-                        })
-                      }
-                    />
-                  </div>
+                  <ItemGroup className="gap-2">
+                    <Item className="p-0">
+                      <ItemContent>
+                        <ItemTitle>Borrow from next month</ItemTitle>
+                        <ItemDescription>
+                          Use this option to count this expense towards next
+                          months budget.
+                        </ItemDescription>
+                      </ItemContent>
+                      <ItemActions>
+                        <Switch
+                          checked={formData.borrowFromNextMonth}
+                          onCheckedChange={() =>
+                            dispatch({
+                              borrowFromNextMonth:
+                                !formData.borrowFromNextMonth,
+                            })
+                          }
+                        />
+                      </ItemActions>
+                    </Item>
 
-                  <div className="flex items-center mt-2">
-                    <div>
-                      <p className="text-sm font-medium">Gift Transaction?</p>
-                      <p className="text-sm text-muted-foreground">
-                        Use this option to make this a gift transaction.
-                      </p>
-                    </div>
-                    <Switch
-                      checked={formData.giftTransaction}
-                      onCheckedChange={() =>
-                        dispatch({ giftTransaction: !formData.giftTransaction })
-                      }
-                    />
-                  </div>
+                    <ItemSeparator />
 
-                  <div className="flex items-center mt-2">
-                    <div>
-                      <p className="text-sm font-medium">Split Payments</p>
-                      <p className="text-sm text-muted-foreground">
-                        Use this option to automatically split payments to
-                        upcoming months.
-                      </p>
-                    </div>
-                    <Switch
-                      checked={formData.splitPayments}
-                      onCheckedChange={() =>
-                        dispatch({ splitPayments: !formData.splitPayments })
-                      }
-                    />
-                  </div>
+                    <Item className="p-0">
+                      <ItemContent>
+                        <ItemTitle>Gift Transaction?</ItemTitle>
+                        <ItemDescription>
+                          Use this option to make this a gift transaction.
+                        </ItemDescription>
+                      </ItemContent>
+                      <ItemActions>
+                        <Switch
+                          checked={formData.giftTransaction}
+                          onCheckedChange={() =>
+                            dispatch({
+                              giftTransaction: !formData.giftTransaction,
+                            })
+                          }
+                        />
+                      </ItemActions>
+                    </Item>
+
+                    <ItemSeparator />
+
+                    <Item className="p-0">
+                      <ItemContent>
+                        <ItemTitle>Split Payments</ItemTitle>
+                        <ItemDescription>
+                          Use this option to automatically split payments to
+                          upcoming months.
+                        </ItemDescription>
+                      </ItemContent>
+                      <ItemActions>
+                        <Switch
+                          checked={formData.splitPayments}
+                          onCheckedChange={() =>
+                            dispatch({ splitPayments: !formData.splitPayments })
+                          }
+                        />
+                      </ItemActions>
+                    </Item>
+                  </ItemGroup>
                 </CardContent>
               </Card>
             </CollapsibleContent>
