@@ -41,14 +41,13 @@ export default function ReceiptCapturer({
       const img = new Image();
       img.src = reader.result as string;
       img.onload = function () {
-        const resultCanvas = scanner.extractPaper(img, 405, 720);
-        const secondPass = scanner.extractPaper(
-          resultCanvas,
+        const resultCanvas = scanner.extractPaper(
+          img,
           405,
           720
         ) as HTMLCanvasElement;
-        setImageSrc(secondPass.toDataURL());
-        secondPass.toBlob((blob) => {
+        setImageSrc(resultCanvas.toDataURL());
+        resultCanvas.toBlob((blob) => {
           if (!blob) return;
           fileToUpload.current = new File([blob], file.name, {
             lastModified: file.lastModified,
