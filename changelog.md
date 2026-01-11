@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Year in Review feature
+- Beta test for receipt auto detect
 
 ### Fixed
 
