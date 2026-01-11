@@ -1,7 +1,6 @@
 import { AuthProvider } from "../providers/AuthProvider";
 import ReduxProvider from "@/redux/provider";
 import { ERRORS, getInitialData } from "../lib/getInitialData";
-import BudgetProvider from "../providers/BudgetProvider";
 import Navigation from "../components/Core/Navigation";
 import ReduxInitializer from "../components/ReduxInitializer";
 import { FTBDrawer, FTBDrawerProvider } from "../components/ui/ftbDrawer";
