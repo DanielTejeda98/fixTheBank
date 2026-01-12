@@ -1,70 +1,83 @@
 import mongoose from "mongoose";
 
 export interface PlannedIncome {
-    month: String,
-    incomeStreams: mongoose.Types.Array<{source: String, amount: Number}>
+  month: String;
+  incomeStreams: mongoose.Types.Array<{ source: String; amount: Number }>;
 }
 
 export interface Budget extends mongoose.Document {
-    owner: mongoose.Types.ObjectId,
-    allowed: mongoose.Types.Array<mongoose.Types.ObjectId>,
-    categories: mongoose.Types.Array<mongoose.Types.ObjectId>,
-    accounts: mongoose.Types.Array<mongoose.Types.ObjectId>,
-    income: mongoose.Types.Array<mongoose.Types.ObjectId>,
-    plannedIncome: mongoose.Types.Array<PlannedIncome>
-    expenses: mongoose.Types.Array<mongoose.Types.ObjectId>,
-    savings: mongoose.Types.ObjectId,
-    isShared: boolean,
-    shareCode: string | null,
-    shareId: mongoose.Types.ObjectId
+  owner: mongoose.Types.ObjectId;
+  allowed: mongoose.Types.Array<mongoose.Types.ObjectId>;
+  categories: mongoose.Types.Array<mongoose.Types.ObjectId>;
+  accounts: mongoose.Types.Array<mongoose.Types.ObjectId>;
+  income: mongoose.Types.Array<mongoose.Types.ObjectId>;
+  plannedIncome: mongoose.Types.Array<PlannedIncome>;
+  expenses: mongoose.Types.Array<mongoose.Types.ObjectId>;
+  transfers: mongoose.Types.Array<mongoose.Types.ObjectId>;
+  savings: mongoose.Types.ObjectId;
+  isShared: boolean;
+  shareCode: string | null;
+  shareId: mongoose.Types.ObjectId;
 }
 
 const BudgetSchema = new mongoose.Schema<Budget>({
-    owner: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+  allowed: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
-    allowed: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    }],
-    categories: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Categories"
-    }],
-    accounts: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Account"
-    }],
-    income: [{type: mongoose.Schema.Types.ObjectId, ref: "Income"}],
-    plannedIncome: [{
-        type: {
-            month: String,
-            incomeStreams: [{
-                type: {
-                    source: String,
-                    amount: Number
-                }
-            }]
-        }
-    }],
-    expenses: [{type: mongoose.Schema.Types.ObjectId, ref: "Expense"}],
-    savings: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Savings"
+  ],
+  categories: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Categories",
     },
-    isShared: {
-        type: Boolean,
-        default: false
+  ],
+  accounts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Account",
     },
-    shareCode: {
-        type: String,
-        default: null
+  ],
+  income: [{ type: mongoose.Schema.Types.ObjectId, ref: "Income" }],
+  plannedIncome: [
+    {
+      type: {
+        month: String,
+        incomeStreams: [
+          {
+            type: {
+              source: String,
+              amount: Number,
+            },
+          },
+        ],
+      },
     },
-    shareId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "ShareableBudget"
-    }
-})
+  ],
+  expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Expense" }],
+  transfers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Transfer" }],
+  savings: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Savings",
+  },
+  isShared: {
+    type: Boolean,
+    default: false,
+  },
+  shareCode: {
+    type: String,
+    default: null,
+  },
+  shareId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ShareableBudget",
+  },
+});
 
-export default mongoose.models.Budget || mongoose.model<Budget>("Budget", BudgetSchema);
+export default mongoose.models.Budget ||
+  mongoose.model<Budget>("Budget", BudgetSchema);

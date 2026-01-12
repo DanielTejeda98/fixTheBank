@@ -1,19 +1,31 @@
-"use client"
+"use client";
 
 import { useSetInitialStore } from "@/redux/features/budget-slice";
 import { useLoadSettings } from "../hooks/useLoadSettings";
 import { InitialData } from "@/types/budget";
 import BudgetCacheProvider from "../lib/budgetCache";
+import { SavingsCacheProvider } from "../lib/savingsCache";
 
-export default function ReduxInitializer({ children, initialData }: { children: React.ReactNode, initialData: InitialData }) {
-    const serverBudget = initialData.mappedBudget;
-    const { budget, useCachedData} = BudgetCacheProvider.getBudget({
-        lastFetched: serverBudget?.lastFetched
-    })
-    
-    const freshBudget = useCachedData ? budget : serverBudget;
+export default function ReduxInitializer({
+  children,
+  initialData,
+}: {
+  children: React.ReactNode;
+  initialData: InitialData;
+}) {
+  const { savings, mappedBudget } = initialData;
+  const { budget, useCachedData } = BudgetCacheProvider.getBudget({
+    lastFetched: mappedBudget?.lastFetched,
+  });
 
-    useSetInitialStore({ budget: freshBudget})
-    useLoadSettings();
-    return (<>{children}</>)
+  const cachedSavings = SavingsCacheProvider.getCachedSavings();
+
+  const freshBudget = useCachedData ? budget : mappedBudget;
+
+  useSetInitialStore({
+    budget: freshBudget,
+    savings: cachedSavings || savings,
+  });
+  useLoadSettings();
+  return <>{children}</>;
 }

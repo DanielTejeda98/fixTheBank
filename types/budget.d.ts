@@ -1,9 +1,11 @@
 // Type definitions for FixTheBank
 
+import { Savings } from "./savings";
 import { User } from "./user";
 
 export interface InitialData {
   mappedBudget: BudgetView | null;
+  savings: Savings;
 }
 
 export interface BudgetView {
@@ -11,6 +13,7 @@ export interface BudgetView {
   income: IncomeTransaction[];
   plannedIncome: PlannedIncomeView[];
   expenses: ExpenseTransaction[];
+  transfers: TransferTransaction[];
   categories: CategoryView[];
   accounts: AccountView[];
   minDate: string;
@@ -85,6 +88,20 @@ export interface ExpenseTransaction {
   splitPaymentMasterId?: string | null;
   reconciled: Date | null;
   reconciledBy: User;
+}
+
+export interface TransferTransaction {
+  _id: string;
+  name: string;
+  amount: number;
+  date: Date;
+  transactionType: "deposit" | "withdraw";
+  account: string;
+  bucket: string;
+  savingsTransferId: string;
+  budgetId: string;
+  createdBy: User;
+  updatedBy: User;
 }
 
 export interface TransactionView {

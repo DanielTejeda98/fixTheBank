@@ -11,10 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Year in Review feature
 - Beta test for receipt auto detect
+- Added support for Savings Transfers
 
 ### Fixed
 
 - Transaction List card description text not aligning properly
+- Dates shifting between viewer and editor
 
 ## [0.4.2]
 

@@ -11,6 +11,10 @@ import userModel from "@/models/userModel";
 import categoriesModel, { Category } from "@/models/categoriesModel";
 import accountModel, { Account } from "@/models/accountModel";
 import normalizeMongooseObjects from "@/app/lib/normalizeMongooseObjects";
+import savingsModel from "@/models/savingsModel";
+import savingsAccountBucket from "@/models/savingsAccountBucket";
+import savingsAccount from "@/models/savingsAccount";
+import transferModel from "@/models/transferModel";
 
 export async function getUserFullBudgetDocument(
   userId: mongoose.Types.ObjectId,
@@ -62,6 +66,35 @@ export async function getUserFullBudgetDocument(
             path: "createdBy updatedBy reconciledBy",
             model: userModel,
             select: "username",
+          },
+        ],
+      })
+      .populate({
+        path: "transfers",
+        model: transferModel,
+        match: { date: { $gte: minDate, $lte: maxDate } },
+        populate: [
+          {
+            path: "createdBy updatedBy",
+            model: userModel,
+            select: "username",
+          },
+        ],
+      })
+      .populate({
+        path: "savings",
+        model: savingsModel,
+        select: "savingsAccounts",
+        populate: [
+          {
+            path: "savingsAccounts",
+            model: savingsAccount,
+            populate: [
+              {
+                path: "buckets",
+                model: savingsAccountBucket,
+              },
+            ],
           },
         ],
       })

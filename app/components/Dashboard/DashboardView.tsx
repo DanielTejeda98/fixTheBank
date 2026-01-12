@@ -10,6 +10,7 @@ import { Button, buttonVariants } from "../ui/button";
 import { useFTBDrawer } from "../ui/ftbDrawer";
 import TopOptions from "../Core/TopOptions";
 import { useGetMergedTransactionsList } from "../Transactions/useGetMergedTransactionsList";
+import TransferEditor from "./TransferEditor";
 
 export default function DashboardView() {
   const { openWithComponent } = useFTBDrawer();
@@ -34,6 +35,7 @@ export default function DashboardView() {
   const DrawerComponents = {
     addIncome: <AddIncome budgetId={budgetId} />,
     expenseEditor: <ExpenseEditor budgetId={budgetId} />,
+    transfer: <TransferEditor />,
   };
 
   const openDrawer = (component: keyof typeof DrawerComponents) => {
@@ -77,10 +79,17 @@ export default function DashboardView() {
                     </div> */}
         </div>
         <div className="flex justify-center gap-2 mt-5">
-          <Button variant="secondary" onClick={() => openDrawer("addIncome")}>
-            (+) Add funds
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => openDrawer("addIncome")}
+          >
+            (+) Add Income
           </Button>
-          <Button onClick={() => openDrawer("expenseEditor")}>
+          <Button type="button" onClick={() => openDrawer("transfer")}>
+            Transfer
+          </Button>
+          <Button type="button" onClick={() => openDrawer("expenseEditor")}>
             (-) Add Expense
           </Button>
         </div>

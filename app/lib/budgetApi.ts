@@ -1,6 +1,9 @@
 import { setBudget } from "@/redux/features/budget-slice";
 import { store } from "@/redux/store";
 import { BudgetShareResponse } from "@/types/BudgetShareResponse";
+import { TransferDTO } from "../components/Dashboard/TransferEditorSchema";
+import { getSavings } from "./savingsApi";
+import { setSavings } from "@/redux/features/savings-slice";
 
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_FTB_HOST}/api`;
 
@@ -274,6 +277,80 @@ const reconcileIncome = async (incomeId: string, reconciled: boolean) => {
   return parsedRes;
 };
 
+const createTransfer = async (transferDto: TransferDTO) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/transfer`, {
+      method: "POST",
+      body: JSON.stringify(transferDto),
+    });
+
+    if (!res.ok) {
+      throw Error(`Error creating transfer: ${res.statusText}`);
+    }
+
+    const parsedRes = await res.json();
+    if (!parsedRes.success) {
+      throw Error(parsedRes.error);
+    }
+    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || "";
+    const budgetRes = await getBudget(budgetDate);
+    const savingsRes = await getSavings();
+    store.dispatch(setBudget(budgetRes.data));
+    store.dispatch(setSavings(savingsRes));
+
+    return parsedRes;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateTransfer = async (
+  transferId: string,
+  transferDto: Partial<TransferDTO>
+) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/transfer/${transferId}`, {
+      method: "PUT",
+      body: JSON.stringify(transferDto),
+    });
+
+    if (!res.ok) {
+      throw Error(`Error updating transfer: ${res.statusText}`);
+    }
+
+    const parsedRes = await res.json();
+    if (!parsedRes.success) {
+      throw Error(parsedRes.error);
+    }
+    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || "";
+    const budgetRes = await getBudget(budgetDate);
+    const savingsRes = await getSavings();
+    store.dispatch(setBudget(budgetRes.data));
+    store.dispatch(setSavings(savingsRes));
+
+    return parsedRes;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const deleteTransfer = async (transferId: string) => {
+  const res = await fetch(`${API_BASE_URL}/transfer/${transferId}`, {
+    method: "DELETE",
+  });
+  const parsedRes = await res.json();
+  if (!parsedRes.success) {
+    throw Error(parsedRes.error);
+  }
+  const budgetDate = sessionStorage.getItem("selectedBudgetDate") || "";
+  const budgetRes = await getBudget(budgetDate);
+  const savingsRes = await getSavings();
+  store.dispatch(setBudget(budgetRes.data));
+  store.dispatch(setSavings(savingsRes));
+
+  return parsedRes;
+};
+
 export {
   createExpense,
   createSplitExpense,
@@ -291,4 +368,7 @@ export {
   deletePlannedIncome,
   reconcileExpense,
   reconcileIncome,
+  createTransfer,
+  updateTransfer,
+  deleteTransfer,
 };
