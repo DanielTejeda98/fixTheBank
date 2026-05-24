@@ -15,25 +15,35 @@ import { Label } from "@/app/components/ui/label";
 import { useForm } from "@tanstack/react-form";
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import z from "zod";
 
-const forgotPasswordFormSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email address"),
-});
+const resetPasswordFormSchema = z
+  .object({
+    token: z.string().min(1, "Token is required"),
+    newPassword: z.string().min(8, "Password must be at least 8 characters"),
+    confirmNewPassword: z.string().min(8, "Please confirm your new password"),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "Passwords do not match",
+  });
 
-export default function ForgotPassword() {
+export default function ResetPassword() {
+  const params = useSearchParams();
   const [successAlertMsg, setSuccessAlertMsg] = useState("");
   const form = useForm({
     defaultValues: {
-      email: "",
+      token: params.get("token") || "",
+      newPassword: "",
+      confirmNewPassword: "",
     },
     validators: {
-      onChange: forgotPasswordFormSchema,
+      onChange: resetPasswordFormSchema,
     },
     onSubmit: async (values) => {
       try {
-        const res = await fetch("/api/auth/forgot-password", {
+        const res = await fetch("/api/auth/reset-password", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -53,11 +63,9 @@ export default function ForgotPassword() {
     <div className="w-full h-svh flex items-center justify-center">
       <Card className="mx-2 lg:max-w-1/3">
         <CardHeader>
-          <CardTitle className="text-center">Forgot Password</CardTitle>
+          <CardTitle className="text-center">Reset Password</CardTitle>
           <CardDescription className="text-center">
-            Fill out the form to request a password reset. If an account with
-            the provided email exists, you will receive instructions to reset
-            your password.
+            Fill out the form to reset your password.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -72,15 +80,31 @@ export default function ForgotPassword() {
           >
             <div className="flex flex-col gap-4">
               <form.Field
-                name="email"
+                name="newPassword"
                 children={(field) => (
                   <Field>
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="newPassword">New Password</Label>
                     <Input
-                      type="email"
-                      placeholder="Enter your email"
+                      type="password"
+                      placeholder="Enter your new password"
                       onChange={(e) => field.handleChange(e.target.value)}
-                      id="email"
+                      id="newPassword"
+                    />
+                  </Field>
+                )}
+              />
+              <form.Field
+                name="confirmNewPassword"
+                children={(field) => (
+                  <Field>
+                    <Label htmlFor="confirmNewPassword">
+                      Confirm New Password
+                    </Label>
+                    <Input
+                      type="password"
+                      placeholder="Confirm your new password"
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      id="confirmNewPassword"
                     />
                   </Field>
                 )}
@@ -91,8 +115,8 @@ export default function ForgotPassword() {
                   children={([isSubmitting]) => (
                     <Button type="submit" disabled={isSubmitting}>
                       {isSubmitting
-                        ? "Requesting password reset..."
-                        : "Request Password Reset"}
+                        ? "Resetting password..."
+                        : "Reset Password"}
                     </Button>
                   )}
                 />

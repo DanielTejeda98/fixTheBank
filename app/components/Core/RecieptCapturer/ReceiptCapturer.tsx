@@ -31,33 +31,26 @@ export default function ReceiptCapturer({
   async function uploadImageForReceipt(file: File | null | undefined) {
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = processImageForReceipt;
-    reader.readAsDataURL(file);
+    const scanner = new jscanify();
+    const img = new Image();
+    img.src = URL.createObjectURL(file) as string;
+    img.onload = function () {
+      const resultCanvas = scanner.extractPaper(
+        img,
+        405,
+        720
+      ) as HTMLCanvasElement;
+      setImageSrc(resultCanvas.toDataURL());
+      resultCanvas.toBlob((blob) => {
+        if (!blob) return;
+        fileToUpload.current = new File([blob], file.name, {
+          lastModified: file.lastModified,
+          type: "image/png",
+        });
+      }, "image/png");
 
-    function processImageForReceipt() {
-      if (!file) return;
-      const scanner = new jscanify();
-      const img = new Image();
-      img.src = reader.result as string;
-      img.onload = function () {
-        const resultCanvas = scanner.extractPaper(
-          img,
-          405,
-          720
-        ) as HTMLCanvasElement;
-        setImageSrc(resultCanvas.toDataURL());
-        resultCanvas.toBlob((blob) => {
-          if (!blob) return;
-          fileToUpload.current = new File([blob], file.name, {
-            lastModified: file.lastModified,
-            type: "image/png",
-          });
-        }, "image/png");
-
-        setDialogOpen(true);
-      };
-    }
+      setDialogOpen(true);
+    };
   }
 
   const approveUploadFile = () => {
