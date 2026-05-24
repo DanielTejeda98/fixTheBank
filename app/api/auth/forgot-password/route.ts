@@ -1,5 +1,6 @@
 import dbConnect from "@/app/lib/dbConnect";
 import userModel from "@/models/userModel";
+import smtp2goClient from "@/providers/SMTP2GO";
 import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -16,7 +17,12 @@ export async function POST(req: NextRequest) {
 
   const user = await userModel.findOne({ email });
 
-  if (user) {
+  if (
+    user &&
+    !user.disabled &&
+    user.passwordResetTokenExpiry &&
+    user.passwordResetTokenExpiry < new Date()
+  ) {
     // Generate a password reset token and expiry
     const token = Buffer.from(
       crypto.getRandomValues(new Uint8Array(32)),
@@ -29,8 +35,15 @@ export async function POST(req: NextRequest) {
       passwordResetTokenExpiry: expiry,
     });
 
-    // Send email with reset instructions (this is a placeholder - implement your email sending logic here)
-    console.log(`Send password reset email to ${email} with token: ${token}`);
+    smtp2goClient.sendEmail({
+      sender: `${process.env.DEFAULT_FROM_NAME} <${process.env.DEFAULT_FROM_ADDRESS}>`,
+      to: user.email,
+      subject: "Password Reset Request",
+      template_id: "1041248",
+      template_data: {
+        reset_url: `${process.env.NEXT_PUBLIC_FTB_HOST}/auth/reset-password?token=${token}`,
+      },
+    });
   }
 
   return new Response(
