@@ -74,11 +74,11 @@ interface FormData {
 const getIntitalFormData = (
   accounts: AccountView[],
   categories: CategoryView[],
-  transaction?: any
+  transaction?: any,
 ): FormData => {
   if (transaction) {
     return {
-      amount: transaction.amount.toString(),
+      amount: transaction.amount?.toString(),
       account:
         accounts.find((acc) => acc._id === transaction.account)?._id ||
         accounts[0]?._id ||
@@ -89,11 +89,11 @@ const getIntitalFormData = (
         "",
       date: formatDateInput(
         new Date(
-          transaction.transactionDate.split("T")[0].replaceAll("-", "/") ||
-            transaction.date.split("T")[0].replaceAll("-", "/")
-        )
+          transaction.transactionDate?.split("T")[0].replaceAll("-", "/") ||
+            transaction.date?.split("T")[0].replaceAll("-", "/"),
+        ),
       ),
-      description: transaction.description,
+      description: transaction?.description,
       borrowFromNextMonth: !transaction.transactionDate
         ? false
         : new Date(transaction.transactionDate) < new Date(transaction.date),
@@ -101,8 +101,8 @@ const getIntitalFormData = (
       revealGiftDate: transaction.revealGiftDate
         ? formatDateInput(
             new Date(
-              transaction.revealGiftDate.split("T")[0].replaceAll("-", "/")
-            )
+              transaction.revealGiftDate?.split("T")[0].replaceAll("-", "/"),
+            ),
           )
         : "",
       splitPayments: !!transaction.splitPaymentMasterId || false,
@@ -131,9 +131,11 @@ const getIntitalFormData = (
 export default function ExpenseEditor({
   budgetId,
   transaction,
+  isFromTemplate = false,
 }: {
   budgetId: string;
   transaction?: any;
+  isFromTemplate?: boolean;
 }) {
   const { setOpen: setOpenDrawer } = useFTBDrawer();
   const userId = useSession().data?.user?.id;
@@ -143,7 +145,7 @@ export default function ExpenseEditor({
   const forceUpdate = useReducer((x) => x + 1, 0)[1];
   const reduxDispatch = useDispatch();
   const dateButtonOnLeft = useAppSelector(
-    (state) => state.settingsReducer.value.dateTodayButtonOnLeft
+    (state) => state.settingsReducer.value.dateTodayButtonOnLeft,
   );
   const [formRootError, setFormRootError] = useState<string | null>(null); // For errors not tied to a specific field
   const [furtherOptionsOpen, setFurtherOptionsOpen] = useState(false);
@@ -152,7 +154,7 @@ export default function ExpenseEditor({
     (state: FormData, action: FormData): FormData => {
       return { ...state, ...action };
     },
-    { ...getIntitalFormData(accounts, categories, transaction) }
+    { ...getIntitalFormData(accounts, categories, transaction) },
   );
 
   // Handles the drawer opening and closing between edit and non edit states
@@ -187,7 +189,7 @@ export default function ExpenseEditor({
       setFormRootError(
         `Failed to upload image. ${
           (error as Error).message
-        }. Please try again or try later.`
+        }. Please try again or try later.`,
       );
     } finally {
       setIsImageUploading(false);
@@ -208,12 +210,12 @@ export default function ExpenseEditor({
         if (formData.splitPayments) {
           await createSplitExpense(
             { userId },
-            { ...formData, amount: Number(formData.amount), budgetId }
+            { ...formData, amount: Number(formData.amount), budgetId },
           );
         } else {
           await createExpense(
             { userId },
-            { ...formData, amount: Number(formData.amount), budgetId }
+            { ...formData, amount: Number(formData.amount), budgetId },
           );
         }
       } else {
@@ -223,7 +225,7 @@ export default function ExpenseEditor({
       setFormRootError(
         `Failed to create expense. ${
           (error as Error).message
-        }. Please try again or try later.`
+        }. Please try again or try later.`,
       );
       return;
     }
@@ -239,7 +241,7 @@ export default function ExpenseEditor({
       setFormRootError(
         `Failed to refresh budget data. ${
           (error as Error).message
-        }. Please refresh the page manually.`
+        }. Please refresh the page manually.`,
       );
     }
   };
@@ -260,7 +262,7 @@ export default function ExpenseEditor({
     ));
   };
 
-  const isEdit = !!transaction;
+  const isEdit = !!transaction && !isFromTemplate;
   const actionPrefix = isEdit ? "Edit" : "Add";
   const receiptLabel =
     isEdit && formData.receiptImage
@@ -330,7 +332,7 @@ export default function ExpenseEditor({
           {validator.current.message(
             "amount",
             formData.amount,
-            "numeric|required"
+            "numeric|required",
           )}
         </div>
 
@@ -404,7 +406,7 @@ export default function ExpenseEditor({
           {validator.current.message(
             "description",
             formData.description,
-            "required"
+            "required",
           )}
         </div>
 
@@ -420,7 +422,7 @@ export default function ExpenseEditor({
             {validator.current.message(
               "revealGiftDate",
               formData.revealGiftDate,
-              "required"
+              "required",
             )}
           </div>
         ) : null}
@@ -439,7 +441,7 @@ export default function ExpenseEditor({
             {validator.current.message(
               "numberOfPayments",
               formData.numberOfPayments,
-              "numeric|required"
+              "numeric|required",
             )}
           </div>
         ) : null}

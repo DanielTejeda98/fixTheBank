@@ -11,13 +11,14 @@ import { useFTBDrawer } from "../ui/ftbDrawer";
 import TopOptions from "../Core/TopOptions";
 import { useGetMergedTransactionsList } from "../Transactions/useGetMergedTransactionsList";
 import TransferEditor from "./TransferEditor";
+import TemplateDashboardList from "../Settings/Templates/TemplateDashboardList";
 
 export default function DashboardView() {
   const { openWithComponent } = useFTBDrawer();
 
   const budgetId = useAppSelector((state) => state.budgetReducer.value._id);
   const budgetMonth = useAppSelector(
-    (state) => state.budgetReducer.value.minDate
+    (state) => state.budgetReducer.value.minDate,
   );
   const balance =
     useAppSelector((state) => state.budgetReducer.value.balance) || 0;
@@ -94,6 +95,8 @@ export default function DashboardView() {
           </Button>
         </div>
       </FullSizeCard>
+
+      <TemplateDashboardList />
 
       <section className="m-3 p-3 border">
         <div className="flex justify-between items-center">

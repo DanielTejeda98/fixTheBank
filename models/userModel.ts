@@ -7,6 +7,10 @@ export interface User extends mongoose.Document {
   disabled: boolean;
   passwordResetToken?: string;
   passwordResetTokenExpiry?: Date;
+  budgetConfigurations: {
+    budgetId: mongoose.Types.ObjectId;
+    pinnedTemplates: mongoose.Types.ObjectId[];
+  }[];
 }
 
 const UserSchema = new mongoose.Schema<User>({
@@ -32,6 +36,20 @@ const UserSchema = new mongoose.Schema<User>({
   passwordResetTokenExpiry: {
     type: Date,
   },
+  budgetConfigurations: [
+    {
+      budgetId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Budget",
+      },
+      pinnedTemplates: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Template",
+        },
+      ],
+    },
+  ],
 });
 
 export default mongoose.models.User || mongoose.model<User>("User", UserSchema);

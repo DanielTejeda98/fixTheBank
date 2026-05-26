@@ -38,13 +38,13 @@ function ShareCodeDisplay({ shareCode }: { shareCode: string }) {
 export default function SettingsView() {
   const settings = useAppSelector((state) => state.settingsReducer.value);
   const isBudgetOwner = useAppSelector(
-    (state) => state.budgetReducer.value.isOwner
+    (state) => state.budgetReducer.value.isOwner,
   );
   const isShared = useAppSelector(
-    (state) => state.budgetReducer.value.isShared
+    (state) => state.budgetReducer.value.isShared,
   );
   const shareCode = useAppSelector(
-    (state) => state.budgetReducer.value.shareCode
+    (state) => state.budgetReducer.value.shareCode,
   );
   const [isBudgetShared, setIsBudgetShared] = useState(isShared);
 
@@ -54,7 +54,7 @@ export default function SettingsView() {
     },
     {
       ...settings,
-    }
+    },
   );
   const reduxDispatch = useDispatch();
 
@@ -81,7 +81,7 @@ export default function SettingsView() {
         setBudgetShareSettings({
           isShared: !!res.data?.joinCode,
           shareCode: res.data?.joinCode || null,
-        })
+        }),
       );
     } catch (error) {
       console.log(error);
@@ -93,6 +93,11 @@ export default function SettingsView() {
       <Link href={"/settings/accounts"}>
         <Button variant={"outline"} className="w-full py-6 justify-start">
           Manage Budget Accounts
+        </Button>
+      </Link>
+      <Link href={"/settings/templates"}>
+        <Button variant={"outline"} className="w-full py-6 justify-start">
+          Manage Templates
         </Button>
       </Link>
       {isBudgetOwner && (

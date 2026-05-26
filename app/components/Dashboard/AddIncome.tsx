@@ -25,24 +25,30 @@ interface FormData {
   date?: string;
 }
 
-export default function AddIncome({ budgetId }: { budgetId: string }) {
+export default function AddIncome({
+  budgetId,
+  templateData,
+}: {
+  budgetId: string;
+  templateData?: any;
+}) {
   const { setOpen } = useFTBDrawer();
   const userId = useSession().data?.user?.id;
   const reduxDispatch = useDispatch();
   const validator = useReactValidator();
   const forceUpdate = useReducer((x) => x + 1, 0)[1];
   const dateButtonOnLeft = useAppSelector(
-    (state) => state.settingsReducer.value.dateTodayButtonOnLeft
+    (state) => state.settingsReducer.value.dateTodayButtonOnLeft,
   );
   const [formData, formDispatch] = useReducer(
     (state: FormData, action: FormData): FormData => {
       return { ...state, ...action };
     },
     {
-      amount: "",
-      source: "",
+      amount: templateData?.amount?.toString() || "",
+      source: templateData?.source || "",
       date: "",
-    }
+    },
   );
 
   const clearForm = () => {
@@ -66,7 +72,7 @@ export default function AddIncome({ budgetId }: { budgetId: string }) {
     try {
       await createIncome(
         { userId },
-        { ...formData, amount: Number(formData.amount), budgetId }
+        { ...formData, amount: Number(formData.amount), budgetId },
       );
       const budgetDate = sessionStorage.getItem("selectedBudgetDate") || "";
       const res = await getBudget(budgetDate);
@@ -106,7 +112,7 @@ export default function AddIncome({ budgetId }: { budgetId: string }) {
             {validator.current.message(
               "income",
               formData.amount,
-              "numeric|required"
+              "numeric|required",
             )}
           </div>
 

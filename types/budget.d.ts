@@ -14,8 +14,10 @@ export interface BudgetView {
   plannedIncome: PlannedIncomeView[];
   expenses: ExpenseTransaction[];
   transfers: TransferTransaction[];
+  templates: TemplateView[];
   categories: CategoryView[];
   accounts: AccountView[];
+  pinnedTemplates: string[];
   minDate: string;
   maxDate: string;
   isOwner: boolean;
@@ -32,13 +34,13 @@ export interface CategoryView {
     {
       month: string;
       amount: number;
-    }
+    },
   ];
   notes: [
     {
       month: string;
       note: string;
-    }
+    },
   ];
 }
 
@@ -121,4 +123,18 @@ export interface TransactionView {
   createdBy: MiniUser;
   updatedBy: MiniUser;
   splitPaymentMasterId?: string | null;
+}
+
+export interface TemplateView {
+  _id: string;
+  name: string;
+  description: string;
+  type: "expense" | "income" | "transfer";
+  data: any;
+  recurringSettings: {
+    frequency: "daily" | "weekly" | "biweekly" | "monthly" | "yearly";
+    endCondition: "never" | "afterOccurrences" | "onDate";
+    occurrences?: number;
+    endDate?: Date;
+  } | null;
 }

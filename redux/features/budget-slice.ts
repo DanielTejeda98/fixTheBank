@@ -10,6 +10,7 @@ import {
   CategoryView,
   ExpenseTransaction,
   IncomeTransaction,
+  TemplateView,
   TransferTransaction,
 } from "@/types/budget";
 import { getTotalPlannedSavings, setSavings } from "./savings-slice";
@@ -27,6 +28,8 @@ type BudgetState = {
   plannedIncome: any[];
   expenses: ExpenseTransaction[];
   transfers: TransferTransaction[];
+  templates: TemplateView[];
+  pinnedTemplates: string[];
   minDate: string;
   maxDate: string;
   isOwner: boolean;
@@ -50,6 +53,8 @@ const initialState = {
     plannedIncome: [],
     expenses: [],
     transfers: [],
+    templates: [],
+    pinnedTemplates: [],
     minDate: "",
     maxDate: "",
     isOwner: false,
@@ -70,14 +75,14 @@ const getTotalPlannedIncome = (budget: any): number => {
     .find((pi: any) => pi.month === budget.minDate)
     ?.incomeStreams.reduce(
       (acc: number, current: any) => acc + current.amount,
-      0
+      0,
     );
 };
 
 const getTotalAllocated = (budget: any): number => {
   return budget.categories
     .map((x: any) =>
-      x.maxMonthExpectedAmount.find((x: any) => x.month === budget.minDate)
+      x.maxMonthExpectedAmount.find((x: any) => x.month === budget.minDate),
     )
     .reduce((acc: number, curr: any) => {
       if (!curr) {
@@ -148,13 +153,21 @@ export const budget = createSlice({
     },
     setBudgetShareSettings: (
       state,
-      action: PayloadAction<{ isShared: boolean; shareCode: string | null }>
+      action: PayloadAction<{ isShared: boolean; shareCode: string | null }>,
     ) => {
       return {
         value: {
           ...state.value,
           isShared: action.payload.isShared,
           shareCode: action.payload.shareCode,
+        },
+      };
+    },
+    setPinnedTemplates: (state, action: PayloadAction<string[]>) => {
+      return {
+        value: {
+          ...state.value,
+          pinnedTemplates: action.payload,
         },
       };
     },
@@ -171,12 +184,16 @@ export const selectCategories = (state: RootState) =>
   state.budgetReducer.value.categories;
 export const selectAccounts = (state: RootState) =>
   state.budgetReducer.value.accounts;
+export const selectTemplates = (state: RootState) =>
+  state.budgetReducer.value.templates;
+export const selectPinnedTemplateIds = (state: RootState) =>
+  state.budgetReducer.value.pinnedTemplates;
 
 export const selectTransactions = createSelector(
   [selectIncome, selectExpense, selectTransfers],
   (income, expenses, transfers) => {
     return [...income, ...expenses, ...transfers];
-  }
+  },
 );
 
 export const selectUnallocatedFunds = (state: RootState) => {
@@ -185,10 +202,19 @@ export const selectUnallocatedFunds = (state: RootState) => {
     ((state.budgetReducer.value.totalAllocated || 0) +
       getTotalPlannedSavings(
         state.savingsReducer.value,
-        state.budgetReducer.value.minDate
+        state.budgetReducer.value.minDate,
       ))
   );
 };
+
+export const selectPinnedTemplates = createSelector(
+  [selectTemplates, selectPinnedTemplateIds],
+  (templates, ptids) => {
+    return ptids
+      .map((ptid) => templates.find((template) => template._id === ptid))
+      .filter((temp) => !!temp);
+  },
+);
 
 export function useSetInitialStore({
   budget,
@@ -204,6 +230,10 @@ export function useSetInitialStore({
   }, [budget, dispatch]);
 }
 
-export const { setBudget, setJoinRequestList, setBudgetShareSettings } =
-  budget.actions;
+export const {
+  setBudget,
+  setJoinRequestList,
+  setBudgetShareSettings,
+  setPinnedTemplates,
+} = budget.actions;
 export default budget.reducer;

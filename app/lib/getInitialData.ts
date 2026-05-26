@@ -46,8 +46,8 @@ export async function getInitialData(): Promise<InitialData> {
         requesters = normalizeMongooseObjects(
           await getBudgetRequesters(
             userId,
-            new mongoose.Types.ObjectId(data._id)
-          )
+            new mongoose.Types.ObjectId(data._id),
+          ),
         );
       } catch (error) {
         console.log(error);
@@ -62,6 +62,8 @@ export async function getInitialData(): Promise<InitialData> {
       expenses: normalizeMongooseObjects(data.expenses),
       plannedIncome: normalizeMongooseObjects(data.plannedIncome),
       transfers: normalizeMongooseObjects(data.transfers),
+      templates: normalizeMongooseObjects(data.templates),
+      pinnedTemplates: normalizeMongooseObjects(data.pinnedTemplates),
       minDate: data.minDate,
       maxDate: data.maxDate,
       isShared: data.isShared,

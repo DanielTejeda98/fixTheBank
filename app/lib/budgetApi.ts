@@ -1,4 +1,4 @@
-import { setBudget } from "@/redux/features/budget-slice";
+import { setBudget, setPinnedTemplates } from "@/redux/features/budget-slice";
 import { store } from "@/redux/store";
 import { BudgetShareResponse } from "@/types/BudgetShareResponse";
 import { TransferDTO } from "../components/Dashboard/TransferEditorSchema";
@@ -46,7 +46,7 @@ const createSplitExpense = async (headers: any, expense: any) => {
 export const createReceiptImage = async (
   headers: any,
   receiptImage: File,
-  budgetId: string
+  budgetId: string,
 ) => {
   try {
     const res = await fetch(`${API_BASE_URL}/images/${budgetId}`, {
@@ -88,12 +88,12 @@ const createIncome = async (headers: any, income: any) => {
 
 const getBudget = async (budgetDate?: String) => {
   const res = await fetch(
-    `${API_BASE_URL}/budget${budgetDate ? "?budgetDate=" + budgetDate : ""}`
+    `${API_BASE_URL}/budget${budgetDate ? "?budgetDate=" + budgetDate : ""}`,
   );
   const parsedData = await res.json();
   localStorage.setItem(
     "budgetData",
-    JSON.stringify({ lastFetched: new Date().getTime(), ...parsedData.data })
+    JSON.stringify({ lastFetched: new Date().getTime(), ...parsedData.data }),
   );
   return parsedData;
 };
@@ -164,7 +164,7 @@ const requestToJoinBudget = async (headers: any, joinCode: string) => {
 const approveJoinRequest = async (
   headers: any,
   budgetId: string,
-  requesterId: string
+  requesterId: string,
 ) => {
   const res = await fetch(`${API_BASE_URL}/budget/join/approve`, {
     headers,
@@ -188,7 +188,7 @@ const getRequestersList = async (headers: any, budgetId: string) => {
 const createPlannedIncome = async (
   headers: any,
   monthIndex: String,
-  pIncome: any
+  pIncome: any,
 ) => {
   const res = await fetch(`${API_BASE_URL}/budget/planned-income`, {
     headers,
@@ -214,7 +214,7 @@ const createPlannedIncome = async (
 const deletePlannedIncome = async (
   headers: any,
   monthIndex: String,
-  incomeSourceId: any
+  incomeSourceId: any,
 ) => {
   const res = await fetch(`${API_BASE_URL}/budget/planned-income`, {
     headers,
@@ -306,7 +306,7 @@ const createTransfer = async (transferDto: TransferDTO) => {
 
 const updateTransfer = async (
   transferId: string,
-  transferDto: Partial<TransferDTO>
+  transferDto: Partial<TransferDTO>,
 ) => {
   try {
     const res = await fetch(`${API_BASE_URL}/transfer/${transferId}`, {
@@ -351,6 +351,96 @@ const deleteTransfer = async (transferId: string) => {
   return parsedRes;
 };
 
+const createTemplate = async (templateData: any) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/templates`, {
+      method: "POST",
+      body: JSON.stringify(templateData),
+    });
+    const parsedRes = await res.json();
+    if (!parsedRes.success) {
+      throw Error(parsedRes.error);
+    }
+    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || "";
+    const budgetRes = await getBudget(budgetDate);
+    store.dispatch(setBudget(budgetRes.data));
+    return parsedRes;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateTemplate = async (templateId: string, templateData: any) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/templates/${templateId}`, {
+      method: "PUT",
+      body: JSON.stringify(templateData),
+    });
+    const parsedRes = await res.json();
+    if (!parsedRes.success) {
+      throw Error(parsedRes.error);
+    }
+    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || "";
+    const budgetRes = await getBudget(budgetDate);
+    store.dispatch(setBudget(budgetRes.data));
+    return parsedRes;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const deleteTemplate = async (templateId: string) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/templates/${templateId}`, {
+      method: "DELETE",
+    });
+    const parsedRes = await res.json();
+    if (!parsedRes.success) {
+      throw Error(parsedRes.error);
+    }
+    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || "";
+    const budgetRes = await getBudget(budgetDate);
+    store.dispatch(setBudget(budgetRes.data));
+    return parsedRes;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const userPinTemplate = async (templateId: string) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/templates/pin/${templateId}`, {
+      method: "PUT",
+    });
+    const parsedRes = await res.json();
+    if (!parsedRes.success) {
+      throw Error(parsedRes.error);
+    }
+
+    store.dispatch(setPinnedTemplates(parsedRes.data));
+    return parsedRes;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const userUnpinTemplate = async (templateId: string) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/templates/pin/${templateId}`, {
+      method: "DELETE",
+    });
+    const parsedRes = await res.json();
+    if (!parsedRes.success) {
+      throw Error(parsedRes.error);
+    }
+
+    store.dispatch(setPinnedTemplates(parsedRes.data));
+    return parsedRes;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export {
   createExpense,
   createSplitExpense,
@@ -371,4 +461,9 @@ export {
   createTransfer,
   updateTransfer,
   deleteTransfer,
+  createTemplate,
+  updateTemplate,
+  deleteTemplate,
+  userPinTemplate,
+  userUnpinTemplate,
 };

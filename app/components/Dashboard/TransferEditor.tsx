@@ -40,16 +40,18 @@ import { useFTBDrawer } from "../ui/ftbDrawer";
 
 export default function TransferEditor({
   transaction,
+  isFromTemplate = false,
 }: {
   transaction?: TransferTransaction;
+  isFromTemplate?: boolean;
 }) {
   const { setOpen } = useFTBDrawer();
   const [serverError, setServerError] = useState("");
   const dateButtonOnLeft = useAppSelector(
-    (state) => state.settingsReducer.value.dateTodayButtonOnLeft
+    (state) => state.settingsReducer.value.dateTodayButtonOnLeft,
   );
   const savingsAccounts = useAppSelector(
-    (state) => state.savingsReducer.value.savingsAccounts
+    (state) => state.savingsReducer.value.savingsAccounts,
   );
 
   const renderAccountOptions = (): ReactNode => {
@@ -80,9 +82,9 @@ export default function TransferEditor({
       date: formatDateInput(
         transaction?.date
           ? new Date(
-              transaction.date.toString().split("T")[0].replaceAll("-", "/")
+              transaction.date.toString().split("T")[0].replaceAll("-", "/"),
             )
-          : new Date()
+          : new Date(),
       ),
     },
     validators: {
@@ -90,7 +92,7 @@ export default function TransferEditor({
     },
     onSubmit: async ({ value }: { value: TransferDTO }) => {
       try {
-        if (transaction) {
+        if (transaction && !isFromTemplate) {
           await updateTransfer(transaction._id, value);
           setOpen(false);
           return;
@@ -103,7 +105,7 @@ export default function TransferEditor({
         setServerError(
           `Failed to create transfer. ${
             (error as Error).message
-          }. Please try again or try later.`
+          }. Please try again or try later.`,
         );
       }
     },
@@ -121,7 +123,7 @@ export default function TransferEditor({
       <DrawerHeader>
         <DrawerTitle>Transfer</DrawerTitle>
         <DrawerDescription>
-          {transaction ? "Edit" : "Create"} a transfer
+          {transaction && !isFromTemplate ? "Edit" : "Create"} a transfer
         </DrawerDescription>
       </DrawerHeader>
       <DrawerBody className="flex flex-col">
@@ -309,7 +311,7 @@ export default function TransferEditor({
                     name={field.name}
                     value={field.state.value}
                     onValueChange={field.handleChange}
-                    disabled={!!transaction}
+                    disabled={!!transaction && !isFromTemplate}
                   >
                     <SelectTrigger
                       id="transfer-editor-savingsAccount"

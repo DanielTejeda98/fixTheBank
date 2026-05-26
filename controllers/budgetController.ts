@@ -15,14 +15,16 @@ import savingsModel from "@/models/savingsModel";
 import savingsAccountBucket from "@/models/savingsAccountBucket";
 import savingsAccount from "@/models/savingsAccount";
 import transferModel from "@/models/transferModel";
+import templateModel from "@/models/templateModel";
+import { getUserPinnedTemplates } from "./templateController";
 
 export async function getUserFullBudgetDocument(
   userId: mongoose.Types.ObjectId,
-  budgetMonth: Date
+  budgetMonth: Date,
 ) {
   if (process.env.DEBUG === "debug") {
     console.log(
-      `[getUserFullBudgetDocument] Getting full budget document started`
+      `[getUserFullBudgetDocument] Getting full budget document started`,
     );
   }
   try {
@@ -98,6 +100,17 @@ export async function getUserFullBudgetDocument(
           },
         ],
       })
+      .populate({
+        path: "templates",
+        model: templateModel,
+        populate: [
+          {
+            path: "createdBy updatedBy",
+            model: userModel,
+            select: "username",
+          },
+        ],
+      })
       .exec();
 
     if (!budget) {
@@ -130,6 +143,7 @@ export async function getUserFullBudgetDocument(
         timeZone: "UTC",
       }),
       isOwner: budget._doc.owner.toString() === userId.toString(),
+      pinnedTemplates: await getUserPinnedTemplates(userId, budget._id),
     };
   } catch (error) {
     console.error(error);
@@ -139,7 +153,7 @@ export async function getUserFullBudgetDocument(
 export type YearBudgetReviewData = ReturnType<typeof getBudgetForYear>;
 export async function getBudgetForYear(
   userId: mongoose.Types.ObjectId,
-  year: string
+  year: string,
 ) {
   try {
     await dbConnect();
@@ -214,11 +228,11 @@ export async function getBudgetForYear(
     const budgetDoc: Budget = normalizeMongooseObjects(budget._doc);
     const totalExpenses = (budgetDoc.expenses as unknown as Expense[]).reduce(
       (acc: number, curr: Expense) => acc + curr.amount,
-      0
+      0,
     );
     const totalIncome = (budgetDoc.income as unknown as Income[]).reduce(
       (acc: number, curr: Income) => acc + curr.amount,
-      0
+      0,
     );
 
     const categoryTotalsExpenseBreakdown = (
@@ -232,17 +246,17 @@ export async function getBudgetForYear(
             (budgetDoc.expenses as unknown as Expense[])
               .filter((ex) => ex.category === category._id)
               .reduce((acc: number, curr: Expense) => acc + curr.amount, 0)
-              .toFixed(2)
+              .toFixed(2),
           ),
           totalPlanned: parseFloat(
             category.maxMonthExpectedAmount
               .filter(
                 (mmea) =>
                   new Date(mmea.month as string).getFullYear() ===
-                  parseInt(year)
+                  parseInt(year),
               )
               .reduce((acc, curr) => (acc += curr.amount as number), 0)
-              .toFixed(2)
+              .toFixed(2),
           ),
         };
       })
@@ -259,7 +273,7 @@ export async function getBudgetForYear(
             (budgetDoc.expenses as unknown as Expense[])
               .filter((ex) => ex.account === account._id)
               .reduce((acc: number, curr: Expense) => acc + curr.amount, 0)
-              .toFixed(2)
+              .toFixed(2),
           ),
         };
       })
@@ -275,12 +289,12 @@ export async function getBudgetForYear(
                 (ex.transactionDate
                   ? new Date(ex.transactionDate)
                   : new Date(ex.date)
-                ).getMonth() === index
+                ).getMonth() === index,
             )
             .reduce((acc: number, curr: Expense) => acc + curr.amount, 0)
-            .toFixed(2)
+            .toFixed(2),
         );
-      }
+      },
     );
 
     const monthlyIncomeTotalBreakdown = Array.from({ length: 12 }).map(
@@ -289,9 +303,9 @@ export async function getBudgetForYear(
           (budgetDoc.income as unknown as Income[])
             .filter((ex) => new Date(ex.date).getMonth() === index)
             .reduce((acc: number, curr: Income) => acc + curr.amount, 0)
-            .toFixed(2)
+            .toFixed(2),
         );
-      }
+      },
     );
 
     return {
@@ -361,7 +375,7 @@ export async function toggleShareableBudget(userId: mongoose.Types.ObjectId) {
 
 export async function joinSharedBudget(
   userId: mongoose.Types.ObjectId,
-  joinCode: string
+  joinCode: string,
 ) {
   try {
     await dbConnect();
@@ -371,7 +385,7 @@ export async function joinSharedBudget(
     })) as ShareableBudget;
     if (!sharedBudget) {
       throw new Error(
-        "No shared budget with the provided join code: " + joinCode
+        "No shared budget with the provided join code: " + joinCode,
       );
     }
 
@@ -388,7 +402,7 @@ export async function joinSharedBudget(
 
 export async function getBudgetRequesters(
   userId: mongoose.Types.ObjectId,
-  budgetId: mongoose.Types.ObjectId
+  budgetId: mongoose.Types.ObjectId,
 ) {
   try {
     await dbConnect();
@@ -409,11 +423,11 @@ export async function getBudgetRequesters(
 export async function approveRequesterToJoinBudget(
   userId: mongoose.Types.ObjectId,
   budgetId: mongoose.Types.ObjectId,
-  requesterId: mongoose.Types.ObjectId
+  requesterId: mongoose.Types.ObjectId,
 ) {
   if (userId === requesterId) {
     throw new Error(
-      `Requester ID ${requesterId} is the same as budget owner ID ${userId}`
+      `Requester ID ${requesterId} is the same as budget owner ID ${userId}`,
     );
   }
 
@@ -426,7 +440,7 @@ export async function approveRequesterToJoinBudget(
     })) as Budget;
     if (!budget) {
       throw new Error(
-        `No budget found for user ${userId} with the provided budget Id ${budgetId}`
+        `No budget found for user ${userId} with the provided budget Id ${budgetId}`,
       );
     }
 
@@ -450,7 +464,7 @@ export async function approveRequesterToJoinBudget(
 export async function addPlannedIncome(
   userId: mongoose.Types.ObjectId,
   monthIndex: string,
-  newIncomeStream: { source: string; amount: Number }
+  newIncomeStream: { source: string; amount: Number },
 ) {
   try {
     await dbConnect();
@@ -463,7 +477,7 @@ export async function addPlannedIncome(
     }
 
     const plannedIncomeMonthList = budget._doc.plannedIncome.find(
-      (doc: any) => doc.month === monthIndex
+      (doc: any) => doc.month === monthIndex,
     );
     // If the month index does not exist, create one and push our new source
     if (!plannedIncomeMonthList) {
@@ -489,7 +503,7 @@ export async function addPlannedIncome(
 export async function removePlannedIncome(
   userId: mongoose.Types.ObjectId,
   monthIndex: string,
-  incomeSourceId: mongoose.Types.ObjectId
+  incomeSourceId: mongoose.Types.ObjectId,
 ) {
   try {
     await dbConnect();
@@ -502,7 +516,7 @@ export async function removePlannedIncome(
     }
 
     const plannedIncomeMonthList = budget._doc.plannedIncome.find(
-      (doc: any) => doc.month === monthIndex
+      (doc: any) => doc.month === monthIndex,
     );
 
     // If the month index does not exist, create one and push our new source
@@ -543,12 +557,20 @@ export async function getBudgetUsers(userId: mongoose.Types.ObjectId) {
 function getBudgetMinMaxDates(budgetMonth: Date) {
   if (process.env.DEBUG === "debug") {
     console.log(
-      `[getBudgetMinMaxDates]: Received call with budgetMonth ${budgetMonth}`
+      `[getBudgetMinMaxDates]: Received call with budgetMonth ${budgetMonth}`,
     );
   }
   return {
     minDate: new Date(
-      Date.UTC(budgetMonth.getFullYear(), budgetMonth.getMonth(), 1, 0, 0, 0, 0)
+      Date.UTC(
+        budgetMonth.getFullYear(),
+        budgetMonth.getMonth(),
+        1,
+        0,
+        0,
+        0,
+        0,
+      ),
     ),
     maxDate: new Date(
       Date.UTC(
@@ -558,8 +580,8 @@ function getBudgetMinMaxDates(budgetMonth: Date) {
         23,
         59,
         59,
-        999
-      )
+        999,
+      ),
     ),
   };
 }
@@ -569,7 +591,7 @@ async function createSharedBudgetInformation(userId: mongoose.Types.ObjectId) {
   try {
     const budget = await budgetModel.findOne(
       { owner: userId },
-      "owner isShared shareId"
+      "owner isShared shareId",
     );
     if (!budget) {
       throw new Error("No budget found for specified user");
@@ -602,12 +624,12 @@ async function createSharedBudgetInformation(userId: mongoose.Types.ObjectId) {
 
 async function deleteSharedBudgetInformation(
   userId: mongoose.Types.ObjectId,
-  sharedBudgetInfo: ShareableBudget
+  sharedBudgetInfo: ShareableBudget,
 ) {
   try {
     const budget = await budgetModel.findOne(
       { owner: userId },
-      "owner isShared shareId"
+      "owner isShared shareId",
     );
     if (!budget) {
       throw new Error("No budget found for specified user");
@@ -622,7 +644,7 @@ async function deleteSharedBudgetInformation(
 
 async function syncBudgetWithShareableBudgetInfo(
   budgetDocument: Budget,
-  sharedBudgetInfo: ShareableBudget | null
+  sharedBudgetInfo: ShareableBudget | null,
 ) {
   try {
     if (sharedBudgetInfo) {
