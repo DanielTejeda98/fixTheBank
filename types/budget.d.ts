@@ -138,3 +138,11 @@ export interface TemplateView {
     endDate?: Date;
   } | null;
 }
+
+export interface BankTransaction {
+  id?: string;
+  date: string;
+  amount: number;
+  description: string;
+  type: string;
+}

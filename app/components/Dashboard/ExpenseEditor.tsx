@@ -55,6 +55,8 @@ import {
   ItemTitle,
 } from "../ui/item";
 import ReceiptCapturer from "../Core/RecieptCapturer/ReceiptCapturer";
+import { LucideArrowLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FormData {
   amount?: string;
@@ -132,10 +134,12 @@ export default function ExpenseEditor({
   budgetId,
   transaction,
   isFromTemplate = false,
+  onReturn,
 }: {
   budgetId: string;
   transaction?: any;
   isFromTemplate?: boolean;
+  onReturn?: (createdExpense?: any) => void;
 }) {
   const { setOpen: setOpenDrawer } = useFTBDrawer();
   const userId = useSession().data?.user?.id;
@@ -205,15 +209,17 @@ export default function ExpenseEditor({
       return;
     }
 
+    let createdExpense;
+
     try {
       if (!isEdit) {
         if (formData.splitPayments) {
-          await createSplitExpense(
+          createdExpense = await createSplitExpense(
             { userId },
             { ...formData, amount: Number(formData.amount), budgetId },
           );
         } else {
-          await createExpense(
+          createdExpense = await createExpense(
             { userId },
             { ...formData, amount: Number(formData.amount), budgetId },
           );
@@ -235,8 +241,9 @@ export default function ExpenseEditor({
       const res = await getBudget(budgetDate);
       // Set store values
       reduxDispatch(setBudget(res.data));
-      setOpenDrawer(false);
       clearForm();
+      if (!onReturn) setOpenDrawer(false);
+      else onReturn(createdExpense.data);
     } catch (error) {
       setFormRootError(
         `Failed to refresh budget data. ${
@@ -262,7 +269,7 @@ export default function ExpenseEditor({
     ));
   };
 
-  const isEdit = !!transaction && !isFromTemplate;
+  const isEdit = !!transaction._id && !isFromTemplate;
   const actionPrefix = isEdit ? "Edit" : "Add";
   const receiptLabel =
     isEdit && formData.receiptImage
@@ -275,10 +282,17 @@ export default function ExpenseEditor({
       onReset={clearForm}
       className="flex flex-wrap overflow-scroll"
     >
-      <DrawerHeader>
-        <DrawerTitle>{actionPrefix} Expense</DrawerTitle>
-        <DrawerDescription>{actionPrefix} an expense</DrawerDescription>
-      </DrawerHeader>
+      <div className="flex gap-2 p-4">
+        {onReturn && (
+          <Button type="button" aria-label="Return" onClick={onReturn}>
+            <LucideArrowLeft />
+          </Button>
+        )}
+        <DrawerHeader className={cn({ "p-0": !!onReturn })}>
+          <DrawerTitle>{actionPrefix} Expense</DrawerTitle>
+          <DrawerDescription>{actionPrefix} an expense</DrawerDescription>
+        </DrawerHeader>
+      </div>
       <DrawerBody className="flex-col w-full">
         {formRootError ? (
           <Card className="w-full mb-2 bg-red-100 border-red-300 text-red-900">

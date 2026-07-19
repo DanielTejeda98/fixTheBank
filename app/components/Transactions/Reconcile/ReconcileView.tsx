@@ -10,27 +10,22 @@ import {
   selectExpense,
   selectIncome,
 } from "@/redux/features/budget-slice";
-import { Collapsible, CollapsibleContent } from "@radix-ui/react-collapsible";
-import { CollapsibleTrigger } from "../../ui/collapsible";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { ExpenseTransaction } from "@/types/budget";
-import ReconcileExpenseTransactionCard from "./ReconcileExpenseTransactionCard";
-import ReconcileIncomeTransactionCard from "./ReconcileIncomeTransactionCard";
 import { Button } from "../../ui/button";
 import AddIncome from "../../Dashboard/AddIncome";
 import ExpenseEditor from "../../Dashboard/ExpenseEditor";
 import { useFTBDrawer } from "../../ui/ftbDrawer";
 import ReconcileAccountCollapse from "./ReconcileAccountCollapse";
 import ReconcileIncomeCollapse from "./ReconcileIncomeCollapse";
+import TransactionsUploaderDrawer from "./TransactionsUploader/TransactionsUploaderDrawer";
 
 export default function ReconcileView() {
   const { openWithComponent } = useFTBDrawer();
   const [accountsWithTransactionsMap, setAccountsWithTransactionsMap] =
     useState<Map<string, ExpenseTransaction[]>>(new Map());
   const budgetMonth = useAppSelector(
-    (state) => state.budgetReducer.value.minDate
+    (state) => state.budgetReducer.value.minDate,
   );
   const budgetId = useAppSelector((state) => state.budgetReducer.value._id);
   const accounts = useAppSelector(selectAccounts);
@@ -51,6 +46,7 @@ export default function ReconcileView() {
   const DrawerComponents = {
     addIncome: <AddIncome budgetId={budgetId} />,
     expenseEditor: <ExpenseEditor budgetId={budgetId} />,
+    transactionsUploader: <TransactionsUploaderDrawer />,
   };
 
   const openDrawer = (component: keyof typeof DrawerComponents) => {
@@ -75,6 +71,14 @@ export default function ReconcileView() {
         </Button>
         <Button onClick={() => openDrawer("expenseEditor")}>
           (-) Add Expense
+        </Button>
+      </div>
+      <div className="flex justify-center gap-2 mt-5">
+        <Button
+          variant="outline"
+          onClick={() => openDrawer("transactionsUploader")}
+        >
+          Upload Transactions CSV
         </Button>
       </div>
 

@@ -4,6 +4,7 @@ import { BudgetShareResponse } from "@/types/BudgetShareResponse";
 import { TransferDTO } from "../components/Dashboard/TransferEditorSchema";
 import { getSavings } from "./savingsApi";
 import { setSavings } from "@/redux/features/savings-slice";
+import { BankTransaction } from "@/types/budget";
 
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_FTB_HOST}/api`;
 
@@ -441,6 +442,43 @@ const userUnpinTemplate = async (templateId: string) => {
   }
 };
 
+const bulkReconcileTransactions = async (
+  transactions: BankTransaction[],
+  accountId: string,
+  pullIncome: boolean,
+) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/transactions/batch-reconcile`, {
+      method: "POST",
+      body: JSON.stringify({ transactions, accountId, pullIncome }),
+    });
+
+    const parsedRes = await res.json();
+
+    return parsedRes;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const markMatchedTransactionsAsReconciled = async (
+  transactions: BankTransaction[],
+) => {
+  try {
+    await fetch(`${API_BASE_URL}/transactions/batch-reconcile`, {
+      method: "PATCH",
+      body: JSON.stringify({ transactions }),
+    });
+
+    const budgetDate = sessionStorage.getItem("selectedBudgetDate") || "";
+    const budgetRes = await getBudget(budgetDate);
+    store.dispatch(setBudget(budgetRes.data));
+    return;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export {
   createExpense,
   createSplitExpense,
@@ -466,4 +504,6 @@ export {
   deleteTemplate,
   userPinTemplate,
   userUnpinTemplate,
+  bulkReconcileTransactions,
+  markMatchedTransactionsAsReconciled,
 };

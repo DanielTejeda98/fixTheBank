@@ -17,6 +17,8 @@ import {
   DrawerTitle,
 } from "../ui/drawer";
 import { useFTBDrawer } from "../ui/ftbDrawer";
+import { LucideArrowLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FormData {
   budgetId?: string;
@@ -28,9 +30,11 @@ interface FormData {
 export default function AddIncome({
   budgetId,
   templateData,
+  onReturn,
 }: {
   budgetId: string;
   templateData?: any;
+  onReturn?: (createdIncome: any) => void;
 }) {
   const { setOpen } = useFTBDrawer();
   const userId = useSession().data?.user?.id;
@@ -47,7 +51,7 @@ export default function AddIncome({
     {
       amount: templateData?.amount?.toString() || "",
       source: templateData?.source || "",
-      date: "",
+      date: templateData?.date || "",
     },
   );
 
@@ -68,9 +72,9 @@ export default function AddIncome({
       forceUpdate();
       return;
     }
-
+    let createdIncome;
     try {
-      await createIncome(
+      createdIncome = await createIncome(
         { userId },
         { ...formData, amount: Number(formData.amount), budgetId },
       );
@@ -83,7 +87,8 @@ export default function AddIncome({
       console.log(error);
     }
 
-    setOpen(false);
+    if (!onReturn) setOpen(false);
+    else onReturn(createdIncome);
     clearForm();
   };
   return (
@@ -93,10 +98,19 @@ export default function AddIncome({
         onReset={clearForm}
         className="flex flex-wrap overflow-scroll"
       >
-        <DrawerHeader>
-          <DrawerTitle>Add Income</DrawerTitle>
-          <DrawerDescription>Use this form to add any income</DrawerDescription>
-        </DrawerHeader>
+        <div className="flex gap-2 p-4">
+          {onReturn && (
+            <Button type="button" aria-label="Return" onClick={onReturn}>
+              <LucideArrowLeft />
+            </Button>
+          )}
+          <DrawerHeader className={cn({ "p-0": !!onReturn })}>
+            <DrawerTitle>Add Income</DrawerTitle>
+            <DrawerDescription>
+              Use this form to add any income
+            </DrawerDescription>
+          </DrawerHeader>
+        </div>
         <DrawerBody className="flex-col w-full">
           <div className="mt-2 w-full">
             <Label htmlFor="income">Income</Label>
