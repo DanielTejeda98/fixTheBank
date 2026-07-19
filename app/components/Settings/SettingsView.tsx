@@ -189,7 +189,9 @@ export default function SettingsView() {
           </Button>
         </CardFooter>
       </Card>
-      <p className="text-sm text-muted-foreground mt-1">Version: 0.5.0</p>
+      <p className="text-sm text-muted-foreground mt-1">
+        Version: {process.env.NEXT_PUBLIC_APP_VERSION}
+      </p>
     </main>
   );
 }
