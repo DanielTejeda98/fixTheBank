@@ -34,7 +34,7 @@ export default function AddIncome({
 }: {
   budgetId: string;
   templateData?: any;
-  onReturn?: (createdIncome: any) => void;
+  onReturn?: (createdIncome?: any, type?: "income") => void;
 }) {
   const { setOpen } = useFTBDrawer();
   const userId = useSession().data?.user?.id;
@@ -88,7 +88,7 @@ export default function AddIncome({
     }
 
     if (!onReturn) setOpen(false);
-    else onReturn(createdIncome);
+    else onReturn(createdIncome, "income");
     clearForm();
   };
   return (

@@ -139,7 +139,7 @@ export default function ExpenseEditor({
   budgetId: string;
   transaction?: any;
   isFromTemplate?: boolean;
-  onReturn?: (createdExpense?: any) => void;
+  onReturn?: (createdExpense?: any, type?: "expense") => void;
 }) {
   const { setOpen: setOpenDrawer } = useFTBDrawer();
   const userId = useSession().data?.user?.id;
@@ -243,7 +243,7 @@ export default function ExpenseEditor({
       reduxDispatch(setBudget(res.data));
       clearForm();
       if (!onReturn) setOpenDrawer(false);
-      else onReturn(createdExpense.data);
+      else onReturn(createdExpense.data, "expense");
     } catch (error) {
       setFormRootError(
         `Failed to refresh budget data. ${
