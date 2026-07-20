@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Manage Templates: Users can now create transactions from templates even if they are not in quick view.
 
+### Fixes
+
+- Bulk Reconcile: Created transfers from unmatched tab wouldn't move over to matched.
+- Bulk Reconcile: Chase provider errored with Debit account
+
 ## [0.6.0]
 
 ### Added
