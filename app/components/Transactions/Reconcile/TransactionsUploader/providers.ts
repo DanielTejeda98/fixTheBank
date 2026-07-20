@@ -19,7 +19,7 @@ export const providers = [
           complete: (results) =>
             resolve(
               results.data.map((row: any) => ({
-                date: row["Transaction Date"],
+                date: row["Transaction Date"] || row["Posting Date"],
                 amount: parseFloat(row["Amount"]),
                 description: row["Description"],
                 type: row["Type"],
