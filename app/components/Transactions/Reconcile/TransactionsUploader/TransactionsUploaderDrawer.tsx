@@ -233,7 +233,7 @@ function TransactionReconciler({
                 const transaction = row.original;
                 const isBankTransaction = transaction.isBankTransaction;
                 return (
-                  <Card>
+                  <Card key={`ut-${row.id}`}>
                     <CardContent>
                       <TransactionCardProvider>
                         <div className="w-full">
@@ -330,7 +330,7 @@ function TransactionReconciler({
                 const { dbTransaction, bankTransaction } = row.original;
 
                 return (
-                  <Card>
+                  <Card key={`mt-${row.id}`}>
                     <CardHeader>
                       <div className="flex justify-between items-center">
                         <Badge
@@ -354,10 +354,10 @@ function TransactionReconciler({
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 gap-4">
-                        <div className="border p-2 rounded-sm flex justify-between bg-gray-300">
+                        <div className="border p-2 rounded-sm flex justify-between bg-secondary">
                           <p>System: {dbTransaction.description}</p>
                         </div>
-                        <div className="border p-2 rounded-sm flex justify-between bg-gray-300">
+                        <div className="border p-2 rounded-sm flex justify-between bg-secondary">
                           <p>Bank: {bankTransaction.description}</p>
                         </div>
                       </div>
