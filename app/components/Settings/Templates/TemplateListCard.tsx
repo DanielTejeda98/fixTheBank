@@ -7,19 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "../../ui/card";
-import { Badge } from "../../ui/badge";
-import { toSentenceCase } from "@/lib/utils";
-import {
-  LucideArrowLeftRight,
-  LucideBanknote,
-  LucideCalendar,
-  LucideClock,
-  LucideDollarSign,
-} from "lucide-react";
+import { LucideCalendar, LucideClock } from "lucide-react";
 import { useFTBDrawer } from "../../ui/ftbDrawer";
-import TemplateEditor from "./TemplateEditor";
 import { TemplateView } from "@/types/budget";
 import TemplateCardBadge from "./TemplateCardBadge";
+import TemplateViewer from "./TemplateViewer";
 
 export default function TemplateListCard({
   template,
@@ -29,7 +21,7 @@ export default function TemplateListCard({
   const { setOpen: setDrawerOpen, setDrawerComponent } = useFTBDrawer();
 
   const handleEditTemplate = (templateId: string) => {
-    setDrawerComponent(<TemplateEditor templateId={templateId} />);
+    setDrawerComponent(<TemplateViewer templateId={templateId} />);
     setDrawerOpen(true);
   };
 

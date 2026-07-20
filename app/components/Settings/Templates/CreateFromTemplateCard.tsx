@@ -1,55 +1,16 @@
 "use client";
 
-import { useFTBDrawer } from "../../ui/ftbDrawer";
 import { TemplateView } from "@/types/budget";
 import TemplateCardBadge from "./TemplateCardBadge";
 import { Item, ItemDescription, ItemHeader, ItemTitle } from "../../ui/item";
-import ExpenseEditor from "../../Dashboard/ExpenseEditor";
-import { useAppSelector } from "@/redux/store";
-import AddIncome from "../../Dashboard/AddIncome";
-import TransferEditor from "../../Dashboard/TransferEditor";
+import useCreateFromTemplate from "./useCreateFromTemplate";
 
 export default function CreateFromTemplateCard({
   template,
 }: {
   template: TemplateView;
 }) {
-  const budgetId = useAppSelector((state) => state.budgetReducer.value._id);
-  const { setOpen: setDrawerOpen, setDrawerComponent } = useFTBDrawer();
-
-  const handleCreateTransaction = () => {
-    switch (template.type) {
-      case "income":
-        setDrawerComponent(
-          <AddIncome budgetId={budgetId} templateData={template.data} />,
-        );
-        break;
-      case "expense":
-        setDrawerComponent(
-          <ExpenseEditor
-            isFromTemplate={true}
-            transaction={template.data}
-            budgetId={budgetId}
-          />,
-        );
-        break;
-      case "transfer":
-        setDrawerComponent(
-          <TransferEditor
-            isFromTemplate={true}
-            transaction={{
-              ...template.data,
-              account: template.data.savingsAccount,
-              bucket: template.data.savingsBucket,
-            }}
-          />,
-        );
-        break;
-      default:
-        return;
-    }
-    setDrawerOpen(true);
-  };
+  const handleCreateTransaction = useCreateFromTemplate(template);
 
   return (
     <button
