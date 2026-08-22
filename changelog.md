@@ -5,20 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## [0.7.0]
 
 ### Added
 
 - Template Viewer: a new component for managing templates to just have a view of the template without editing it.
+- Bulk Reconcile: Exclude CC payments unless requested
+- Planner: Users can now delete planned income
+- (BREAKING) Planner API: Removed unused user header and changed delete route to api/budget/planned-income/[monthIndex]/[plannedIncomeId]
 
 ### Changes
 
 - Manage Templates: Users can now create transactions from templates even if they are not in quick view.
+- Planner: Income list UI overhaul
 
 ### Fixes
 
 - Bulk Reconcile: Created transfers from unmatched tab wouldn't move over to matched.
 - Bulk Reconcile: Chase provider errored with Debit account
+- Add Expense: Fixed crash due to null reference
 
 ## [0.6.0]
 

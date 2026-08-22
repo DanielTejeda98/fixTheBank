@@ -503,7 +503,7 @@ export async function addPlannedIncome(
 export async function removePlannedIncome(
   userId: mongoose.Types.ObjectId,
   monthIndex: string,
-  incomeSourceId: mongoose.Types.ObjectId,
+  incomeSourceId: string,
 ) {
   try {
     await dbConnect();
@@ -524,9 +524,17 @@ export async function removePlannedIncome(
       throw new Error("Month index does not exist!");
     }
 
-    plannedIncomeMonthList.pull(incomeSourceId);
+    const plannedIncomeDoc = plannedIncomeMonthList.incomeStreams.find(
+      (pi: any) => pi._id.toString() === incomeSourceId,
+    );
 
-    budget.save();
+    if (!plannedIncomeDoc) {
+      throw new Error("No income with ID matches month incomes.");
+    }
+
+    plannedIncomeMonthList.incomeStreams.pull(plannedIncomeDoc);
+
+    await budget.save();
   } catch (error) {
     throw error;
   }

@@ -186,13 +186,8 @@ const getRequestersList = async (headers: any, budgetId: string) => {
   return await res.json();
 };
 
-const createPlannedIncome = async (
-  headers: any,
-  monthIndex: String,
-  pIncome: any,
-) => {
+const createPlannedIncome = async (monthIndex: String, pIncome: any) => {
   const res = await fetch(`${API_BASE_URL}/budget/planned-income`, {
-    headers,
     method: "POST",
     body: JSON.stringify({
       monthIndex,
@@ -213,18 +208,15 @@ const createPlannedIncome = async (
 };
 
 const deletePlannedIncome = async (
-  headers: any,
-  monthIndex: String,
-  incomeSourceId: any,
+  monthIndex: string,
+  incomeSourceId: string,
 ) => {
-  const res = await fetch(`${API_BASE_URL}/budget/planned-income`, {
-    headers,
-    method: "DELETE",
-    body: JSON.stringify({
-      monthIndex,
-      incomeSourceId,
-    }),
-  });
+  const res = await fetch(
+    `${API_BASE_URL}/budget/planned-income/${encodeURIComponent(monthIndex)}/${incomeSourceId}`,
+    {
+      method: "DELETE",
+    },
+  );
 
   const parsedRes = await res.json();
   if (!parsedRes.success) {

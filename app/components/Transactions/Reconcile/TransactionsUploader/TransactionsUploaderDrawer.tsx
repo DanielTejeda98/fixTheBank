@@ -44,6 +44,7 @@ import {
   LucideCheck,
   LucideDatabase,
   LucideEdit,
+  LucideFilter,
   LucideLandmark,
   LucidePlus,
   LucideTrash,
@@ -91,15 +92,19 @@ function AccountFileUploader({
   accounts,
   selectedAccountId,
   pullIncome,
+  pullCCPayment,
   setSelectedAccountId,
   setPullIncome,
+  setPullCCPayment,
   uploadedFile,
 }: {
   accounts: { _id: string; name: string }[];
   selectedAccountId: string | null;
   pullIncome: boolean;
+  pullCCPayment: boolean;
   setSelectedAccountId: (accountId: string) => void;
   setPullIncome: (state: boolean) => void;
+  setPullCCPayment: (state: boolean) => void;
   uploadedFile: React.RefObject<HTMLInputElement | null>;
 }) {
   return (
@@ -145,6 +150,19 @@ function AccountFileUploader({
         </div>
         <Switch checked={pullIncome} onCheckedChange={setPullIncome}></Switch>
       </div>
+      <div className="mb-4 flex justify-between w-full items-center border rounded-lg p-4">
+        <div>
+          <p>Include Credit Card Payments?</p>
+          <p className="text-sm">
+            Use this option to pull credit card payment transactions to
+            reconcile with this account.
+          </p>
+        </div>
+        <Switch
+          checked={pullCCPayment}
+          onCheckedChange={setPullCCPayment}
+        ></Switch>
+      </div>
     </div>
   );
 }
@@ -167,6 +185,30 @@ function TransactionReconciler({
 }) {
   const tabsDefaultValue =
     unmatchedTransactions.length > 0 ? "unmatched" : "matched";
+
+  const unmatchedTransactionsAvailableFIlters = () => {
+    const filters = {
+      bank: false,
+      system: false,
+    };
+
+    if (
+      unmatchedTransactions.some((transaction) => transaction.isBankTransaction)
+    ) {
+      filters.bank = true;
+    }
+
+    if (
+      unmatchedTransactions.some(
+        (transaction) => !transaction.isBankTransaction,
+      )
+    ) {
+      filters.system = true;
+    }
+    return Object.keys(filters).filter(
+      (key) => filters[key as keyof typeof filters],
+    );
+  };
 
   const unmatchedTransactionsTable = useReactTable({
     data: unmatchedTransactions,
@@ -229,6 +271,16 @@ function TransactionReconciler({
         <TabsContent value="unmatched" className="w-full">
           {unmatchedTransactions.length > 0 ? (
             <div className="grid grid-cols-1 gap-2 overflow-y-auto max-h-[50dvh]">
+              {unmatchedTransactionsAvailableFIlters().length > 1 && (
+                <div className="flex items-center w-full gap-2 mb-2">
+                  <p>Filters:</p>
+                  {unmatchedTransactionsAvailableFIlters().map((filter) => (
+                    <Badge key={filter} variant="secondary" asChild>
+                      {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                    </Badge>
+                  ))}
+                </div>
+              )}
               {unmatchedTransactionsTable.getRowModel().rows.map((row) => {
                 const transaction = row.original;
                 const isBankTransaction = transaction.isBankTransaction;
@@ -394,6 +446,7 @@ export default function TransactionsUploaderDrawer() {
     null,
   );
   const [pullIncome, setPullIncome] = useState<boolean>(false);
+  const [pullCCPayment, setPullCCPayment] = useState<boolean>(false);
   const [deltaResponse, setDeltaResponse] = useState<{
     matchedTransactions: {
       dbTransaction: BankTransaction;
@@ -422,7 +475,10 @@ export default function TransactionsUploaderDrawer() {
       if (provider) {
         try {
           setApiBusy(true);
-          const brankTransactions = await provider.csvTransformer(file);
+          const brankTransactions = await provider.csvTransformer(
+            file,
+            pullCCPayment,
+          );
           const res = await bulkReconcileTransactions(
             brankTransactions,
             selectedAccountId,
@@ -604,7 +660,9 @@ export default function TransactionsUploaderDrawer() {
                 accounts={accounts}
                 selectedAccountId={selectedAccountId}
                 pullIncome={pullIncome}
+                pullCCPayment={pullCCPayment}
                 setPullIncome={setPullIncome}
+                setPullCCPayment={setPullCCPayment}
                 setSelectedAccountId={setSelectedAccountId}
                 uploadedFile={uploadedFile}
               />
