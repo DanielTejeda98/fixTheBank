@@ -269,7 +269,7 @@ export default function ExpenseEditor({
     ));
   };
 
-  const isEdit = !!transaction._id && !isFromTemplate;
+  const isEdit = !!transaction?._id && !isFromTemplate;
   const actionPrefix = isEdit ? "Edit" : "Add";
   const receiptLabel =
     isEdit && formData.receiptImage
